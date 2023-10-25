@@ -50,10 +50,20 @@ class ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat App'),
+        title: Text(
+          '상대방 아이디',
+          style: TextStyle(color: Colors.black), // 텍스트 색상을 흰색으로 설정
+        ),
+        centerTitle: true, // 제목을 중앙 정렬
+        backgroundColor: Colors.white, // AppBar의 배경색을 투명색으로 설정
       ),
+
       body: Column(
         children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Text("상대방이 계좌이체 등 직접 결제를 요구하면 거절하시고 \n 즉시 고객센터로 알려주세요", style: TextStyle(fontSize: 12,), textAlign: TextAlign.center,),
+          ),
           Expanded(
             child: ChatMessages(chatRoomId: chatRoomId, userAId: userAId),
           ),
@@ -144,9 +154,12 @@ class ChatMessages extends StatelessWidget {
 
             final messageWidget = ChatMessage(
               text: messageText,
-              sendTime: messageTimestamp != null ? messageTimestamp.toDate() : DateTime.now(),
+              sendTime: messageTimestamp != null
+                  ? DateFormat('a h:mm').format(messageTimestamp.toDate())
+                  : DateFormat('a h:mm').format(DateTime.now()),
               isCurrentUser: isCurrentUser,
             );
+
 
             messageWidgets.add(messageWidget);
           }
@@ -167,7 +180,7 @@ class ChatMessages extends StatelessWidget {
 
 class ChatMessage extends StatelessWidget {
   final String text;
-  final DateTime sendTime;
+  final String sendTime;
   final bool isCurrentUser;
 
   ChatMessage({
@@ -178,6 +191,12 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentDateTime = DateTime.now();
+    final messageDateTime = DateFormat('yy.MM.dd hh:mm').parse(sendTime, true);
+
+    // 날짜를 비교하여 '다음 날' 여부를 확인
+    final isNextDay = currentDateTime.day < messageDateTime.day;
+
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
@@ -189,7 +208,7 @@ class ChatMessage extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                  color: isCurrentUser ? Colors.blue : Colors.grey,
+                  color: isCurrentUser ? Colors.orange : Colors.grey,
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: Text(
@@ -198,8 +217,9 @@ class ChatMessage extends StatelessWidget {
                 ),
               ),
               Text(
-                '${sendTime.toLocal()}',
+                isNextDay ? '---------${DateFormat('yyyy.MM.dd').format(messageDateTime)}--------' : sendTime,
                 style: TextStyle(fontSize: 12, color: Colors.grey),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
