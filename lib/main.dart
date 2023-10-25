@@ -1,10 +1,12 @@
-import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
+import 'dart:async';
+
 import 'package:project_flutter/product.dart';
 
 void main() {
   runApp(MyApp());
 }
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -23,57 +25,87 @@ class Main extends StatefulWidget {
 }
 
 class _MainState extends State<Main> {
+  late PageController _pageController;
+  int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // 페이지 컨트롤러 초기화
+    _pageController = PageController(
+      initialPage: _currentPage,
+      viewportFraction: 0.8,
+    );
+
+    // 타이머를 사용하여 자동 슬라이드 구현
+    Timer.periodic(Duration(seconds: 2), (timer) {
+      if (_currentPage < 2) {
+        _currentPage++;
+      } else {
+        _currentPage = 0;
+      }
+      _pageController.animateToPage(
+        _currentPage,
+        duration: Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: Text("용채"),),
-        body: Container(
-          child: Swiper(
-            viewportFraction: 0.8, // 전체 슬라이드 아이템 크기
-            scale: 0.9, // 활성화 슬라이드 아이템 크기
-            scrollDirection: Axis.horizontal, // 슬라이드 방향
-            axisDirection: AxisDirection.left, // 정렬
-            pagination: SwiperPagination(
-              alignment: Alignment.bottomCenter, // 페이지네이션 위치
-              builder: SwiperPagination.rect, // 세 가지 스타일의 pagination 사용 가능
-            ), // 페이지네이션
-            control: SwiperControl(
-              iconPrevious: Icons.access_alarms_rounded,// 이전 버튼
-              iconNext: Icons.add,// 다음 버튼
-              color: Colors.red,// 버튼 색상
-              disableColor: Colors.lightGreenAccent, // 비활성화 버튼 색상
-              size: 50.0, // 버튼 크기
-            ),// 컨트롤 방향 버튼
-            loop: false,// 반복
-            autoplay: true,// 자동 슬라이드
-            duration: 300,// 속도
-            itemCount: 3, // 슬라이드 개수
-            itemBuilder: (BuildContext ctx, int idx) {
-              return SizedBox(
-                child: Column(
-                  children: [
-
-                  ],
-                ),
-              );
-            },
-          ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("용채"),
+      ),
+      body: Center(
+        child: ListView(
+          children: [
+            Container(
+              height: 200, // 슬라이드 높이 설정
+              child: PageView.builder(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                itemBuilder: (BuildContext context, int index) {
+                  return SizedBox(
+                    width: 100,
+                    child: Container(
+                      color: Colors.lightBlue,
+                      margin: EdgeInsets.symmetric(horizontal: 10.0), // 슬라이드 간 간격
+                    ),
+                  );
+                },
+                itemCount: 3, // 슬라이드 개수
+              ),
+            ),
+          ],
         ),
-        bottomNavigationBar: BottomAppBar(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              IconButton(
-                  onPressed: (){
-                    Navigator.push(
-                        context, MaterialPageRoute(builder: (context) => Product())
-                    );
-                  },
-                  icon: Icon(Icons.add_circle_outline)
-              )
-            ],
-          ),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            IconButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Product()),
+                );
+              },
+              icon: Icon(Icons.add_circle_outline),
+            )
+          ],
         ),
       ),
     );
