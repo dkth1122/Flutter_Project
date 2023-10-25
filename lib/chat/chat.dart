@@ -78,7 +78,7 @@ class ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: Icon(Icons.send, color: Colors.grey,),
                   onPressed: () {
                     _handleOnSubmit();
                   },
