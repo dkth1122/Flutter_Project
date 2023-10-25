@@ -1,121 +1,134 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_flutter/firebase_options.dart';
+import 'package:uuid/uuid.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(Chat());
+  runApp(ChatApp());
 }
 
-class Chat extends StatefulWidget {
-  @override
-  State<Chat> createState() => _ChatState();
-}
-
-class _ChatState extends State<Chat> {
-  String newMessage = "";
-  late TextEditingController messageController;
-
-  @override
-  void initState() {
-    super.initState();
-    messageController = TextEditingController();
-  }
-
-  Widget _chatList() {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection("chat").snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
-        if (snap.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
-        }
-
-        if (snap.hasError) {
-          return Text('Error: ${snap.error}');
-        }
-
-        if (snap.data != null) {
-          return ListView(
-            reverse: true, // 채팅 내용을 역순으로 표시
-            children: snap.data!.docs.reversed.map((DocumentSnapshot document) {
-              Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-              return ChatMessage(
-                text: data['text'],
-                sendTime: data['sendTime'].toDate(),
-              );
-            }).toList(),
-          );
-        } else {
-          return Text('No data available.');
-        }
-      },
-    );
-  }
-
+class ChatApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Chat App'),
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: _chatList(),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: messageController,
-                      onChanged: (text) {
-                        setState(() {
-                          newMessage = text;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        hintText: '메시지 입력',
-                      ),
-                    ),
+      title: 'Chat App',
+      home: ChatScreen(),
+    );
+  }
+}
+
+class ChatScreen extends StatefulWidget {
+  @override
+  State createState() => ChatScreenState();
+}
+
+class ChatScreenState extends State<ChatScreen> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final TextEditingController _messageController = TextEditingController();
+
+// 사용자 A와 사용자 B의 UUID 생성
+  final Uuid uuid = Uuid();
+  final String userAId = uuid.v4();
+  final String userBId = uuid.v4();
+
+// 채팅방 문서 ID => 방 이름 생성
+  final String chatRoomId = 'chat_room_${userAId}_${userBId}';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat App'),
+      ),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: ChatMessages(chatRoomId: chatRoomId),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    controller: _messageController,
+                    decoration: InputDecoration(hintText: '메시지 입력'),
                   ),
-                  ElevatedButton(
-                    onPressed: () {
-                      handleOnSubmit();
-                    },
-                    child: Text('전송'),
-                  ),
-                ],
-              ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () {
+                    _handleOnSubmit();
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  void handleOnSubmit() {
-    if (newMessage.trim().isNotEmpty) {
-      FirebaseFirestore.instance.collection('chat').add({
-        'text': newMessage.trim(),
-        'sendTime': FieldValue.serverTimestamp(),
-        'user': 'User', // Change to current user's display name
+  void _handleOnSubmit() {
+    final String text = _messageController.text;
+    if (text.isNotEmpty) {
+      // 채팅방 문서의 컬렉션 "messages"에 메시지 추가
+      _firestore.collection('chat_rooms/$chatRoomId/messages').add({
+        'text': text,
+        'timestamp': FieldValue.serverTimestamp(),
       });
-
-      messageController.clear();
+      _messageController.clear();
     }
   }
+}
+
+class ChatMessages extends StatelessWidget {
+  final String chatRoomId;
+
+  ChatMessages({
+    required this.chatRoomId,
+  });
 
   @override
-  void dispose() {
-    messageController.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('chat_rooms/$chatRoomId/messages')
+          .orderBy('timestamp', descending: true)
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (!snapshot.hasData) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        final messages = snapshot.data!.docs;
+
+        List<Widget> messageWidgets = [];
+        for (var message in messages) {
+          final messageText = message['text'];
+          final messageTimestamp = message['timestamp'];
+
+          final messageWidget = ChatMessage(
+            text: messageText,
+            sendTime: (messageTimestamp as Timestamp).toDate(),
+          );
+
+          messageWidgets.add(messageWidget);
+        }
+
+        return ListView(
+          reverse: true,
+          children: messageWidgets,
+        );
+      },
+    );
   }
 }
 
@@ -130,20 +143,19 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 10.0),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end, // 채팅 내용을 오른쪽에 표시
-        children: [
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: <Widget>[
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
+            children: <Widget>[
               Container(
-                margin: EdgeInsets.only(right: 16.0), // 채팅 내용과 오른쪽 경계 간격 설정
-                padding: EdgeInsets.all(10.0),
+                padding: EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                  color: Colors.blue, // 채팅 메시지 배경색
-                  borderRadius: BorderRadius.circular(10.0),
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: Text(
                   text,
@@ -151,7 +163,7 @@ class ChatMessage extends StatelessWidget {
                 ),
               ),
               Text(
-                '${sendTime.toLocal().toString()}',
+                '${sendTime.toLocal()}',
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ],
