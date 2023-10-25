@@ -1,11 +1,7 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:project_flutter/firebase_options.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,7 +20,6 @@ class _ProductAddState extends State<ProductAdd> {
   String newProduct = "";
   String newProductDetail = "";
   String newAuthor = "";
-  File? imageFile;
   late TextEditingController productController;
   late TextEditingController detailController;
   late TextEditingController authorController;
@@ -36,33 +31,6 @@ class _ProductAddState extends State<ProductAdd> {
     productController = TextEditingController();
     detailController = TextEditingController();
     authorController = TextEditingController();
-  }
-
-  Future<void> _pickImage(ImageSource source) async {
-    final pickedImage = await ImagePicker().pickImage(source: source);
-    if (pickedImage != null) {
-      setState(() {
-        imageFile = File(pickedImage.path);
-      });
-    }
-  }
-
-  Future<String?> _uploadImage() async {
-    if (imageFile == null) return null;
-
-    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
-    final destination = 'images/$fileName';
-
-    try {
-      await FirebaseStorage.instance.ref(destination).putFile(imageFile!);
-      final imageUrl = await FirebaseStorage.instance
-          .ref(destination)
-          .getDownloadURL();
-      return imageUrl;
-    } catch (e) {
-      print('Image upload failed: $e');
-      return null;
-    }
   }
 
   @override
@@ -78,11 +46,6 @@ class _ProductAddState extends State<ProductAdd> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
-                  ElevatedButton(
-                    onPressed: () => _pickImage(ImageSource.gallery),
-                    child: Text('사진 선택'),
-                  ),
-                  SizedBox(height: 16),
                   TextField(
                     controller: productController,
                     onChanged: (text) {
@@ -162,15 +125,12 @@ class _ProductAddState extends State<ProductAdd> {
     );
   }
 
-  void handleOnSubmit() async {
+  void handleOnSubmit() {
     if (newProduct.trim().isNotEmpty) {
-      final imageUrl = await _uploadImage();
-
       FirebaseFirestore.instance.collection('product').add({
         'product_name': newProduct.trim(),
         'product_detail': newProductDetail.trim(),
         'author': newAuthor.trim(),
-        'image_url': imageUrl,
         'sendTime': FieldValue.serverTimestamp(),
         'user': 'User', // Change to current user's display name
       });
@@ -178,9 +138,6 @@ class _ProductAddState extends State<ProductAdd> {
       productController.clear();
       detailController.clear();
       authorController.clear();
-      setState(() {
-        imageFile = null;
-      });
     }
   }
 
