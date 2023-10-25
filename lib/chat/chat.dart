@@ -10,20 +10,31 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(ChatApp());
+
+  final String chatRoomId = 'your_chat_room_id'; // 여기에 원하는 chatRoomId를 지정
+
+  runApp(ChatApp(chatRoomId: chatRoomId));
 }
 
 class ChatApp extends StatelessWidget {
+
+  final String chatRoomId;
+  ChatApp({required this.chatRoomId});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Chat App',
-      home: ChatScreen(),
+      home: ChatScreen(chatRoomId: chatRoomId),
     );
   }
 }
 
 class ChatScreen extends StatefulWidget {
+
+  final String chatRoomId;
+  ChatScreen({required this.chatRoomId});
+
   @override
   State createState() => ChatScreenState();
 }
@@ -52,10 +63,10 @@ class ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: Text(
           '상대방 아이디',
-          style: TextStyle(color: Colors.black), // 텍스트 색상을 흰색으로 설정
+          style: TextStyle(color: Colors.black),
         ),
-        centerTitle: true, // 제목을 중앙 정렬
-        backgroundColor: Colors.white, // AppBar의 배경색을 투명색으로 설정
+        centerTitle: true,
+        backgroundColor: Colors.white,
       ),
 
       body: Column(
