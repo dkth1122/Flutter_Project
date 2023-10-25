@@ -19,7 +19,6 @@ class Chat extends StatefulWidget {
 class _ChatState extends State<Chat> {
   String newMessage = "";
   late TextEditingController messageController;
-  List<Map<String, dynamic>> messages = [];
 
   @override
   void initState() {
@@ -32,35 +31,30 @@ class _ChatState extends State<Chat> {
       stream: FirebaseFirestore.instance.collection("chat").snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
         if (snap.connectionState == ConnectionState.waiting) {
-          // 여기서는 데이터가 아직 도착하지 않았을 때의 상황을 처리합니다.
-          return CircularProgressIndicator(); // 로딩 표시나 다른 대체 UI를 보여줄 수 있습니다.
+          return CircularProgressIndicator();
         }
 
         if (snap.hasError) {
-          // 오류 처리
           return Text('Error: ${snap.error}');
         }
 
-        // snap.data가 null이 아닌지 확인
         if (snap.data != null) {
           return ListView(
-            children: snap.data!.docs.map((DocumentSnapshot document) {
+            reverse: true, // 채팅 내용을 역순으로 표시
+            children: snap.data!.docs.reversed.map((DocumentSnapshot document) {
               Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-              return ListTile(
-                title: Text(data['text']),
-                subtitle: Text("작성일 : ${data['sendTime'].toDate().toString()}"),
+              return ChatMessage(
+                text: data['text'],
+                sendTime: data['sendTime'].toDate(),
               );
             }).toList(),
           );
         } else {
-          // 데이터가 null이면 빈 화면을 보여줄 수 있습니다.
           return Text('No data available.');
         }
       },
     );
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +66,7 @@ class _ChatState extends State<Chat> {
         body: Column(
           children: [
             Expanded(
-              child:_chatList()
+              child: _chatList(),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -86,6 +80,9 @@ class _ChatState extends State<Chat> {
                           newMessage = text;
                         });
                       },
+                      decoration: InputDecoration(
+                        hintText: '메시지 입력',
+                      ),
                     ),
                   ),
                   ElevatedButton(
@@ -119,5 +116,48 @@ class _ChatState extends State<Chat> {
   void dispose() {
     messageController.dispose();
     super.dispose();
+  }
+}
+
+class ChatMessage extends StatelessWidget {
+  final String text;
+  final DateTime sendTime;
+
+  ChatMessage({
+    required this.text,
+    required this.sendTime,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.end, // 채팅 내용을 오른쪽에 표시
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                margin: EdgeInsets.only(right: 16.0), // 채팅 내용과 오른쪽 경계 간격 설정
+                padding: EdgeInsets.all(10.0),
+                decoration: BoxDecoration(
+                  color: Colors.blue, // 채팅 메시지 배경색
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Text(
+                  text,
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              Text(
+                '${sendTime.toLocal().toString()}',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }
