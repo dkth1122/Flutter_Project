@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:project_flutter/firebase_options.dart';
+import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
+import 'package:project_flutter/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,12 +31,10 @@ class ChatScreen extends StatefulWidget {
 class ChatScreenState extends State<ChatScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _messageController = TextEditingController();
+  bool _isLoading = false;
 
-  // 사용자 A와 사용자 B의 UUID 생성
   late String userAId;
   late String userBId;
-
-  // 채팅방 문서 ID => 방 이름 생성
   late String chatRoomId;
 
   @override
@@ -77,6 +76,8 @@ class ChatScreenState extends State<ChatScreen> {
               ],
             ),
           ),
+          if (_isLoading)
+            CircularProgressIndicator(),
         ],
       ),
     );
@@ -85,24 +86,34 @@ class ChatScreenState extends State<ChatScreen> {
   void _handleOnSubmit() {
     final String text = _messageController.text;
     if (text.isNotEmpty) {
-      // 채팅방 문서의 컬렉션 "messages"에 메시지 추가
+      setState(() {
+        _isLoading = true;
+      });
+
       _firestore.collection('chat_rooms/$chatRoomId/messages').add({
         'text': text,
         'timestamp': FieldValue.serverTimestamp(),
-        'user': userAId, // 현재 사용자를 나타내는 ID
+        'user': userAId,
+      }).then((_) {
+        _messageController.clear();
+      }).catchError((error) {
+        print('Error: $error');
+      }).whenComplete(() {
+        setState(() {
+          _isLoading = false;
+        });
       });
-      _messageController.clear();
     }
   }
 }
 
 class ChatMessages extends StatelessWidget {
   final String chatRoomId;
-  final String userAId; // userAId를 추가
+  final String userAId;
 
   ChatMessages({
     required this.chatRoomId,
-    required this.userAId, // 생성자에서 userAId를 받음
+    required this.userAId,
   });
 
   @override
@@ -112,6 +123,7 @@ class ChatMessages extends StatelessWidget {
           .collection('chat_rooms/$chatRoomId/messages')
           .orderBy('timestamp', descending: true)
           .snapshots(),
+
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
@@ -128,11 +140,11 @@ class ChatMessages extends StatelessWidget {
             final messageTimestamp = message['timestamp'];
             final user = message['user'];
 
-            final isCurrentUser = user == userAId; // 현재 사용자인 경우
+            final isCurrentUser = user == userAId;
 
             final messageWidget = ChatMessage(
               text: messageText,
-              sendTime: (messageTimestamp as Timestamp).toDate(),
+              sendTime: messageTimestamp != null ? messageTimestamp.toDate() : DateTime.now(),
               isCurrentUser: isCurrentUser,
             );
 
