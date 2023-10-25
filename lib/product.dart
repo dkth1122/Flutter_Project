@@ -1,8 +1,17 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:project_flutter/firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(Product());
+}
 
 class Product extends StatefulWidget {
-  Product({Key? key});
-
   @override
   _ProductState createState() => _ProductState();
 }
@@ -10,13 +19,21 @@ class Product extends StatefulWidget {
 class _ProductState extends State<Product> {
   List<String> path = ['dog1.PNG','dog2.PNG','dog3.PNG', 'dog4.png'];
   List<String> productNames = ['뽀짝이 \n25,000', '꼬순이 \n25,000', '시잡이 \n25,000', '쒸익이 \n25,000']; // 각 이미지에 대한 텍스트
-  List<bool> isFavoriteList = [false, false, false];
+  List<bool> isFavoriteList = [false, false, false, false];
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(title: Text("상품페이지"),),
+        appBar: AppBar(
+          title: Text("상품페이지"),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context); // 뒤로가기 버튼을 누를 때 이전 페이지로 돌아가도록 설정
+            },
+          ),
+        ),
         body: Container(
           padding: EdgeInsets.all(10),
           child: GridView.builder(
