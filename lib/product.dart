@@ -2,11 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-import 'firebase_options.dart';
-
 class Product extends StatefulWidget {
   @override
-  _ProductState createState() => _ProductState();
+  State<Product> createState() => _ProductState();
 }
 
 class _ProductState extends State<Product> {
@@ -15,11 +13,32 @@ class _ProductState extends State<Product> {
   @override
   void initState() {
     super.initState();
-    productStream = FirebaseFirestore.instance.collection("product").snapshots();
+    Firebase.initializeApp().then((value) {
+      setState(() {
+        productStream = FirebaseFirestore.instance.collection("product").snapshots();
+      });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    if (productStream == null) {
+      return Scaffold(
+        appBar: AppBar(
+          title: const Text("상품페이지"),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
+        body: const Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("상품페이지"),
@@ -109,3 +128,4 @@ class _ProductState extends State<Product> {
     );
   }
 }
+
