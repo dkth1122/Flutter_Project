@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:project_flutter/firebase_options.dart';
 
 void main() async {
@@ -20,9 +23,12 @@ class _ProductAddState extends State<ProductAdd> {
   String newProduct = "";
   String newProductDetail = "";
   String newAuthor = "";
+  String newPrice = ""; // 추가: 가격 변수
+  File? imageFile;
   late TextEditingController productController;
   late TextEditingController detailController;
   late TextEditingController authorController;
+  late TextEditingController priceController; // 추가: 가격 입력 필드 컨트롤러
   List<Map<String, dynamic>> product = [];
 
   @override
@@ -31,6 +37,34 @@ class _ProductAddState extends State<ProductAdd> {
     productController = TextEditingController();
     detailController = TextEditingController();
     authorController = TextEditingController();
+    priceController = TextEditingController(); // 추가: 가격 입력 필드 컨트롤러
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedImage = await ImagePicker().pickImage(source: source);
+    if (pickedImage != null) {
+      setState(() {
+        imageFile = File(pickedImage.path);
+      });
+    }
+  }
+
+  Future<String?> _uploadImage() async {
+    if (imageFile == null) return null;
+
+    final fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    final destination = 'images/$fileName';
+
+    try {
+      await FirebaseStorage.instance.ref(destination).putFile(imageFile!);
+      final imageUrl = await FirebaseStorage.instance
+          .ref(destination)
+          .getDownloadURL();
+      return imageUrl;
+    } catch (e) {
+      print('Image upload failed: $e');
+      return null;
+    }
   }
 
   @override
@@ -38,7 +72,7 @@ class _ProductAddState extends State<ProductAdd> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Chat App'),
+          title: Text('상품등록'),
         ),
         body: Column(
           children: [
@@ -46,6 +80,11 @@ class _ProductAddState extends State<ProductAdd> {
               padding: const EdgeInsets.all(8.0),
               child: Column(
                 children: [
+                  ElevatedButton(
+                    onPressed: () => _pickImage(ImageSource.gallery),
+                    child: Text('사진 선택'),
+                  ),
+                  SizedBox(height: 16),
                   TextField(
                     controller: productController,
                     onChanged: (text) {
@@ -77,6 +116,17 @@ class _ProductAddState extends State<ProductAdd> {
                     },
                     decoration: InputDecoration(
                       labelText: '작성자',
+                    ),
+                  ),
+                  TextField(
+                    controller: priceController, // 추가: 가격 입력 필드 컨트롤러
+                    onChanged: (text) {
+                      setState(() {
+                        newPrice = text;
+                      });
+                    },
+                    decoration: InputDecoration(
+                      labelText: '가격',
                     ),
                   ),
                   ElevatedButton(
@@ -114,7 +164,8 @@ class _ProductAddState extends State<ProductAdd> {
               document.data() as Map<String, dynamic>;
               return ListTile(
                 title: Text(data['product_name']),
-                subtitle: Text("작성일 : ${data['sendTime'].toDate().toString()}"),
+                subtitle: Text(
+                    "작성일 : ${data['sendTime'].toDate().toString()}"),
               );
             }).toList(),
           );
@@ -125,12 +176,16 @@ class _ProductAddState extends State<ProductAdd> {
     );
   }
 
-  void handleOnSubmit() {
+  void handleOnSubmit() async {
     if (newProduct.trim().isNotEmpty) {
+      final imageUrl = await _uploadImage();
+
       FirebaseFirestore.instance.collection('product').add({
         'product_name': newProduct.trim(),
         'product_detail': newProductDetail.trim(),
         'author': newAuthor.trim(),
+        'price': newPrice.trim(), // 추가: 가격 저장
+        'image_url': imageUrl,
         'sendTime': FieldValue.serverTimestamp(),
         'user': 'User', // Change to current user's display name
       });
@@ -138,6 +193,10 @@ class _ProductAddState extends State<ProductAdd> {
       productController.clear();
       detailController.clear();
       authorController.clear();
+      priceController.clear(); // 추가: 가격 입력 필드 초기화
+      setState(() {
+        imageFile = null;
+      });
     }
   }
 
@@ -146,6 +205,7 @@ class _ProductAddState extends State<ProductAdd> {
     productController.dispose();
     detailController.dispose();
     authorController.dispose();
+    priceController.dispose(); // 추가: 가격 입력 필드 컨트롤러 해제
     super.dispose();
   }
 }
