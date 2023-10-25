@@ -50,10 +50,20 @@ class ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat App'),
+        title: Text(
+          '상대방 아이디',
+          style: TextStyle(color: Colors.black), // 텍스트 색상을 흰색으로 설정
+        ),
+        centerTitle: true, // 제목을 중앙 정렬
+        backgroundColor: Colors.white, // AppBar의 배경색을 투명색으로 설정
       ),
+
       body: Column(
         children: <Widget>[
+          Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Text("상대방이 계좌이체 등 직접 결제를 요구하면 거절하시고 \n 즉시 고객센터로 알려주세요", style: TextStyle(fontSize: 12,), textAlign: TextAlign.center,),
+          ),
           Expanded(
             child: ChatMessages(chatRoomId: chatRoomId, userAId: userAId),
           ),
@@ -68,7 +78,7 @@ class ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: Icon(Icons.send, color: Colors.grey,),
                   onPressed: () {
                     _handleOnSubmit();
                   },
@@ -144,9 +154,12 @@ class ChatMessages extends StatelessWidget {
 
             final messageWidget = ChatMessage(
               text: messageText,
-              sendTime: messageTimestamp != null ? messageTimestamp.toDate() : DateTime.now(),
+              sendTime: messageTimestamp != null
+                  ? DateFormat('yy.MM.dd \n h:mm').format(messageTimestamp.toDate())
+                  : DateFormat('yy.MM.dd \n h:mm').format(DateTime.now()),
               isCurrentUser: isCurrentUser,
             );
+
 
             messageWidgets.add(messageWidget);
           }
@@ -167,7 +180,7 @@ class ChatMessages extends StatelessWidget {
 
 class ChatMessage extends StatelessWidget {
   final String text;
-  final DateTime sendTime;
+  final String sendTime; // DateTime 대신 String으로 유지
   final bool isCurrentUser;
 
   ChatMessage({
@@ -183,23 +196,47 @@ class ChatMessage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: <Widget>[
+          isCurrentUser
+              ? Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Text(
+              '${sendTime.toString()}',
+              style: TextStyle(fontSize: 10, color: Colors.grey),
+              textAlign: TextAlign.left, // 자신의 메시지의 경우에는 왼쪽에 표시
+            ),
+          )
+              : Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Text(
+              '${sendTime.toString()}',
+              style: TextStyle(fontSize: 10, color: Colors.grey),
+              textAlign: TextAlign.right, // 상대방 메시지의 경우에는 오른쪽에 표시
+            ),
+          ),
+
           Column(
             crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: <Widget>[
               Container(
                 padding: EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                  color: isCurrentUser ? Colors.blue : Colors.grey,
-                  borderRadius: BorderRadius.circular(8.0),
+                  color: isCurrentUser ? Colors.orange : Colors.grey,
+                  borderRadius: isCurrentUser
+                      ? BorderRadius.only(
+                    topLeft: Radius.circular(8.0),
+                    topRight: Radius.circular(8.0),
+                    bottomLeft: Radius.circular(8.0),
+                  )
+                      : BorderRadius.only(
+                    topLeft: Radius.circular(8.0),
+                    topRight: Radius.circular(8.0),
+                    bottomRight: Radius.circular(8.0),
+                  ),
                 ),
                 child: Text(
                   text,
                   style: TextStyle(color: Colors.white),
                 ),
-              ),
-              Text(
-                '${sendTime.toLocal()}',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
             ],
           ),

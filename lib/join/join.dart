@@ -18,23 +18,99 @@ class _JoinState extends State<Join> {
   final TextEditingController _name = TextEditingController();
   final TextEditingController _nick = TextEditingController();
   final TextEditingController _birth = TextEditingController();
-  final TextEditingController _addr = TextEditingController();
 
   DateTime? _dateTime;
-  String idValidationMessage = ''; // 변수를 선언하여 메시지 저장
+  String idValidationMessage = ''; //아이디유효성메시지
+  String passwordValidationMessage = ''; //비밀번호유효성메시지
+  String nameValidationMessage = '';//이름유효성메시지
+  String nickValidationMessage = '';//닉네임유효성메시지
+  String emailValidationMessage = '';//이메일 유효성메시지
 
 
 
   void _register() async {
+    // 패스워드 확인
     if (_pw.text != _pw2.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('패스워드가일치하지 않습니다.')),
+        SnackBar(content: Text('패스워드가 일치하지 않습니다.')),
       );
       return;
     }
 
-    // Firestore에서 중복 아이디 체크
+    // 아이디 유효성 검사
+    String id = _id.text;
+    if (!isIdValid(id)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('유효하지 않은 아이디 형식입니다. (6자 이상의 영어 소문자와 숫자의 조합)')),
+      );
+      return;
+    }
 
+    // 아이디 중복 확인
+    bool isIdDuplicate = await isIdAlreadyRegistered(id);
+    if (isIdDuplicate) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('이미 가입된 아이디입니다.')),
+      );
+      return;
+    }
+
+    // 이름 유효성 검사
+    String name = _name.text;
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('이름을 입력하세요.')),
+      );
+      return;
+    }
+
+    // 이메일 유효성 검사
+    String email = _email.text;
+    if (!isEmailValid(email)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('유효하지 않은 이메일 형식입니다.')),
+      );
+      return;
+    }
+
+    // 이메일 중복 확인
+    bool isEmailDuplicate = await isEmailAlreadyRegistered(email);
+    if (isEmailDuplicate) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('중복된 이메일 주소입니다.')),
+      );
+      return;
+    }
+
+    // 닉네임 유효성 검사
+    String nickname = _nick.text;
+    if (!isNicknameValid(nickname)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('유효하지 않은 닉네임 형식입니다. (최대 10자)')),
+      );
+      return;
+    }
+
+    // 닉네임 중복 확인
+    bool isNicknameDuplicate = await isNickAlreadyRegistered(nickname);
+    if (isNicknameDuplicate) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('이미 사용 중인 닉네임입니다.')),
+      );
+      return;
+    }
+
+
+    // 생일 유효성 검사
+    String birth = _birth.text;
+    if (birth.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('생일을 입력하세요.')),
+      );
+      return;
+    }
+
+    // 여기까지 도달하면 모든 검사를 통과한 것이므로 회원가입을 처리
     try {
       await _fs.collection('userList').add({
         'id': _id.text,
@@ -43,12 +119,10 @@ class _JoinState extends State<Join> {
         'name': _name.text,
         'nick': _nick.text,
         'birth': _birth.text,
-        'addr': _addr.text,
-        'status':'C',//기본값 의뢰인 C
-        'banYn': 'N',//기본값 N
-        'delYn': 'N',//기본값 N
-        'cdatetime': FieldValue.serverTimestamp(),//가입시간
-
+        'status': 'C', // 기본값 의뢰인 C
+        'banYn': 'N', // 기본값 N
+        'delYn': 'N', // 기본값 N
+        'cdatetime': FieldValue.serverTimestamp(), // 가입시간
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -61,13 +135,13 @@ class _JoinState extends State<Join> {
       _email.clear();
       _nick.clear();
       _birth.clear();
-      _addr.clear();
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
     }
   }
+
 
 
   // 아이디 중복 확인 함수
@@ -124,11 +198,11 @@ class _JoinState extends State<Join> {
 
   //이메일 형식 유효성검사
   bool isEmailValid(String email) {
-    // 이메일 형식의 정규식 패턴
-    String pattern = r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)*$';
+    String pattern = r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$';
     RegExp regExp = RegExp(pattern);
     return regExp.hasMatch(email);
   }
+
 
   // 비밀번호 유효성 검사 함수 (8자 이상의 영어 소문자와 숫자)
   bool isPasswordValid(String password) {
@@ -140,6 +214,49 @@ class _JoinState extends State<Join> {
   bool arePasswordsMatching(String password, String password2) {
     return password == password2;
   }
+  void checkPasswordValidity(String password, String password2) {
+    if (isPasswordValid(password) && arePasswordsMatching(password, password2)) {
+      setState(() {
+        passwordValidationMessage = '비밀번호가 유효하며 일치합니다.';
+      });
+    } else {
+      setState(() {
+        passwordValidationMessage = '비밀번호는 8자 이상의 영어 소문자와 숫자 조합이어야 하며, 두 비밀번호는 일치해야 합니다.';
+      });
+    }
+  }
+
+  // 정규식을 사용하여 이름이 한글로만 구성되며 최대 10자 이내인지 확인
+  bool isNameValid(String name) {
+    final RegExp nameRegExp = RegExp(r'^[가-힣]{1,10}$');
+    return nameRegExp.hasMatch(name);
+  }
+  // 정규식을 사용하여 닉네임이 최대 10자 이내인지 확인
+  bool isNicknameValid(String nickname) {
+    final RegExp nicknameRegExp = RegExp(r'^[a-zA-Z0-9가-힣]{1,10}$');
+    return nicknameRegExp.hasMatch(nickname);
+  }
+
+  //닉네임 중복검사
+  Future<bool> isNickAlreadyRegistered(String nick) async {
+    bool isDuplicate = false;
+    final FirebaseFirestore _fs = FirebaseFirestore.instance;
+    try {
+      final QuerySnapshot query = await _fs
+          .collection('userList')
+          .where('nick', isEqualTo: _nick.text)
+          .get();
+
+      if (query.docs.isNotEmpty) {
+        isDuplicate = true;
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+    return isDuplicate;
+  }
+
+
 
 
 
@@ -167,7 +284,7 @@ class _JoinState extends State<Join> {
                 String id = _id.text;
                 if (!isIdValid(id)) {
                   setState(() {
-                    idValidationMessage = '유효하지 않은 아이디 형식입니다. 영어소문자와 숫자를 조합한 6자 이상';
+                    idValidationMessage = '유효하지 않은 아이디 형식입니다. (6자 이상의 영어소문자와 숫자의 조합)';
                   });
                 } else {
                   isIdAlreadyRegistered(id).then((isDuplicate) {
@@ -184,7 +301,7 @@ class _JoinState extends State<Join> {
                 }
               },
               decoration: InputDecoration(
-                labelText: '아이디 , 영어소문자와 숫자를 조합한 6자리 이상',
+                labelText: '아이디',
                 labelStyle: TextStyle(
                   color: Color(0xff328772),
                 ),
@@ -196,6 +313,9 @@ class _JoinState extends State<Join> {
                   borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
                   borderRadius: BorderRadius.circular(10.0),
                 ),
+                hintText: "영어소문자와 숫자를 조합한 6자리 이상",
+                suffixIcon: idValidationMessage == '사용 가능한 아이디 입니다.' ? Icon(Icons.check) : null,
+
               ),
             ),
             if (idValidationMessage.isNotEmpty)
@@ -208,11 +328,7 @@ class _JoinState extends State<Join> {
           ],
         ),
       ),
-
-
-
-
-      Padding(
+            Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
                 controller: _pw,
@@ -220,88 +336,212 @@ class _JoinState extends State<Join> {
                 decoration: InputDecoration(
                   labelText: '비밀번호',
                   labelStyle: TextStyle(
-                    color: Color(0xff328772), // 포커스된 상태의 라벨 텍스트 색상
+                    color: Color(0xff328772),
                   ),
-
                   focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xff328772), width: 2.0,), // 포커스된 상태의 테두리 색상 설정
-                    borderRadius: BorderRadius.circular(10.0), // 포커스된 상태의 테두리 모양 설정 (선택 사항)
+                    borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
                   enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xfff48752),  width: 2.0,), // 비활성 상태의 테두리 색상 설정
-                    borderRadius: BorderRadius.circular(10.0), // 비활성 상태의 테두리 모양 설정 (선택 사항)
+                    borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
+                    borderRadius: BorderRadius.circular(10.0),
                   ),
+                  hintText: "8자 이상의 영어 소문자와 숫자 조합",
+
+
                 ),
+                onChanged: (password) {
+                  setState(() {
+                    if (isPasswordValid(password)) {
+                      passwordValidationMessage = '비밀번호가 유효합니다. 비밀번호 확인해주세요. ';
+                    } else {
+                      passwordValidationMessage = '비밀번호가 유효하지 않습니다. (8자 이상의 영어 소문자와 숫자 조합)';
+                    }
+                  });
+                },
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _pw2,
+                    obscureText: true,
+                    decoration: InputDecoration(
+                      labelText: '비밀번호 확인',
+                      labelStyle: TextStyle(
+                        color: Color(0xff328772),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+
+                    ),
+                    onChanged: (password2) {
+                      setState(() {
+                        bool isValidPassword = isPasswordValid(_pw.text);
+                        bool doPasswordsMatch = (password2 == _pw.text);
+
+                        if (isValidPassword && doPasswordsMatch) {
+                          passwordValidationMessage = '비밀번호가 유효하며 일치합니다.';
+                        } else if (!isValidPassword) {
+                          passwordValidationMessage = '비밀번호가 유효하지 않습니다. (8자 이상의 영어 소문자와 숫자 조합)';
+                        } else if (!doPasswordsMatch) {
+                          passwordValidationMessage = '비밀번호가 일치하지 않습니다.';
+                        }
+                      });
+                    },
+
+                  ),
+                  Text(
+                    passwordValidationMessage,
+                    style: TextStyle(
+                      color: passwordValidationMessage == '비밀번호가 유효하며 일치합니다.' ? Colors.blue : Colors.red,
+                    ),
+                  ),
+
+                ],
+              ),
+
+
+            ),
+
+
+
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  TextField(
+                    controller: _name,
+                    decoration: InputDecoration(
+                      labelText: '이름',
+                      labelStyle: TextStyle(
+                        color: Color(0xff328772),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      hintText: '한글로만, 10자 이내',
+
+                    ),
+                    onChanged: (name) {
+                      setState(() {
+                        if (isNameValid(name)) {
+                          nameValidationMessage = '유효한 이름입니다.';
+                        } else {
+                          nameValidationMessage = '한글로만 최대 10자 이내로 입력하세요.';
+                        }
+                      });
+                    },
+                  ),
+                  Text(
+                    nameValidationMessage,
+                    style: TextStyle(
+                      color: nameValidationMessage == '유효한 이름입니다.' ? Colors.blue : Colors.red,
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _pw2,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: '비밀번호 확인',
-                  labelStyle: TextStyle(
-                    color: Color(0xff328772), // 포커스된 상태의 라벨 텍스트 색상
-                  ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: _nick,
+                    onChanged: (value) {
+                      String nickname = _nick.text;
+                      if (nickname.isEmpty) {
+                        setState(() {
+                          nickValidationMessage = '닉네임을 입력하세요';
+                        });
+                      } else if (isNicknameValid(nickname)) {
+                        isNickAlreadyRegistered(nickname).then((isDuplicate) {
+                          if (isDuplicate) {
+                            setState(() {
+                              nickValidationMessage = '이미 사용 중인 닉네임입니다.';
+                            });
+                          } else {
+                            setState(() {
+                              nickValidationMessage = '사용 가능한 닉네임입니다.';
+                            });
+                          }
+                        });
+                      } else {
+                        setState(() {
+                          nickValidationMessage = '닉네임은 최대 10자 이내로 입력하세요.';
+                        });
+                      }
+                    },
+                    decoration: InputDecoration(
+                      labelText: '닉네임',
+                      labelStyle: TextStyle(
+                        color: Color(0xff328772),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      hintText: '10자 이내, 특수기호 불가',
 
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xff328772), width: 2.0,), // 포커스된 상태의 테두리 색상 설정
-                    borderRadius: BorderRadius.circular(10.0), // 포커스된 상태의 테두리 모양 설정 (선택 사항)
+
+                    ),
                   ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xfff48752),  width: 2.0,), // 비활성 상태의 테두리 색상 설정
-                    borderRadius: BorderRadius.circular(10.0), // 비활성 상태의 테두리 모양 설정 (선택 사항)
-                  ),
-                ),
+                  if (nickValidationMessage.isNotEmpty)
+                    Text(
+                      nickValidationMessage,
+                      style: TextStyle(
+                        color: nickValidationMessage == '닉네임을 입력하세요' ? Colors.red :
+                        nickValidationMessage == '사용 가능한 닉네임입니다.' ? Colors.blue : Colors.red,
+                      ),
+                    ),
+                ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _name,
-                decoration: InputDecoration(
-                  labelText: '이름',
-                  labelStyle: TextStyle(
-                    color: Color(0xff328772), // 포커스된 상태의 라벨 텍스트 색상
-                  ),
 
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xff328772), width: 2.0,), // 포커스된 상태의 테두리 색상 설정
-                    borderRadius: BorderRadius.circular(10.0), // 포커스된 상태의 테두리 모양 설정 (선택 사항)
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xfff48752),  width: 2.0,), // 비활성 상태의 테두리 색상 설정
-                    borderRadius: BorderRadius.circular(10.0), // 비활성 상태의 테두리 모양 설정 (선택 사항)
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _nick,
-                decoration: InputDecoration(
-                  labelText: '닉네임',
-                  labelStyle: TextStyle(
-                    color: Color(0xff328772), // 포커스된 상태의 라벨 텍스트 색상
-                  ),
 
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xff328772), width: 2.0,), // 포커스된 상태의 테두리 색상 설정
-                    borderRadius: BorderRadius.circular(10.0), // 포커스된 상태의 테두리 모양 설정 (선택 사항)
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xfff48752),  width: 2.0,), // 비활성 상태의 테두리 색상 설정
-                    borderRadius: BorderRadius.circular(10.0), // 비활성 상태의 테두리 모양 설정 (선택 사항)
-                  ),
-                ),
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
                 controller: _email,
+                onChanged: (email) {
+                  String emailText = _email.text;
+                  if (!isEmailValid(emailText)) {
+                    setState(() {
+                      emailValidationMessage = '유효하지 않은 이메일 형식입니다.';
+                    });
+                  } else {
+                    isEmailAlreadyRegistered(emailText).then((isDuplicate) {
+                      if (isDuplicate) {
+                        setState(() {
+                          emailValidationMessage = '중복된 이메일 주소입니다.';
+                        });
+                      } else {
+                        setState(() {
+                          emailValidationMessage = '사용 가능한 이메일 주소입니다.';
+                        });
+                      }
+                    });
+                  }
+                },
                 decoration: InputDecoration(
                   labelText: '이메일',
                   labelStyle: TextStyle(
@@ -315,35 +555,18 @@ class _JoinState extends State<Join> {
                     borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
                     borderRadius: BorderRadius.circular(10.0),
                   ),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      String email = _email.text;
-                      if (!isEmailValid(email)) {
-                        // 유효하지 않은 이메일 형식입니다. 사용자에게 메시지를 표시하세요.
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('유효하지 않은 이메일 형식입니다.')),
-                        );
-                        return;
-                      }
+                  hintText: '이메일 형식으로 (@포함)',
 
-                      // 이메일 중복 확인
-                      isEmailAlreadyRegistered(email).then((isDuplicate) {
-                        if (isDuplicate) {
-                          // 중복된 이메일입니다. 사용자에게 메시지를 표시하세요.
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('중복된 이메일 주소입니다.')),
-                          );
-                        } else {
-                          // 중복되지 않은 유효한 이메일입니다. 다음 단계로 진행하세요.
-                          // 회원가입 또는 기타 작업을 수행합니다.
-                        }
-                      });
-                    },
-                    icon: Icon(Icons.check),
-                  ),
+
                 ),
-
-            ),),
+              ),
+            ),
+            Text(
+              emailValidationMessage,
+              style: TextStyle(
+                color: emailValidationMessage == '사용 가능한 이메일 주소입니다.' ? Colors.blue : Colors.red,
+              ),
+            ),
 
             Padding(
               padding: const EdgeInsets.all(8.0),
@@ -380,7 +603,7 @@ class _JoinState extends State<Join> {
                         if (value != null) {
                           setState(() {
                             _dateTime = value;
-                            _birth.text = _dateTime.toString(); // 선택한 날짜를 TextField에 표시
+                            _birth.text = _dateTime.toString().split(" ")[0].replaceAll("-", "/"); // 선택한 날짜를 TextField에 표시
                           });
                         }
                       });
@@ -391,30 +614,8 @@ class _JoinState extends State<Join> {
               ),
 
             ),
-            Text(_dateTime != null
-                ? "선택한 날짜: ${_dateTime.toString().split(" ")[0].replaceAll("-", "/")}"
-                : "날짜를 선택하세요"),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _addr,
-                decoration: InputDecoration(
-                  labelText: '주소',
-                  labelStyle: TextStyle(
-                    color: Color(0xff328772), // 포커스된 상태의 라벨 텍스트 색상
-                  ),
 
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xff328772), width: 2.0,), // 포커스된 상태의 테두리 색상 설정
-                    borderRadius: BorderRadius.circular(10.0), // 포커스된 상태의 테두리 모양 설정 (선택 사항)
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xfff48752),  width: 2.0,), // 비활성 상태의 테두리 색상 설정
-                    borderRadius: BorderRadius.circular(10.0), // 비활성 상태의 테두리 모양 설정 (선택 사항)
-                  ),
-                ),
-              ),
-            ),
+
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: _register,

@@ -1,7 +1,6 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/material.dart';
-import 'package:project_flutter/firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+
 
 class Product extends StatefulWidget {
   @override
@@ -9,46 +8,45 @@ class Product extends StatefulWidget {
 }
 
 class _ProductState extends State<Product> {
-  List<bool> isFavoriteList = [false, false, false, false];
-  late Stream<QuerySnapshot> productStream; // Firestore 스트림 변수 추가
+  late Stream<QuerySnapshot> productStream;
 
   @override
   void initState() {
     super.initState();
-    productStream = FirebaseFirestore.instance.collection("product").snapshots(); // Firestore 스트림 초기화
+    productStream = FirebaseFirestore.instance.collection("product").snapshots();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("상품페이지"),
+        title: const Text("상품페이지"),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
-            Navigator.pop(context); // 뒤로가기 버튼을 누를 때 이전 페이지로 돌아가도록 설정
+            Navigator.pop(context);
           },
         ),
       ),
       body: Container(
-        padding: EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
         child: StreamBuilder<QuerySnapshot>(
-          stream: productStream, // Firestore 스트림 사용
+          stream: productStream,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             }
 
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator();
             }
 
             if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-              return Text('상품이 없습니다.');
+              return const Text('상품이 없습니다.');
             }
 
             return GridView.builder(
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 3,
                 crossAxisSpacing: 8,
                 mainAxisSpacing: 8,
@@ -57,19 +55,19 @@ class _ProductState extends State<Product> {
               itemBuilder: (context, index) {
                 final document = snapshot.data!.docs[index];
                 final productName = document['product_name'] as String;
-                final imageUrl = document['image_url'] as String; // 이미지 URL 가져오기
-                final isFavorite = isFavoriteList[index];
+                final price = document['price'] as String; // 가격 가져오기
+                final imageUrl = document['image_url'] as String;
 
                 return Container(
                   width: 100,
                   height: 100,
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.black, width: 1.0),
                   ),
                   child: Stack(
                     children: [
-                      Image.network( // 이미지 로드
+                      Image.network(
                         imageUrl,
                         width: double.infinity,
                         height: double.infinity,
@@ -78,28 +76,24 @@ class _ProductState extends State<Product> {
                       Positioned(
                         bottom: 8,
                         left: 8,
-                        child: Text(
-                          productName,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 15,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        top: 8,
-                        left: 8,
-                        child: IconButton(
-                          icon: Icon(
-                            isFavorite ? Icons.favorite : Icons.favorite_border,
-                            color: Colors.red,
-                            size: 24,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              isFavoriteList[index] = !isFavorite;
-                            });
-                          },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              productName,
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 15,
+                              ),
+                            ),
+                            Text(
+                              '가격: $price 원',
+                              style: const TextStyle(
+                                color: Colors.black,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
