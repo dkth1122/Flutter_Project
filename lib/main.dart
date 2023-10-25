@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:project_flutter/product.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(title: 'Flutter App', home: HomePage());
+    return MaterialApp(
+      title: 'Flutter App',
+      home: HomePage()
+    );
   }
 }
 
@@ -55,6 +57,21 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(fontSize: 18)),
           ),
         ],
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            IconButton(
+                onPressed: (){
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => Product())
+                  );
+                },
+                icon: Icon(Icons.add_circle_outline)
+            )
+          ],
+        ),
       ),
     );
   }
