@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // 필요한 패키지를 추가합니다.
+import 'package:project_flutter/join/loginSuccess.dart';
 import 'package:project_flutter/join/userModel.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +41,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final FirebaseFirestore _fs = FirebaseFirestore.instance; // Firestore 인스턴스를 가져옵니다.
   final TextEditingController _id = TextEditingController();
-  final TextEditingController _pwd = TextEditingController();
+  final TextEditingController _pw = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -73,7 +74,7 @@ class _LoginPageState extends State<LoginPage> {
             ),
             SizedBox(height: 8),
             TextField(
-              controller: _pwd,
+              controller: _pw,
               obscureText: true,
               decoration: InputDecoration(
                 labelText: '패스워드',
@@ -138,17 +139,25 @@ class _LoginPageState extends State<LoginPage> {
 
   void _login() async {
     String id = _id.text;
-    String password = _pwd.text;
+    String password = _pw.text;
 
     final userDocs = await _fs.collection('userList')
         .where('id', isEqualTo: id)
-        .where('pwd', isEqualTo: password).get();
+        .where('pw', isEqualTo: password).get();
 
     if (userDocs.docs.isNotEmpty) {
       Provider.of<UserModel>(context, listen: false).login(id);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('성공적으로 로그인되었습니다!')),
       );
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginSuccess(),
+        ),
+      );
+      _id.clear();
+      _pw.clear();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('아이디나 패스워드를 다시 확인해주세요.')),

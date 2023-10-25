@@ -42,31 +42,30 @@ class _ChatListState extends State<ChatList> {
           return Center(child: CircularProgressIndicator());
         }
 
-        return ListView.builder(
-          itemCount: snap.data!.docs.length,
-          itemBuilder: (context, index) {
-            DocumentSnapshot doc = snap.data!.docs[index];
-            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        return ListView(
+          children: snap.data!.docs.map(
+                (DocumentSnapshot doc) {
+              Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+              // 문서의 ID를 roomId 변수로 설정
+              String roomId = doc.id;
+              print(roomId);
 
-            // 문서의 ID를 roomId 변수로 설정
-            String roomId = doc.id;
-
-            print(snap.data!.docs.length,);
-
-            return ListTile(
-              title: Text('${data['user']}'),
-              subtitle: Text("못하겟따"),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatApp(chatRoomId: roomId),
-                  ),
-                );
-              },
-            );
-          },
+              return ListTile(
+                title: Text('${data['user']}'),
+                subtitle: Text("못하겟따"),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatApp(chatRoomId: roomId),
+                    ),
+                  );
+                },
+              );
+            },
+          ).toList(),
         );
+
       },
     );
   }
