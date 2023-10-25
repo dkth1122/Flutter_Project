@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // 필요한 패키지를 추가합니다.
+import 'package:project_flutter/join/userModel.dart';
+import 'package:provider/provider.dart';
 
 import '../firebase_options.dart';
 import 'join.dart';
@@ -11,13 +13,19 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp( ChangeNotifierProvider(
+    create: (context) => UserModel(),
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        fontFamily: 'Pretendard', // 사용할 폰트 패밀리 이름
+      ),
       title: '로그인',
       home: LoginPage(),
     );
@@ -47,21 +55,69 @@ class _LoginPageState extends State<LoginPage> {
           children: [
             TextField(
               controller: _id,
-              decoration: InputDecoration(labelText: '아이디'),
+              decoration: InputDecoration(
+                labelText: '아이디',
+                labelStyle: TextStyle(
+                  color: Color(0xff328772), // 포커스된 상태의 라벨 텍스트 색상
+                ),
+
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xff328772), width: 2.0,), // 포커스된 상태의 테두리 색상 설정
+                  borderRadius: BorderRadius.circular(10.0), // 포커스된 상태의 테두리 모양 설정 (선택 사항)
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xfff48752),  width: 2.0,), // 비활성 상태의 테두리 색상 설정
+                  borderRadius: BorderRadius.circular(10.0), // 비활성 상태의 테두리 모양 설정 (선택 사항)
+                ),
+              ),
             ),
             SizedBox(height: 8),
             TextField(
               controller: _pwd,
               obscureText: true,
-              decoration: InputDecoration(labelText: '비밀번호'),
+              decoration: InputDecoration(
+                labelText: '패스워드',
+                labelStyle: TextStyle(
+                  color: Color(0xff328772), // 포커스된 상태의 라벨 텍스트 색상
+                ),
+
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xff328772), width: 2.0,),
+                  // 포커스된 상태의 테두리 색상 설정
+                  borderRadius: BorderRadius.circular(10.0),
+
+                  // 포커스된 상태의 테두리 모양 설정 (선택 사항)
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xfff48752),  width: 2.0,), // 비활성 상태의 테두리 색상 설정
+                  borderRadius: BorderRadius.circular(10.0), // 비활성 상태의 테두리 모양 설정 (선택 사항)
+                ),
+              ),
             ),
             SizedBox(height: 16),
             ElevatedButton(
+              style: ButtonStyle(
+                minimumSize: MaterialStateProperty.all(Size(500, 55)),
+                backgroundColor: MaterialStateProperty.all(Color(0xfff48752)),
+                foregroundColor: MaterialStateProperty.all(Color(0xff328772)), // 텍스트 색상 변경
+                // 너비와 높이 조절
+              ),
               onPressed: _login,
               child: Text('로그인'),
             ),
-            SizedBox(height: 16),
+            Expanded(child: SizedBox(height: 10,)),
+
             ElevatedButton(
+              style: ButtonStyle(
+                minimumSize: MaterialStateProperty.all(Size(500, 55)),
+                backgroundColor: MaterialStateProperty.all(Colors.white),
+                side: MaterialStateProperty.all(BorderSide(
+                  color: Color(0xff424242),
+                  width: 2.0,
+                )),
+
+              ),
+
               onPressed: (){
                 Navigator.push(
                   context,
@@ -70,9 +126,10 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 );
               },
-              child: Text('회원가입'),
+              child: Text('회원가입', style: TextStyle(fontFamily: 'Pretedard', color: Colors.black),),
             ),
-            Text("데이터 테스트 다람쥐 쳇바퀴", style: TextStyle(fontFamily: 'Pretendard'))
+
+
           ],
         ),
       ),
@@ -88,6 +145,7 @@ class _LoginPageState extends State<LoginPage> {
         .where('pwd', isEqualTo: password).get();
 
     if (userDocs.docs.isNotEmpty) {
+      Provider.of<UserModel>(context, listen: false).login(id);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('성공적으로 로그인되었습니다!')),
       );
