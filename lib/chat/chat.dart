@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/firebase_options.dart';
@@ -52,7 +53,7 @@ class _ChatState extends State<Chat> {
                 final message = messages[index];
                 return ListTile(
                   title: Text(message['text']),
-                  subtitle: Text(message['displayName']),
+                  subtitle: Text(message['user']),
                 );
               },
             ),
@@ -87,10 +88,10 @@ class _ChatState extends State<Chat> {
 
   void handleOnSubmit() {
     if (newMessage.trim().isNotEmpty) {
-      FirebaseFirestore.instance.collection('messages').add({
+      FirebaseFirestore.instance.collection('chat').add({
         'text': newMessage.trim(),
-        'createdAt': FieldValue.serverTimestamp(),
-        'displayName': 'User', // Change to current user's display name
+        'sendTime': FieldValue.serverTimestamp(),
+        'user': 'User', // Change to current user's display name
       });
 
       messageController.clear();
