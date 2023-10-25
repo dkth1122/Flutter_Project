@@ -31,13 +31,21 @@ class ChatScreenState extends State<ChatScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _messageController = TextEditingController();
 
-// 사용자 A와 사용자 B의 UUID 생성
-  final Uuid uuid = Uuid();
-  final String userAId = uuid.v4();
-  final String userBId = uuid.v4();
+  // 사용자 A와 사용자 B의 UUID 생성
+  late String userAId;
+  late String userBId;
 
-// 채팅방 문서 ID => 방 이름 생성
-  final String chatRoomId = 'chat_room_${userAId}_${userBId}';
+  // 채팅방 문서 ID => 방 이름 생성
+  late String chatRoomId;
+
+  @override
+  void initState() {
+    super.initState();
+    final Uuid uuid = Uuid();
+    userAId = uuid.v4();
+    userBId = uuid.v4();
+    chatRoomId = 'chat_room_${userAId}_${userBId}';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +56,7 @@ class ChatScreenState extends State<ChatScreen> {
       body: Column(
         children: <Widget>[
           Expanded(
-            child: ChatMessages(chatRoomId: chatRoomId),
+            child: ChatMessages(chatRoomId: chatRoomId, userAId: userAId),
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -81,6 +89,7 @@ class ChatScreenState extends State<ChatScreen> {
       _firestore.collection('chat_rooms/$chatRoomId/messages').add({
         'text': text,
         'timestamp': FieldValue.serverTimestamp(),
+        'user': userAId, // 현재 사용자를 나타내는 ID
       });
       _messageController.clear();
     }
@@ -89,9 +98,11 @@ class ChatScreenState extends State<ChatScreen> {
 
 class ChatMessages extends StatelessWidget {
   final String chatRoomId;
+  final String userAId; // userAId를 추가
 
   ChatMessages({
     required this.chatRoomId,
+    required this.userAId, // 생성자에서 userAId를 받음
   });
 
   @override
@@ -102,31 +113,41 @@ class ChatMessages extends StatelessWidget {
           .orderBy('timestamp', descending: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (!snapshot.hasData) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(
             child: CircularProgressIndicator(),
           );
         }
 
-        final messages = snapshot.data!.docs;
+        final messages = snapshot.data?.docs;
 
-        List<Widget> messageWidgets = [];
-        for (var message in messages) {
-          final messageText = message['text'];
-          final messageTimestamp = message['timestamp'];
+        if (messages != null && messages.isNotEmpty) {
+          List<Widget> messageWidgets = [];
+          for (var message in messages) {
+            final messageText = message['text'];
+            final messageTimestamp = message['timestamp'];
+            final user = message['user'];
 
-          final messageWidget = ChatMessage(
-            text: messageText,
-            sendTime: (messageTimestamp as Timestamp).toDate(),
+            final isCurrentUser = user == userAId; // 현재 사용자인 경우
+
+            final messageWidget = ChatMessage(
+              text: messageText,
+              sendTime: (messageTimestamp as Timestamp).toDate(),
+              isCurrentUser: isCurrentUser,
+            );
+
+            messageWidgets.add(messageWidget);
+          }
+
+          return ListView(
+            reverse: true,
+            children: messageWidgets,
           );
-
-          messageWidgets.add(messageWidget);
+        } else {
+          return Center(
+            child: Text('No messages available.'),
+          );
         }
-
-        return ListView(
-          reverse: true,
-          children: messageWidgets,
-        );
       },
     );
   }
@@ -135,10 +156,12 @@ class ChatMessages extends StatelessWidget {
 class ChatMessage extends StatelessWidget {
   final String text;
   final DateTime sendTime;
+  final bool isCurrentUser;
 
   ChatMessage({
     required this.text,
     required this.sendTime,
+    required this.isCurrentUser,
   });
 
   @override
@@ -146,15 +169,15 @@ class ChatMessage extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
+        mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: <Widget>[
           Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: <Widget>[
               Container(
                 padding: EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                  color: Colors.blue,
+                  color: isCurrentUser ? Colors.blue : Colors.grey,
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 child: Text(
