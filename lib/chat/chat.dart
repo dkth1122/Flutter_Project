@@ -155,8 +155,8 @@ class ChatMessages extends StatelessWidget {
             final messageWidget = ChatMessage(
               text: messageText,
               sendTime: messageTimestamp != null
-                  ? DateFormat('a h:mm').format(messageTimestamp.toDate())
-                  : DateFormat('a h:mm').format(DateTime.now()),
+                  ? DateFormat('yy.MM.dd \n h:mm').format(messageTimestamp.toDate())
+                  : DateFormat('yy.MM.dd \n h:mm').format(DateTime.now()),
               isCurrentUser: isCurrentUser,
             );
 
@@ -180,7 +180,7 @@ class ChatMessages extends StatelessWidget {
 
 class ChatMessage extends StatelessWidget {
   final String text;
-  final String sendTime;
+  final String sendTime; // DateTime 대신 String으로 유지
   final bool isCurrentUser;
 
   ChatMessage({
@@ -191,17 +191,29 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final currentDateTime = DateTime.now();
-    final messageDateTime = DateFormat('yy.MM.dd hh:mm').parse(sendTime, true);
-
-    // 날짜를 비교하여 '다음 날' 여부를 확인
-    final isNextDay = currentDateTime.day < messageDateTime.day;
-
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
         mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: <Widget>[
+          isCurrentUser
+              ? Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Text(
+              '${sendTime.toString()}',
+              style: TextStyle(fontSize: 10, color: Colors.grey),
+              textAlign: TextAlign.left, // 자신의 메시지의 경우에는 왼쪽에 표시
+            ),
+          )
+              : Padding(
+            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+            child: Text(
+              '${sendTime.toString()}',
+              style: TextStyle(fontSize: 10, color: Colors.grey),
+              textAlign: TextAlign.right, // 상대방 메시지의 경우에는 오른쪽에 표시
+            ),
+          ),
+
           Column(
             crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: <Widget>[
@@ -209,17 +221,22 @@ class ChatMessage extends StatelessWidget {
                 padding: EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
                   color: isCurrentUser ? Colors.orange : Colors.grey,
-                  borderRadius: BorderRadius.circular(8.0),
+                  borderRadius: isCurrentUser
+                      ? BorderRadius.only(
+                    topLeft: Radius.circular(8.0),
+                    topRight: Radius.circular(8.0),
+                    bottomLeft: Radius.circular(8.0),
+                  )
+                      : BorderRadius.only(
+                    topLeft: Radius.circular(8.0),
+                    topRight: Radius.circular(8.0),
+                    bottomRight: Radius.circular(8.0),
+                  ),
                 ),
                 child: Text(
                   text,
                   style: TextStyle(color: Colors.white),
                 ),
-              ),
-              Text(
-                isNextDay ? '---------${DateFormat('yyyy.MM.dd').format(messageDateTime)}--------' : sendTime,
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-                textAlign: TextAlign.center,
               ),
             ],
           ),
