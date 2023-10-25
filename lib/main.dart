@@ -43,7 +43,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           SizedBox(
-            height: 300,
+            height: 100,
             child: Stack(
               children: [
                 sliderWidget(),
@@ -86,7 +86,7 @@ class _HomePageState extends State<HomePage> {
               return SizedBox(
                 width: MediaQuery.of(context).size.width,
                 child: Image(
-                  fit: BoxFit.fill,
+                  fit: BoxFit.cover,
                   image: NetworkImage(
                     imgLink,
                   ),
@@ -97,7 +97,7 @@ class _HomePageState extends State<HomePage> {
         },
       ).toList(),
       options: CarouselOptions(
-        height: 300,
+        height: 100,
         viewportFraction: 1.0,
         autoPlay: true,
         autoPlayInterval: const Duration(seconds: 4),
