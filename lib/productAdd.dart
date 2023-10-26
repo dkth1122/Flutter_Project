@@ -39,6 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final List<String> categories = ['UX기획','웹','커머스','모바일','프로그램','트렌드','데이터','기타',];
 
   void _addProduct() async {
+
+
     if (_pName.text.isNotEmpty &&
         _pDetail.text.isNotEmpty &&
         _price.text.isNotEmpty &&

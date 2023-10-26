@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart'; // 추가된 라이브러리
+import 'package:intl/intl.dart';
 import 'package:project_flutter/productView.dart';
 
 class Product extends StatefulWidget {
@@ -99,69 +99,49 @@ class _ProductState extends State<Product> {
                     );
                   },
                   child: Container(
-                    width: 100,
-                    height: 100,
-                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.black, width: 1.0),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Stack(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Positioned.fill(
-                          child: Image.network(
-                            imageUrl,
-                            fit: BoxFit.cover,
+                        Expanded(
+                          flex: 2,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(10),
+                            child: Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                            ),
                           ),
                         ),
-                        Positioned(
-                          bottom: 8,
-                          left: 8,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ProductView(
-                                        productName: productName,
-                                        price: formattedPrice.toString(),
-                                        imageUrl: imageUrl,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Text(
+                        const SizedBox(height: 8),
+                        Expanded(
+                          flex: 1,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
                                   productName,
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 15,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ProductView(
-                                        productName: productName,
-                                        price: formattedPrice.toString(),
-                                        imageUrl: imageUrl,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                child: Text(
-                                  '가격: $formattedPrice 원', // 포맷된 가격을 출력
+                                const SizedBox(height: 4),
+                                Text(
+                                  '가격: $formattedPrice 원',
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 12,
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                       ],
