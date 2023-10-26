@@ -230,7 +230,7 @@ class _MyPageState extends State<MyPage> {
             IconButton(
               onPressed: () {
                 Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => ChatApp(chatRoomId: 'chatRoomId')),
+                  context, MaterialPageRoute(builder: (context) => ChatApp()),
                 );
               },
               icon: Icon(Icons.chat),
