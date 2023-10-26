@@ -49,7 +49,9 @@ class _HomePageState extends State<HomePage> {
   // 1초에 한번씩 로딩되는 문제를 해결하기 위해 밖으로 뺏음
   // 현재는 가격 낮은 순으로 정렬했지만 cnt가 추가되면 조회수 높은 순으로 할 예정
   final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").orderBy("price").limit(3).snapshots();
-  final PageController controller = PageController(initialPage: 0, viewportFraction: 0.8);
+  final Stream<QuerySnapshot> productStream2 = FirebaseFirestore.instance.collection("product").snapshots();
+
+
   List imageList = [
     "https://cdn.pixabay.com/photo/2014/04/14/20/11/pink-324175_1280.jpg",
     "https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_1280.jpg",
@@ -107,28 +109,25 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             SizedBox(height: 20,),
-            Container(
-              height: 100,
-              child: PageView(
-                scrollDirection: Axis.horizontal,
-                pageSnapping: false, // false로 수정
-                controller: controller,
-                children: <Widget>[
-                  Container(
-                    color: Colors.blue.withOpacity(0.5),
-                    child: Center(
-                      child: Text('첫 번째 페이지'),
-                    ),
+            // 인기 서비스
+            Row(
+              children: [
+                SizedBox(width: 10,),
+                Text(
+                  "인기 서비스",
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontFamily: 'Pretendard',
+                      fontWeight: FontWeight.bold
                   ),
-                  Container(
-                    color: Colors.red.withOpacity(0.5),
-                    child: Center(
-                      child: Text('첫 번째 페이지'),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
+            Container(
+              height: 250,
+              child: _heartProduct()
+            ),
+            SizedBox(height: 20,),
             // Row는 가장 많이 본 서비스
             Row(
               children: [
@@ -421,7 +420,7 @@ class _HomePageState extends State<HomePage> {
 
   Widget _cntProduct() {
     return StreamBuilder(
-      stream: productStream, // 이제 스트림을 한 번만 설정
+      stream: productStream,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
         if (!snap.hasData) {
           return Transform.scale(
@@ -429,8 +428,7 @@ class _HomePageState extends State<HomePage> {
             child: CircularProgressIndicator(strokeWidth: 20,),
           );
         }
-        return ListView(
-          shrinkWrap: true,
+        return Column(
           children: snap.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> data = document.data() as Map<String, dynamic>;
             return ListTile(
@@ -449,5 +447,47 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _heartProduct() {
+    return StreamBuilder(
+      stream: productStream2,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
+        if (!snap.hasData) {
+          return Transform.scale(
+            scale: 0.1,
+            child: CircularProgressIndicator(strokeWidth: 20),
+          );
+        }
 
+        int initialPage = snap.data!.docs.length ~/ 2;
+
+        return PageView(
+          scrollDirection: Axis.horizontal,
+          pageSnapping: false,
+          controller: PageController(initialPage: initialPage, viewportFraction: 0.6),
+          children: snap.data!.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+            return Container(
+              child: Card(
+                child: Column(
+                  children: [
+                    SizedBox(height: 10),
+                    Image.asset(
+                      'assets/cat1.jpeg',
+                      width: 300,
+                      height: 150,
+                      fit: BoxFit.cover,
+                    ),
+                    ListTile(
+                      title: Text(data['pDetail']),
+                      subtitle: Text("가격 : ${data['price']}"),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
 }
