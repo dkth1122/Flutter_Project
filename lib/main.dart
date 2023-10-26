@@ -49,6 +49,7 @@ class _HomePageState extends State<HomePage> {
   // 1초에 한번씩 로딩되는 문제를 해결하기 위해 밖으로 뺏음
   // 현재는 가격 낮은 순으로 정렬했지만 cnt가 추가되면 조회수 높은 순으로 할 예정
   final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").orderBy("price").limit(3).snapshots();
+  final PageController controller = PageController(initialPage: 0, viewportFraction: 0.8);
   List imageList = [
     "https://cdn.pixabay.com/photo/2014/04/14/20/11/pink-324175_1280.jpg",
     "https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_1280.jpg",
@@ -106,6 +107,22 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             SizedBox(height: 20,),
+            Container(
+              height: 100,
+              child: PageView(
+                scrollDirection: Axis.horizontal,
+                pageSnapping: false, // false로 수정
+                controller: controller,
+                children: <Widget>[
+                  Container(
+                    color: Colors.blue.withOpacity(0.5),
+                    child: Center(
+                      child: Text('첫 번째 페이지'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             // Row는 가장 많이 본 서비스
             Row(
               children: [
@@ -146,7 +163,7 @@ class _HomePageState extends State<HomePage> {
             IconButton(
                 onPressed: (){
                   Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => ChatApp(chatRoomId: 'chatRoomId',))
+                      context, MaterialPageRoute(builder: (context) => ChatApp())
                   );
                 },
                 icon: Icon(Icons.chat)
