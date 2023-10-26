@@ -32,6 +32,7 @@ class _ProductState extends State<Product> {
       if (um.isLogin) {
         // 사용자가 로그인한 경우
         user = um.userId!;
+        print(user);
 
       } else {
         // 사용자가 로그인하지 않은 경우
