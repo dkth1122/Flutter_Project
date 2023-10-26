@@ -1,20 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
-import 'package:uuid/uuid.dart';
-import 'package:project_flutter/firebase_options.dart';
+import 'package:project_flutter/join/userModel.dart';
+import 'package:provider/provider.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  final String chatRoomId = 'your_chat_room_id'; // 여기에 원하는 chatRoomId를 지정
-
-  runApp(ChatApp(chatRoomId: chatRoomId));
-}
+final String chatRoomId = ''; // 여기에 원하는 chatRoomId를 지정
 
 class ChatApp extends StatelessWidget {
 
@@ -51,9 +41,17 @@ class ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    final Uuid uuid = Uuid();
-    userAId = uuid.v4();
-    userBId = uuid.v4();
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+    userBId = "UserB";
+    if (um.isLogin) {
+      // 사용자가 로그인한 경우
+      userAId = um.userId!;
+
+    } else {
+      // 사용자가 로그인하지 않은 경우
+      userAId = "없음";
+      print("로그인 안됨");
+    }
     chatRoomId = 'chat_room_${userAId}_${userBId}';
   }
 

@@ -1,16 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_flutter/chat/chat.dart';
-import 'package:project_flutter/firebase_options.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(ChatList());
-}
 
 class ChatList extends StatefulWidget {
   @override
@@ -22,20 +12,31 @@ class _ChatListState extends State<ChatList> {
 
   @override
   Widget build(BuildContext context) {
+    Stream<QuerySnapshot> messageStream = _fs
+        .collection("chat_rooms")
+        .where(FieldPath.documentId, isGreaterThanOrEqualTo: "yyn1234")
+        .snapshots();
+
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
           title: Text('채팅 목록'),
         ),
-        body: _chatting(),
+        body: MessageListWidget(messageStream: messageStream),
       ),
     );
   }
+}
 
-  Widget _chatting() {
+class MessageListWidget extends StatelessWidget {
+  final Stream<QuerySnapshot> messageStream;
+
+  MessageListWidget({required this.messageStream});
+
+  @override
+  Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: _fs.collection("chat_rooms").orderBy("timestamp", descending: true).snapshots(),
-
+      stream: messageStream,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
 
         if (!snap.hasData) {
@@ -43,29 +44,18 @@ class _ChatListState extends State<ChatList> {
         }
 
         return ListView(
-          children: snap.data!.docs.map(
-                (DocumentSnapshot doc) {
-              Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-              // 문서의 ID를 roomId 변수로 설정
-              String roomId = doc.id;
-              print(roomId);
+          children: snap.data!.docs.map((DocumentSnapshot doc) {
+            Map<String, dynamic> messageData = doc.data() as Map<String, dynamic>;
 
-              return ListTile(
-                title: Text('${data['user']}'),
-                subtitle: Text("테스트"),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatApp(chatRoomId: roomId),
-                    ),
-                  );
-                },
-              );
-            },
-          ).toList(),
+            String messageText = messageData['text'];
+            String sender = messageData['user'];
+
+            return ListTile(
+              title: Text(sender),
+              subtitle: Text(messageText),
+            );
+          }).toList(),
         );
-
       },
     );
   }
