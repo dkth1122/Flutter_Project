@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // 필요한 패키지를 추가합니다.
 import 'package:project_flutter/join/loginSuccess.dart';
 import 'package:project_flutter/join/userModel.dart';
+import 'package:project_flutter/myPage/my_page.dart';
 import 'package:provider/provider.dart';
 
 import '../firebase_options.dart';
@@ -147,13 +148,11 @@ class _LoginPageState extends State<LoginPage> {
 
     if (userDocs.docs.isNotEmpty) {
       Provider.of<UserModel>(context, listen: false).login(id);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('성공적으로 로그인되었습니다!')),
-      );
+
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => LoginSuccess(),
+          builder: (context) => MyPage(),
         ),
       );
       _id.clear();

@@ -189,12 +189,17 @@ class _HomePageState extends State<HomePage> {
                 icon: Icon(Icons.chat_outlined)
             ),
             IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => MyPage())
-                  );
-                },
-                icon: Icon(Icons.person)
+              onPressed: () async {
+                DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('userList').doc('id').get();
+                Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyPage(),
+                  ),
+                );
+              },
+              icon: Icon(Icons.person),
             ),
           ],
         ),
