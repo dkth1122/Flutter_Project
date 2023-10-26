@@ -1,0 +1,193 @@
+[1mdiff --git a/lib/join/login_email.dart b/lib/join/login_email.dart[m
+[1mindex ccc6b8d..022427c 100644[m
+[1m--- a/lib/join/login_email.dart[m
+[1m+++ b/lib/join/login_email.dart[m
+[36m@@ -1,8 +1,8 @@[m
+ import 'package:firebase_core/firebase_core.dart';[m
+ import 'package:flutter/material.dart';[m
+ import 'package:cloud_firestore/cloud_firestore.dart'; // 필요한 패키지를 추가합니다.[m
+[32m+[m[32mimport 'package:project_flutter/join/loginSuccess.dart';[m
+ import 'package:project_flutter/join/userModel.dart';[m
+[31m-import 'package:project_flutter/main.dart';[m
+ import 'package:provider/provider.dart';[m
+ [m
+ import '../firebase_options.dart';[m
+[36m@@ -147,11 +147,13 @@[m [mclass _LoginPageState extends State<LoginPage> {[m
+ [m
+     if (userDocs.docs.isNotEmpty) {[m
+       Provider.of<UserModel>(context, listen: false).login(id);[m
+[31m-[m
+[32m+[m[32m      ScaffoldMessenger.of(context).showSnackBar([m
+[32m+[m[32m        SnackBar(content: Text('성공적으로 로그인되었습니다!')),[m
+[32m+[m[32m      );[m
+       Navigator.push([m
+         context,[m
+         MaterialPageRoute([m
+[31m-          builder: (context) => HomePage(),[m
+[32m+[m[32m          builder: (context) => LoginSuccess(),[m
+         ),[m
+       );[m
+       _id.clear();[m
+[1mdiff --git a/lib/main.dart b/lib/main.dart[m
+[1mindex db76b18..644f48d 100644[m
+[1m--- a/lib/main.dart[m
+[1m+++ b/lib/main.dart[m
+[36m@@ -3,7 +3,6 @@[m [mimport 'package:firebase_core/firebase_core.dart';[m
+ import 'package:flutter/material.dart';[m
+ import 'package:carousel_slider/carousel_slider.dart';[m
+ import 'package:project_flutter/chat/chatList.dart';[m
+[31m-import 'package:project_flutter/join/login_email.dart';[m
+ import 'package:project_flutter/myPage/my_page.dart';[m
+ import 'package:project_flutter/product.dart';[m
+ import 'package:provider/provider.dart';[m
+[36m@@ -64,13 +63,6 @@[m [mclass _HomePageState extends State<HomePage> {[m
+     return Scaffold([m
+       appBar: AppBar([m
+         title: const Text('용채'),[m
+[31m-        actions: [[m
+[31m-          TextButton(onPressed: (){[m
+[31m-            Navigator.push([m
+[31m-            context, MaterialPageRoute(builder: (context) => LoginPage())[m
+[31m-            );[m
+[31m-          }, child: Text("로그인",style: TextStyle(fontSize: 15, color: Colors.white),))[m
+[31m-        ],[m
+       ),[m
+       body: SingleChildScrollView([m
+         child: Column([m
+[36m@@ -79,13 +71,13 @@[m [mclass _HomePageState extends State<HomePage> {[m
+               padding: EdgeInsets.all(20),[m
+               child: TextField([m
+                 decoration: InputDecoration([m
+[31m-                  hintText: "검색어를 입력하세요",[m
+[31m-                  suffixIcon: Icon(Icons.search),[m
+[31m-                  border: OutlineInputBorder([m
+[31m-                    borderRadius: BorderRadius.circular(25)[m
+[31m-                  ),[m
+[31m-                  filled: true,[m
+[31m-                  fillColor: Color.fromRGBO(211, 211, 211, 0.7019607843137254)[m
+[32m+[m[32m                    hintText: "검색어를 입력하세요",[m
+[32m+[m[32m                    suffixIcon: Icon(Icons.search),[m
+[32m+[m[32m                    border: OutlineInputBorder([m
+[32m+[m[32m                        borderRadius: BorderRadius.circular(25)[m
+[32m+[m[32m                    ),[m
+[32m+[m[32m                    filled: true,[m
+[32m+[m[32m                    fillColor: Color.fromRGBO(211, 211, 211, 0.7019607843137254)[m
+ [m
+                 ),[m
+                 onChanged: (text) {[m
+[36m@@ -119,9 +111,9 @@[m [mclass _HomePageState extends State<HomePage> {[m
+                 Text([m
+                   "가장 많이 본 서비스",[m
+                   style: TextStyle([m
+[31m-                    fontSize: 24,[m
+[31m-                    fontFamily: 'Pretendard',[m
+[31m-                    fontWeight: FontWeight.bold[m
+[32m+[m[32m                      fontSize: 24,[m
+[32m+[m[32m                      fontFamily: 'Pretendard',[m
+[32m+[m[32m                      fontWeight: FontWeight.bold[m
+                   ),[m
+                 ),[m
+               ],[m
+[36m@@ -197,18 +189,12 @@[m [mclass _HomePageState extends State<HomePage> {[m
+                 icon: Icon(Icons.chat_outlined)[m
+             ),[m
+             IconButton([m
+[31m-              onPressed: () async {[m
+[31m-[m
+[31m-[m
+[31m-                final userModel = Provider.of<UserModel>(context, listen: false);[m
+[31m-                if (userModel.isLogin) {[m
+[31m-                  // 사용자가 로그인한 경우에만 MyPage로 이동[m
+[31m-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyPage()));[m
+[31m-                } else {[m
+[31m-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));[m
+[31m-                }[m
+[31m-              },[m
+[31m-              icon: Icon(Icons.person),[m
+[32m+[m[32m                onPressed: (){[m
+[32m+[m[32m                  Navigator.push([m
+[32m+[m[32m                      context, MaterialPageRoute(builder: (context) => MyPage())[m
+[32m+[m[32m                  );[m
+[32m+[m[32m                },[m
+[32m+[m[32m                icon: Icon(Icons.person)[m
+             ),[m
+           ],[m
+         ),[m
+[1mdiff --git a/lib/myPage/my_page.dart b/lib/myPage/my_page.dart[m
+[1mindex 86fddcd..1c4b0e2 100644[m
+[1m--- a/lib/myPage/my_page.dart[m
+[1m+++ b/lib/myPage/my_page.dart[m
+[36m@@ -1,76 +1,57 @@[m
+[31m-import 'package:cloud_firestore/cloud_firestore.dart';[m
+ import 'package:firebase_core/firebase_core.dart';[m
+ import 'package:flutter/material.dart';[m
+[31m-import 'package:provider/provider.dart';[m
+ [m
+[31m-import '../chat/chat.dart';[m
+[31m-import '../chat/chatList.dart';[m
+ import '../firebase_options.dart';[m
+[31m-import '../join/userModel.dart';[m
+[31m-import '../product.dart';[m
+ [m
+ void main() async {[m
+   WidgetsFlutterBinding.ensureInitialized();[m
+   await Firebase.initializeApp([m
+     options: DefaultFirebaseOptions.currentPlatform,[m
+   );[m
+[31m-  runApp([m
+[31m-    ChangeNotifierProvider([m
+[31m-      create: (context) => UserModel(),[m
+[31m-      child: MyApp(),[m
+[31m-    ),[m
+[31m-  );[m
+[31m-}[m
+[31m-[m
+[31m-class MyApp extends StatelessWidget {[m
+[31m-  @override[m
+[31m-  Widget build(BuildContext context) {[m
+[31m-    return MaterialApp([m
+[31m-      home: MyPage(),[m
+[31m-    );[m
+[31m-  }[m
+[32m+[m[32m  runApp(MyPage());[m
+ }[m
+ [m
+ class MyPage extends StatefulWidget {[m
+[32m+[m[32m  const MyPage({Key? key});[m
+[32m+[m
+   @override[m
+   State<MyPage> createState() => _MyPageState();[m
+ }[m
+ [m
+ class _MyPageState extends State<MyPage> {[m
+[32m+[m
+   @override[m
+   Widget build(BuildContext context) {[m
+[31m-    UserModel userModel = Provider.of<UserModel>(context);[m
+[31m-    String? userId = userModel.userId;[m
+[31m-    return Scaffold([m
+[31m-      appBar: AppBar([m
+[31m-        title: Text([m
+[31m-          "마이페이지",[m
+[31m-          style: TextStyle(color: Colors.grey),[m
+[31m-        ),[m
+[31m-        centerTitle: true,[m
+[31m-        backgroundColor: Colors.white,[m
+[31m-        elevation: 1.0,[m
+[31m-        iconTheme: IconThemeData(color: Colors.grey),[m
+[31m-        leading: IconButton([m
+[31m-          icon: Icon(Icons.add_alert),[m
+[31m-          onPressed: () {[m
+[31m-            // 왼쪽 아이콘을 눌렀을 때 수행할 작업을 여기에 추가합니다.[m
+[31m-          },[m
+[31m-        ),[m
+[31m-        actions: [[m
+[31m-          TextButton([m
+[31m-            child: Text([m
+[31m-              "계정 설정",[m
+[31m-              style: TextStyle(color: Colors.grey),[m
+[31m-            ),[m
+[32m+[m[32m    return MaterialApp([m
+[32m+[m[32m      home: Scaffold([m
+[32m+[m[32m        appBar: AppBar([m
+[32m+[m[32m          title: Text(
