@@ -1,7 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:project_flutter/chat/chatList.dart';
 import 'package:project_flutter/product.dart';
+import 'chat/chat.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -33,6 +36,9 @@ class _HomePageState extends State<HomePage> {
   int _current = 0;
   int _current2 = 0;
   final CarouselController _controller = CarouselController();
+  // 1초에 한번씩 로딩되는 문제를 해결하기 위해 밖으로 뺏음
+  // 현재는 가격 낮은 순으로 정렬했지만 cnt가 추가되면 조회수 높은 순으로 할 예정
+  final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").orderBy("price").limit(3).snapshots();
   List imageList = [
     "https://cdn.pixabay.com/photo/2014/04/14/20/11/pink-324175_1280.jpg",
     "https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_1280.jpg",
@@ -50,47 +56,70 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('용채'),
       ),
-      body: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.all(20),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: "검색어를 입력하세요",
-                suffixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(25)
-                ),
-                filled: true,
-                fillColor: Color.fromRGBO(211, 211, 211, 0.7019607843137254)
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.all(20),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: "검색어를 입력하세요",
+                  suffixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25)
+                  ),
+                  filled: true,
+                  fillColor: Color.fromRGBO(211, 211, 211, 0.7019607843137254)
 
+                ),
+                onChanged: (text) {
+                },
               ),
-              onChanged: (text) {
-              },
             ),
-          ),
-          SizedBox(
-            height: 100,
-            child: Stack(
+            SizedBox(
+              height: 100,
+              child: Stack(
+                children: [
+                  sliderWidget(),
+                  sliderIndicator(),
+                ],
+              ),
+            ),
+            SizedBox(height: 20,),
+            SizedBox(
+              height: 300,
+              child: Stack(
+                children: [
+                  sliderWidget2(),
+                  sliderIndicator2(),
+                ],
+              ),
+            ),
+            SizedBox(height: 200,),
+            Row(
               children: [
-                sliderWidget(),
-                sliderIndicator(),
+                SizedBox(width: 20,),
+                Text(
+                  "가장 많이 본 서비스",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontFamily: 'Pretendard',
+                    fontWeight: FontWeight.bold
+                  ),
+                ),
               ],
             ),
-          ),
-          SizedBox(height: 20,),
-          SizedBox(
-            height: 300,
-            child: Stack(
-              children: [
-                sliderWidget2(),
-                sliderIndicator2(),
-              ],
-            ),
-          ),
-        ],
+            _cntProduct(),
+          ],
+        ),
       ),
+
+
+
+
+
       bottomNavigationBar: BottomAppBar(
+        height: 60,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -101,7 +130,23 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
                 icon: Icon(Icons.add_circle_outline)
-            )
+            ),
+            IconButton(
+                onPressed: (){
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => ChatApp(chatRoomId: 'chatRoomId',))
+                  );
+                },
+                icon: Icon(Icons.chat)
+            ),
+            IconButton(
+                onPressed: (){
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => ChatList())
+                  );
+                },
+                icon: Icon(Icons.chat_outlined)
+            ),
           ],
         ),
       ),
@@ -324,6 +369,30 @@ class _HomePageState extends State<HomePage> {
           );
         }),
       ),
+    );
+  }
+
+  Widget _cntProduct() {
+    return StreamBuilder(
+      stream: productStream, // 이제 스트림을 한 번만 설정
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
+        return ListView(
+          shrinkWrap: true,
+          children: snap.data!.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+            return ListTile(
+              leading: Image.asset(
+                'dog1.PNG',
+                width: 200,
+                height: 300,
+                fit: BoxFit.cover,
+              ),
+              title: Text(data['product_detail']),
+              subtitle: Text("가격 : ${data['price']}"),
+            );
+          }).toList(),
+        );
+      },
     );
   }
 }
