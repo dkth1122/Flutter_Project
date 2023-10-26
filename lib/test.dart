@@ -1,80 +1,57 @@
 import 'package:flutter/material.dart';
 
-class My extends StatefulWidget {
-  const My({super.key});
+void main() => runApp(const Test());
 
-  @override
-  State<My> createState() => _MyState();
-}
+/// This is the main application widget.
+class Test extends StatelessWidget {
+  const Test({Key? key}) : super(key: key);
 
-class _MyState extends State<My> {
+  static const String _title = 'Text PageView';
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("gd"),),
-      body: Column(
-        children: [
-          // 다른 위젯들 추가
-
-          Expanded(
-            child: PageView(
-              // 페이지 목록
-              children: [
-                // 첫 번째 페이지
-                SizedBox.expand(
-                  child: Container(
-                    color: Colors.red,
-                    child: Center(
-                      child: Text(
-                        'Page index : 0',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ),
-                  ),
-                ),
-                // 두 번째 페이지
-                SizedBox.expand(
-                  child: Container(
-                    color: Colors.yellow,
-                    child: Center(
-                      child: Text(
-                        'Page index : 1',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ),
-                  ),
-                ),
-                // 세 번째 페이지
-                SizedBox.expand(
-                  child: Container(
-                    color: Colors.green,
-                    child: Center(
-                      child: Text(
-                        'Page index : 2',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ),
-                  ),
-                ),
-                // 네 번째 페이지
-                SizedBox.expand(
-                  child: Container(
-                    color: Colors.blue,
-                    child: Center(
-                      child: Text(
-                        'Page index : 3',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ),
-                  ),
-                )
-              ],
-            )
-          ),
-
-          // 다른 위젯들 추가
-        ],
+    return MaterialApp(
+      title: _title,
+      home: Scaffold(
+        appBar: AppBar(title: const Text(_title)),
+        body: const PageViewWidget(),
       ),
+    );
+  }
+}
+
+/// This is the stateless widget that the main application instantiates.
+class PageViewWidget extends StatelessWidget {
+  const PageViewWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final PageController controller =
+    PageController(initialPage: 0, viewportFraction: 0.8);
+
+    return PageView(
+      scrollDirection: Axis.horizontal,
+      controller: controller,
+      children: <Widget>[
+        Container(
+          color: Colors.blue.withOpacity(0.5),
+          child: Center(
+            child: Text('첫 번째 페이지',style: TextStyle(fontSize: 50),),
+          ),
+        ),
+        Container(
+          color: Colors.orangeAccent.withOpacity(0.5),
+          child: Center(
+            child: Text('두 번째 페이지',style: TextStyle(fontSize: 50),),
+          ),
+        ),
+        Container(
+          color: Colors.cyanAccent.withOpacity(0.5),
+          child: Center(
+            child: Text('세 번째 페이지',style: TextStyle(fontSize: 50),),
+          ),
+        ),
+      ],
     );
   }
 }

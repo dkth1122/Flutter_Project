@@ -3,9 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:project_flutter/chat/chatList.dart';
-import 'package:project_flutter/join/login_email.dart';
 import 'package:project_flutter/myPage/my_page.dart';
 import 'package:project_flutter/product.dart';
+import 'package:project_flutter/test.dart';
 import 'package:provider/provider.dart';
 import 'chat/chat.dart';
 import 'firebase_options.dart';
@@ -55,22 +55,15 @@ class _HomePageState extends State<HomePage> {
     "https://cdn.pixabay.com/photo/2015/06/19/20/13/sunset-815270_1280.jpg",
     "https://cdn.pixabay.com/photo/2016/01/08/05/24/sunflower-1127174_1280.jpg",
   ];
-  List<String> imagePaths1 = ['dog1.PNG','dog2.PNG','dog3.PNG','dog4.PNG',];
-  List<String> imagePaths2 = ['dog1.PNG','dog2.PNG','dog3.PNG','dog4.PNG',];
-  List<String> imagePaths3 = ['dog1.PNG','dog2.PNG','dog3.PNG','dog4.PNG',];
-  List<String> imagePaths4 = ['dog1.PNG','dog2.PNG','dog3.PNG','dog4.PNG',];
+  List<String> imagePaths1 = ['assets/cat1.jpeg','assets/cat2.jpeg','assets/cat3.jpeg','assets/cat4.jpeg',];
+  List<String> imagePaths2 = ['assets/cat1.jpeg','assets/cat2.jpeg','assets/cat3.jpeg','assets/cat4.jpeg',];
+  List<String> imagePaths3 = ['assets/cat1.jpeg','assets/cat2.jpeg','assets/cat3.jpeg','assets/cat4.jpeg',];
+  List<String> imagePaths4 = ['assets/cat1.jpeg','assets/cat2.jpeg','assets/cat3.jpeg','assets/cat4.jpeg',];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('용채'),
-        actions: [
-          TextButton(onPressed: (){
-            Navigator.push(
-            context, MaterialPageRoute(builder: (context) => LoginPage())
-            );
-          }, child: Text("로그인",style: TextStyle(fontSize: 15, color: Colors.white),))
-        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -79,13 +72,13 @@ class _HomePageState extends State<HomePage> {
               padding: EdgeInsets.all(20),
               child: TextField(
                 decoration: InputDecoration(
-                  hintText: "검색어를 입력하세요",
-                  suffixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25)
-                  ),
-                  filled: true,
-                  fillColor: Color.fromRGBO(211, 211, 211, 0.7019607843137254)
+                    hintText: "검색어를 입력하세요",
+                    suffixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(25)
+                    ),
+                    filled: true,
+                    fillColor: Color.fromRGBO(211, 211, 211, 0.7019607843137254)
 
                 ),
                 onChanged: (text) {
@@ -119,35 +112,12 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   "가장 많이 본 서비스",
                   style: TextStyle(
-                    fontSize: 24,
-                    fontFamily: 'Pretendard',
-                    fontWeight: FontWeight.bold
+                      fontSize: 24,
+                      fontFamily: 'Pretendard',
+                      fontWeight: FontWeight.bold
                   ),
                 ),
               ],
-            ),
-            Container(
-              height: 100,
-              child: PageView(
-                clipBehavior: Clip.none,
-                children: [
-                  Container(
-                    height: 200, // 원하는 높이 설정
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal, // 수평 스크롤을 위해
-                      child: Row(
-                        children: [
-                          Image.asset('dog1.png'),
-                          Image.asset('dog1.png'),
-                          Image.asset('dog1.png'),
-                          Image.asset('dog1.png'),
-                          Image.asset('dog1.png'),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
             ),
             _cntProduct(),
             SizedBox(
@@ -158,7 +128,6 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-
           ],
         ),
       ),
@@ -197,18 +166,20 @@ class _HomePageState extends State<HomePage> {
                 icon: Icon(Icons.chat_outlined)
             ),
             IconButton(
-              onPressed: () async {
-
-
-                final userModel = Provider.of<UserModel>(context, listen: false);
-                if (userModel.isLogin) {
-                  // 사용자가 로그인한 경우에만 MyPage로 이동
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyPage()));
-                } else {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
-                }
-              },
-              icon: Icon(Icons.person),
+                onPressed: (){
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => MyPage())
+                  );
+                },
+                icon: Icon(Icons.person)
+            ),
+            IconButton(
+                onPressed: (){
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => Test())
+                  );
+                },
+                icon: Icon(Icons.telegram_sharp)
             ),
           ],
         ),
@@ -451,7 +422,7 @@ class _HomePageState extends State<HomePage> {
             Map<String, dynamic> data = document.data() as Map<String, dynamic>;
             return ListTile(
               leading: Image.asset(
-                'dog1.PNG',
+                'cat1.jpeg',
                 width: 200,
                 height: 300,
                 fit: BoxFit.cover,
