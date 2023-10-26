@@ -3,16 +3,24 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:project_flutter/chat/chatList.dart';
+import 'package:project_flutter/myPage/my_page.dart';
 import 'package:project_flutter/product.dart';
+import 'package:provider/provider.dart';
 import 'chat/chat.dart';
 import 'firebase_options.dart';
+import 'join/userModel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MyApp());
+  runApp(
+      ChangeNotifierProvider(
+        create: (context) => UserModel(),
+        child: MyApp(),
+      )
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -146,6 +154,14 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
                 icon: Icon(Icons.chat_outlined)
+            ),
+            IconButton(
+                onPressed: (){
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => MyPage())
+                  );
+                },
+                icon: Icon(Icons.person)
             ),
           ],
         ),
@@ -376,6 +392,12 @@ class _HomePageState extends State<HomePage> {
     return StreamBuilder(
       stream: productStream, // 이제 스트림을 한 번만 설정
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
+        if (!snap.hasData) {
+          return Transform.scale(
+            scale: 0.1,
+            child: CircularProgressIndicator(strokeWidth: 20,),
+          );
+        }
         return ListView(
           shrinkWrap: true,
           children: snap.data!.docs.map((DocumentSnapshot document) {
