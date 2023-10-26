@@ -120,6 +120,12 @@ class _HomePageState extends State<HomePage> {
                       child: Text('첫 번째 페이지'),
                     ),
                   ),
+                  Container(
+                    color: Colors.red.withOpacity(0.5),
+                    child: Center(
+                      child: Text('첫 번째 페이지'),
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -159,14 +165,6 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
                 icon: Icon(Icons.add_circle_outline)
-            ),
-            IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => ChatApp())
-                  );
-                },
-                icon: Icon(Icons.chat)
             ),
             IconButton(
                 onPressed: (){
