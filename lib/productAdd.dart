@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-
+import 'package:project_flutter/join/userModel.dart';
+import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -13,6 +14,8 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -21,7 +24,12 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
+
+
 class HomeScreen extends StatefulWidget {
+
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -33,6 +41,23 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _iUrl = TextEditingController();
   final TextEditingController _cnt = TextEditingController();
   final TextEditingController _user = TextEditingController();
+  String user = "";
+
+  @override
+  void initState() {
+    super.initState();
+    UserModel um =Provider.of<UserModel>(context, listen: false);
+
+    if (um.isLogin) {
+      // 사용자가 로그인한 경우
+      user = um.userId!;
+
+    } else {
+      // 사용자가 로그인하지 않은 경우
+      user = "없음";
+      print("로그인 안됨");
+    }
+  }
 
   String? _selectedCategory;
 
@@ -56,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
         'iUrl': _iUrl.text,
         'category': _selectedCategory,
         'cnt': 0,
-        'user': _user.text,
+        'user': user,
         'sendTime': FieldValue.serverTimestamp(),
       });
 
@@ -143,11 +168,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
               },
               decoration: InputDecoration(labelText: "카테고리"),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _user,
-              decoration: InputDecoration(labelText: "등록자"),
             ),
             SizedBox(height: 20),
             ElevatedButton(

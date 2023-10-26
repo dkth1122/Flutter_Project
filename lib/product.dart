@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
+import 'package:project_flutter/productAdd.dart';
 import 'package:project_flutter/productView.dart';
+import 'package:project_flutter/join/userModel.dart';
+import 'package:provider/provider.dart';
 
 class Product extends StatefulWidget {
   @override
@@ -20,6 +22,23 @@ class _ProductState extends State<Product> {
         productStream = FirebaseFirestore.instance.collection("product").snapshots();
       });
     });
+    String user = "";
+
+    @override
+    void initState() {
+      super.initState();
+      UserModel um =Provider.of<UserModel>(context, listen: false);
+
+      if (um.isLogin) {
+        // 사용자가 로그인한 경우
+        user = um.userId!;
+
+      } else {
+        // 사용자가 로그인하지 않은 경우
+        user = "없음";
+        print("로그인 안됨");
+      }
+    }
   }
 
   @override
@@ -50,6 +69,19 @@ class _ProductState extends State<Product> {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => HomeScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: Container(
         padding: const EdgeInsets.all(10),
@@ -83,8 +115,6 @@ class _ProductState extends State<Product> {
                 final price = document['price'] as int;
                 final imageUrl = document['iUrl'] as String;
 
-                final formattedPrice = NumberFormat('#,###').format(price); // 가격을 한국 원화 단위로 포맷
-
                 return GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -92,56 +122,76 @@ class _ProductState extends State<Product> {
                       MaterialPageRoute(
                         builder: (context) => ProductView(
                           productName: productName,
-                          price: formattedPrice.toString(),
+                          price: price.toString(),
                           imageUrl: imageUrl,
                         ),
                       ),
                     );
                   },
                   child: Container(
+                    width: 100,
+                    height: 100,
+                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.black, width: 1.0),
-                      borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                    child: Stack(
                       children: [
-                        Expanded(
-                          flex: 2,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.network(
-                              imageUrl,
-                              fit: BoxFit.cover,
-                            ),
+                        Positioned.fill(
+                          child: Image.network(
+                            imageUrl,
+                            fit: BoxFit.cover,
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Expanded(
-                          flex: 1,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
+                        Positioned(
+                          bottom: 8,
+                          left: 8,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ProductView(
+                                        productName: productName,
+                                        price: price.toString(),
+                                        imageUrl: imageUrl,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Text(
                                   productName,
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 15,
-                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  '가격: $formattedPrice 원',
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => ProductView(
+                                        productName: productName,
+                                        price: price.toString(),
+                                        imageUrl: imageUrl,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  '가격: $price 원',
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 12,
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
@@ -153,6 +203,19 @@ class _ProductState extends State<Product> {
           },
         ),
       ),
+    );
+  }
+}
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Product(),
     );
   }
 }
