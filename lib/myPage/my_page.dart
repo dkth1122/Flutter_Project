@@ -1,7 +1,11 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../chat/chat.dart';
+import '../chat/chatList.dart';
 import '../join/userModel.dart';
+import '../product.dart';
 
 class MyPage extends StatefulWidget {
   @override
@@ -145,6 +149,52 @@ class _MyPageState extends State<MyPage> {
             thickness: 10.0,
           ),
         ],
+      ),
+
+      bottomNavigationBar: BottomAppBar(
+        height: 60,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            IconButton(
+                onPressed: (){
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => Product())
+                  );
+                },
+                icon: Icon(Icons.add_circle_outline)
+            ),
+            IconButton(
+                onPressed: (){
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => ChatApp(chatRoomId: 'chatRoomId',))
+                  );
+                },
+                icon: Icon(Icons.chat)
+            ),
+            IconButton(
+                onPressed: (){
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => ChatList())
+                  );
+                },
+                icon: Icon(Icons.chat_outlined)
+            ),
+            IconButton(
+              onPressed: () async {
+                DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('userList').doc('id').get();
+                Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyPage(),
+                  ),
+                );
+              },
+              icon: Icon(Icons.person),
+            ),
+          ],
+        ),
       ),
     );
   }
