@@ -52,7 +52,7 @@ class _ChatListState extends State<ChatList> {
 
               return ListTile(
                 title: Text('${data['user']}'),
-                subtitle: Text("못하겟따"),
+                subtitle: Text("테스트"),
                 onTap: () {
                   Navigator.push(
                     context,
