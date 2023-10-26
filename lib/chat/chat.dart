@@ -1,110 +1,215 @@
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
-class ChatApp extends StatefulWidget {
+import '../join/userModel.dart';
 
-  var roomId;
-
+class ChatApp extends StatelessWidget {
+  final String roomId;
   ChatApp({required this.roomId});
-
-  @override
-  State createState() => ChatAppState();
-}
-
-class ChatAppState extends State<ChatApp> {
-  final CollectionReference chatCollection =
-  FirebaseFirestore.instance.collection('chat');
-  TextEditingController messageController = TextEditingController();
-  String roomId = "user1_user2";
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Chat App'),
-        ),
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: chatCollection
-                    .doc(roomId)
-                    .collection('message')
-                    .orderBy('sendTime')
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) return CircularProgressIndicator();
-                  final messages = snapshot.data?.docs;
-                  List<Widget> messageWidgets = [];
-                  for (var message in messages!) {
-                    final messageText = message['text'];
-                    final messageSender = message['sender'];
-                    final messageWidget = MessageWidget(
-                      sender: messageSender,
-                      text: messageText,
-                    );
-                    messageWidgets.add(messageWidget);
-                  }
-                  return ListView(
-                    children: messageWidgets,
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                children: <Widget>[
-                  Expanded(
-                    child: TextField(
-                      controller: messageController,
-                      decoration: InputDecoration(
-                        hintText: 'Enter a message...',
-                      ),
-                    ),
+      title: 'Chat App',
+      home: ChatScreen(roomId: roomId),
+    );
+  }
+}
+
+class ChatScreen extends StatefulWidget {
+  final String roomId;
+
+  ChatScreen({required this.roomId});
+
+  @override
+  State createState() => ChatScreenState(roomId: roomId);
+}
+
+class ChatScreenState extends State<ChatScreen> {
+  final String roomId;
+  ChatScreenState({required this.roomId});
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final TextEditingController _messageController = TextEditingController();
+  bool _isLoading = false;
+
+  late String user1;
+
+  @override
+  void initState() {
+    super.initState();
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+    if (um.isLogin) {
+      user1 = um.userId!;
+    } else {
+      user1 = "없음";
+      print("로그인 안됨");
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat App'),
+      ),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: ChatMessages(roomId: roomId, user1: user1),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    controller: _messageController,
+                    decoration: InputDecoration(hintText: '메시지 입력'),
                   ),
-                  IconButton(
-                    icon: Icon(Icons.send),
-                    onPressed: () {
-                      sendMessage(roomId, 'user1', messageController.text);
-                      messageController.clear();
-                    },
-                  ),
-                ],
-              ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () {
+                    _handleOnSubmit();
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+          if (_isLoading)
+            CircularProgressIndicator(),
+        ],
       ),
     );
   }
 
-  void sendMessage(String roomId, String sender, String text) {
-    chatCollection.doc(roomId).collection('message').add({
-      'sendTime': DateTime.now(),
-      'sender': sender,
-      'text': text,
-    });
+  void _handleOnSubmit() {
+    final String text = _messageController.text;
+    if (text.isNotEmpty) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      _firestore
+          .collection('chat')
+          .doc(roomId)
+          .collection('message')
+          .add({'text': text, 'sendTime': FieldValue.serverTimestamp(), 'user': user1,})
+          .then((_) {
+        _messageController.clear();
+      })
+          .catchError((error) {
+        print('Error: $error');
+      })
+          .whenComplete(() {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
   }
 }
 
-class MessageWidget extends StatelessWidget {
-  final String sender;
-  final String text;
+class ChatMessages extends StatelessWidget {
+  final String roomId;
+  final String user1;
 
-  MessageWidget({required this.sender, required this.text});
+  ChatMessages({
+    required this.roomId,
+    required this.user1,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection('chat')
+          .doc(roomId)
+          .collection('message')
+          .orderBy('sendTime', descending:true )
+          .snapshots(),
+
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        final messages = snapshot.data?.docs;
+
+        if (messages != null && messages.isNotEmpty) {
+          List<Widget> messageWidgets = [];
+          for (var message in messages) {
+            final messageText = message['text'];
+            final messageTimestamp = message['sendTime'];
+            //final user = message['user'];
+
+            //final isCurrentUser = user == user1;
+
+            final messageWidget = ChatMessage(
+              text: messageText,
+              sendTime: messageTimestamp != null ? messageTimestamp.toDate(): DateTime.now(), isCurrentUser: true,
+              //isCurrentUser: isCurrentUser,
+            );
+
+            messageWidgets.add(messageWidget);
+          }
+
+          return ListView(
+            reverse: true,
+            children: messageWidgets,
+          );
+        } else {
+          return Center(
+            child: Text('No messages available.'),
+          );
+        }
+      },
+    );
+  }
+}
+
+class ChatMessage extends StatelessWidget {
+  final String text;
+  final DateTime sendTime;
+  final bool isCurrentUser;
+
+  ChatMessage({
+    required this.text,
+    required this.sendTime,
+    required this.isCurrentUser,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('$sender: ', style: TextStyle(fontWeight: FontWeight.bold)),
-          Text(text),
+        mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        children: <Widget>[
+          Column(
+            crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            children: <Widget>[
+              Container(
+                padding: EdgeInsets.all(8.0),
+                decoration: BoxDecoration(
+                  color: isCurrentUser ? Colors.blue : Colors.grey,
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+                child: Text(
+                  text,
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              Text(
+                '${sendTime.toLocal()}',
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ],
+          ),
         ],
       ),
     );

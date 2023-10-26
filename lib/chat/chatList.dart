@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../join/userModel.dart';
 import 'chat.dart';
 
 class ChatList extends StatefulWidget {
@@ -8,7 +10,28 @@ class ChatList extends StatefulWidget {
   _ChatListState createState() => _ChatListState();
 }
 
+
 class _ChatListState extends State<ChatList> {
+
+  String user1 = "";
+  String user2 = "";
+
+  @override
+  void initState() {
+    super.initState();
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+    user2 = "UserB";
+    if (um.isLogin) {
+      // 사용자가 로그인한 경우
+      user1 = um.userId!;
+
+    } else {
+      // 사용자가 로그인하지 않은 경우
+      user1 = "yyn1234";
+      print("로그인 안됨");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -22,12 +45,7 @@ class _ChatListState extends State<ChatList> {
                 SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
-                    // 여기에 새 채팅 추가 로직을 구현하세요.
-                    // 예를 들어, Navigator를 사용하여 다음 화면(Chat)으로 이동할 수 있습니다.
-                    // Navigator.push(
-                    //   context,
-                    //   MaterialPageRoute(builder: (context) => Chat()),
-                    // );
+
                   },
                   child: Text("새 채팅 시작"),
                 ),
@@ -45,25 +63,42 @@ class _ChatListState extends State<ChatList> {
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collection("chat").snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
-        return ListView(
-          children: snap.data!.docs.map((DocumentSnapshot document) {
-            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+        if (snap.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // 로딩 중인 경우 표시
+        }
+
+        final chatList = snap.data?.docs;
+
+        return chatList == null || chatList.isEmpty
+            ? Center(child: Text('No chats available'))
+            : ListView.builder(
+          itemCount: chatList.length,
+          itemBuilder: (context, index) {
+            final document = chatList[index];
+            final data = document.data() as Map<String, dynamic>?;
+            if (data == null || !data.containsKey('user1') || !data.containsKey('user2')) {
+              return Container();
+            }
+
             return ListTile(
               title: Text(data['user2']),
               subtitle: Text(data['user1']),
               onTap: () {
-                // 여기에서 선택한 채팅을 열도록 구현할 수 있습니다.
+                print("아이디 ===> ${document.id}");
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ChatApp(roomId: data['roomId']),
+                    builder: (context) => ChatApp(roomId: document.id),
                   ),
                 );
               },
             );
-          }).toList(),
+          },
         );
       },
     );
   }
+
+
+
 }
