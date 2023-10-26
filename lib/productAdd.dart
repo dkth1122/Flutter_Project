@@ -36,7 +36,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String? _selectedCategory;
 
-  final List<String> categories = [    'UX기획',    '웹',    '커머스',    '모바일',    '프로그램',    '트렌드',    '데이터',    '기타',  ];
+  final List<String> categories = ['UX기획','웹','커머스','모바일','프로그램','트렌드','데이터','기타',];
 
   void _addProduct() async {
     if (_pName.text.isNotEmpty &&
@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
       FirebaseFirestore.instance.collection('product');
 
       await product.add({
-        'pName': '0',
+        'pName': _pName.text,
         'pDetail': _pDetail.text,
         'price': int.parse(_price.text),
         'iUrl': _iUrl.text,
@@ -108,6 +108,11 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             SizedBox(height: 10),
             TextField(
+              controller: _pName,
+              decoration: InputDecoration(labelText: "상품명"),
+            ),
+            SizedBox(height: 20),
+            TextField(
               controller: _pDetail,
               decoration: InputDecoration(labelText: "상품 설명"),
             ),
@@ -136,12 +141,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 });
               },
               decoration: InputDecoration(labelText: "카테고리"),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _cnt,
-              decoration: InputDecoration(labelText: "조회수"),
-              keyboardType: TextInputType.number,
             ),
             SizedBox(height: 20),
             TextField(

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart'; // 추가된 라이브러리
 import 'package:project_flutter/productView.dart';
 
 class Product extends StatefulWidget {
@@ -78,9 +79,11 @@ class _ProductState extends State<Product> {
               itemCount: productList.length,
               itemBuilder: (context, index) {
                 final document = productList[index];
-                final productName = document['product_name'] as String;
-                final price = document['price'] as String;
-                final imageUrl = document['image_url'] as String;
+                final productName = document['pName'] as String;
+                final price = document['price'] as int;
+                final imageUrl = document['iUrl'] as String;
+
+                final formattedPrice = NumberFormat('#,###').format(price); // 가격을 한국 원화 단위로 포맷
 
                 return GestureDetector(
                   onTap: () {
@@ -89,7 +92,7 @@ class _ProductState extends State<Product> {
                       MaterialPageRoute(
                         builder: (context) => ProductView(
                           productName: productName,
-                          price: price,
+                          price: formattedPrice.toString(),
                           imageUrl: imageUrl,
                         ),
                       ),
@@ -123,7 +126,7 @@ class _ProductState extends State<Product> {
                                     MaterialPageRoute(
                                       builder: (context) => ProductView(
                                         productName: productName,
-                                        price: price,
+                                        price: formattedPrice.toString(),
                                         imageUrl: imageUrl,
                                       ),
                                     ),
@@ -144,14 +147,14 @@ class _ProductState extends State<Product> {
                                     MaterialPageRoute(
                                       builder: (context) => ProductView(
                                         productName: productName,
-                                        price: price,
+                                        price: formattedPrice.toString(),
                                         imageUrl: imageUrl,
                                       ),
                                     ),
                                   );
                                 },
                                 child: Text(
-                                  '가격: $price 원',
+                                  '가격: $formattedPrice 원', // 포맷된 가격을 출력
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 12,
