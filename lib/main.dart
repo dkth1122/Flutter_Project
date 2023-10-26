@@ -103,7 +103,8 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            SizedBox(height: 200,),
+            SizedBox(height: 20,),
+            // Row는 가장 많이 본 서비스
             Row(
               children: [
                 SizedBox(width: 20,),
@@ -117,7 +118,39 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
+            Container(
+              height: 100,
+              child: PageView(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    height: 200, // 원하는 높이 설정
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal, // 수평 스크롤을 위해
+                      child: Row(
+                        children: [
+                          Image.asset('dog1.png'),
+                          Image.asset('dog1.png'),
+                          Image.asset('dog1.png'),
+                          Image.asset('dog1.png'),
+                          Image.asset('dog1.png'),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
             _cntProduct(),
+            SizedBox(
+              height: 300,
+              child: Stack(
+                children: [
+                  sliderWidget3(),
+                ],
+              ),
+            ),
+
           ],
         ),
       ),
@@ -409,12 +442,58 @@ class _HomePageState extends State<HomePage> {
                 height: 300,
                 fit: BoxFit.cover,
               ),
-              title: Text(data['product_detail']),
+              title: Text(data['pDetail']),
               subtitle: Text("가격 : ${data['price']}"),
             );
           }).toList(),
         );
       },
+    );
+  }
+
+  Widget sliderWidget3() {
+    return CarouselSlider(
+      carouselController: _controller,
+      items: [
+        Column(
+          children: [
+            Container(
+              height: 100,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: imagePaths1.map((imagePath) {
+                  // return Image.asset(imagePath);
+                  return Image.asset(imagePath);
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+        Column(
+          children: [
+            Container(
+              height: 100,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: imagePaths3.map((imagePath) {
+                  return Image.asset(imagePath);
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+      ],
+      options: CarouselOptions(
+        height: 300,
+        viewportFraction: 1,
+        autoPlay: false,
+        enableInfiniteScroll: false,
+        onPageChanged: (index, reason) {
+          setState(() {
+            _current2 = index;
+          });
+        },
+      ),
     );
   }
 }
