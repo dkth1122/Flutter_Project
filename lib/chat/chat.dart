@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ChatApp extends StatefulWidget {
+
+  var roomId;
+
+  ChatApp({required this.roomId});
+
   @override
   State createState() => ChatAppState();
 }

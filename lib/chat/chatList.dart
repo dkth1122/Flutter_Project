@@ -1,51 +1,67 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 
-class ChatListScreen extends StatefulWidget {
+import 'chat.dart';
+
+class ChatList extends StatefulWidget {
   @override
-  _ChatListScreenState createState() => _ChatListScreenState();
+  _ChatListState createState() => _ChatListState();
 }
 
-class _ChatListScreenState extends State<ChatListScreen> {
+class _ChatListState extends State<ChatList> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Chat List'),
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: Text("채팅 목록")),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(30),
+            child: Column(
+              children: [
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    // 여기에 새 채팅 추가 로직을 구현하세요.
+                    // 예를 들어, Navigator를 사용하여 다음 화면(Chat)으로 이동할 수 있습니다.
+                    // Navigator.push(
+                    //   context,
+                    //   MaterialPageRoute(builder: (context) => Chat()),
+                    // );
+                  },
+                  child: Text("새 채팅 시작"),
+                ),
+                SizedBox(height: 10),
+                Expanded(child: _listChat()),
+              ],
+            ),
+          ),
+        ),
       ),
-      body: ChatList(),
     );
   }
-}
 
-class ChatList extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
+  Widget _listChat() {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('chat').snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return CircularProgressIndicator();
-        }
-
-        List<QueryDocumentSnapshot> chatRooms = snapshot.data!.docs;
-
-        return ListView.builder(
-          itemCount: chatRooms.length,
-          itemBuilder: (context, index) {
-            final chatRoom = chatRooms[index];
-            final roomId = chatRoom.id;
-
-            // 여기에서 필요한 정보를 chatRoom으로부터 가져오고 UI에 출력할 수 있습니다.
-            // 예를 들어, 상대방의 이름, 마지막 메시지 등을 가져와서 출력할 수 있습니다.
-
+      stream: FirebaseFirestore.instance.collection("chat").snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
+        return ListView(
+          children: snap.data!.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
             return ListTile(
-              title: Text(roomId), // 채팅 방 이름 또는 정보를 여기에 표시
+              title: Text(data['user2']),
+              subtitle: Text(data['user1']),
               onTap: () {
-                // 채팅 방을 열거나 해당 채팅으로 이동하는 코드를 여기에 추가
+                // 여기에서 선택한 채팅을 열도록 구현할 수 있습니다.
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatApp(roomId: data['roomId']),
+                  ),
+                );
               },
             );
-          },
+          }).toList(),
         );
       },
     );
