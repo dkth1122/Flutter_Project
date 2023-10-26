@@ -10,7 +10,6 @@ class Product extends StatefulWidget {
 
 class _ProductState extends State<Product> {
   late Stream<QuerySnapshot>? productStream;
-  List<bool> isFavoriteList = [];
 
   @override
   void initState() {
@@ -83,11 +82,6 @@ class _ProductState extends State<Product> {
                 final price = document['price'] as String;
                 final imageUrl = document['image_url'] as String;
 
-                // 초기 값은 모두 false로 설정
-                if (isFavoriteList.length <= index) {
-                  isFavoriteList.add(false);
-                }
-
                 return GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -97,14 +91,9 @@ class _ProductState extends State<Product> {
                           productName: productName,
                           price: price,
                           imageUrl: imageUrl,
-                          isFavorite: isFavoriteList[index],
                         ),
                       ),
-                    ).then((value) {
-                      setState(() {
-                        isFavoriteList[index] = value ?? false;
-                      });
-                    });
+                    );
                   },
                   child: Container(
                     width: 100,
@@ -122,33 +111,6 @@ class _ProductState extends State<Product> {
                           ),
                         ),
                         Positioned(
-                          top: 0,
-                          left: 0,
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ProductView(
-                                    productName: productName,
-                                    price: price,
-                                    imageUrl: imageUrl,
-                                    isFavorite: isFavoriteList[index],
-                                  ),
-                                ),
-                              ).then((value) {
-                                setState(() {
-                                  isFavoriteList[index] = value ?? false;
-                                });
-                              });
-                            },
-                            child: Icon(
-                              isFavoriteList[index] ? Icons.favorite : Icons.favorite_border,
-                              color: Colors.red,
-                            ),
-                          ),
-                        ),
-                        Positioned(
                           bottom: 8,
                           left: 8,
                           child: Column(
@@ -163,14 +125,9 @@ class _ProductState extends State<Product> {
                                         productName: productName,
                                         price: price,
                                         imageUrl: imageUrl,
-                                        isFavorite: isFavoriteList[index],
                                       ),
                                     ),
-                                  ).then((value) {
-                                    setState(() {
-                                      isFavoriteList[index] = value ?? false;
-                                    });
-                                  });
+                                  );
                                 },
                                 child: Text(
                                   productName,
@@ -189,14 +146,9 @@ class _ProductState extends State<Product> {
                                         productName: productName,
                                         price: price,
                                         imageUrl: imageUrl,
-                                        isFavorite: isFavoriteList[index],
                                       ),
                                     ),
-                                  ).then((value) {
-                                    setState(() {
-                                      isFavoriteList[index] = value ?? false;
-                                    });
-                                  });
+                                  );
                                 },
                                 child: Text(
                                   '가격: $price 원',

@@ -4,13 +4,11 @@ class ProductView extends StatefulWidget {
   final String productName;
   final String price;
   final String imageUrl;
-  final bool isFavorite;
 
   const ProductView({
     required this.productName,
     required this.price,
     required this.imageUrl,
-    required this.isFavorite,
   });
 
   @override
@@ -19,6 +17,7 @@ class ProductView extends StatefulWidget {
 
 class _ProductViewState extends State<ProductView> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool _isFavorite = false;
 
   @override
   void initState() {
@@ -32,25 +31,105 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
     super.dispose();
   }
 
+  void _toggleFavorite() {
+    setState(() {
+      _isFavorite = !_isFavorite;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("상세보기"),
-        bottom: TabBar(
-          controller: _tabController,
-          tabs: const [
-            Tab(text: '상품 상세'),
-            Tab(text: '후기'),
-          ],
+        title: const Text(
+          "상세보기",
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
+      body: Column(
         children: [
-          _buildProductDetailTab(),
-          _buildReviewTab(),
+          TabBar(
+            controller: _tabController,
+            labelColor: Colors.black, // 폰트 컬러 검정색으로 변경
+            tabs: const [
+              Tab(text: '상품 상세'),
+              Tab(text: '후기'),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _buildProductDetailTab(),
+                _buildReviewTab(),
+              ],
+            ),
+          ),
         ],
+      ),
+      bottomNavigationBar: BottomAppBar(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              flex: 8,
+              child: ElevatedButton(
+                onPressed: () {
+                  // 구매하기 버튼 동작 추가
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: const Text('구매하기'),
+                        content: Text('상품 "${widget.productName}"을(를) 구매하시겠습니까?'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('취소'),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              // 여기에 구매 로직을 추가하세요.
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('구매가 완료되었습니다.')),
+                              );
+                            },
+                            child: const Text('구매'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 16.0),
+                  child: Text(
+                    '구매하기',
+                    style: TextStyle(fontSize: 18.0),
+                  ),
+                ),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: IconButton(
+                onPressed: () {
+                  // 찜하기 버튼 동작 추가
+                  setState(() {
+                    _toggleFavorite();
+                  });
+                },
+                icon: Icon(
+                  _isFavorite ? Icons.favorite : Icons.favorite_border,
+                  color: _isFavorite ? Colors.red : null,
+                  size: 32,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -81,7 +160,6 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
               fontSize: 16,
             ),
           ),
-
         ],
       ),
     );
