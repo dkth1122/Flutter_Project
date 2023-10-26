@@ -1,9 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // 필요한 패키지를 추가합니다.
-import 'package:project_flutter/join/loginSuccess.dart';
 import 'package:project_flutter/join/userModel.dart';
-import 'package:project_flutter/myPage/my_page.dart';
+import 'package:project_flutter/main.dart';
 import 'package:provider/provider.dart';
 
 import '../firebase_options.dart';
@@ -152,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MyPage(),
+          builder: (context) => HomePage(),
         ),
       );
       _id.clear();

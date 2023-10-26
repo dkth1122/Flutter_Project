@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:project_flutter/chat/chatList.dart';
+import 'package:project_flutter/join/login_email.dart';
 import 'package:project_flutter/myPage/my_page.dart';
 import 'package:project_flutter/product.dart';
 import 'package:provider/provider.dart';
@@ -63,6 +64,13 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('용채'),
+        actions: [
+          TextButton(onPressed: (){
+            Navigator.push(
+            context, MaterialPageRoute(builder: (context) => LoginPage())
+            );
+          }, child: Text("로그인",style: TextStyle(fontSize: 15, color: Colors.white),))
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -190,14 +198,15 @@ class _HomePageState extends State<HomePage> {
             ),
             IconButton(
               onPressed: () async {
-                DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection('userList').doc('id').get();
-                Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MyPage(),
-                  ),
-                );
+
+
+                final userModel = Provider.of<UserModel>(context, listen: false);
+                if (userModel.isLogin) {
+                  // 사용자가 로그인한 경우에만 MyPage로 이동
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyPage()));
+                } else {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
+                }
               },
               icon: Icon(Icons.person),
             ),
