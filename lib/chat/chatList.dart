@@ -1,60 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:project_flutter/chat/chat.dart';
 
-class ChatList extends StatefulWidget {
+class ChatListScreen extends StatefulWidget {
   @override
-  _ChatListState createState() => _ChatListState();
+  _ChatListScreenState createState() => _ChatListScreenState();
 }
 
-class _ChatListState extends State<ChatList> {
-  final FirebaseFirestore _fs = FirebaseFirestore.instance;
-
+class _ChatListScreenState extends State<ChatListScreen> {
   @override
   Widget build(BuildContext context) {
-    Stream<QuerySnapshot> messageStream = _fs
-        .collection("chat_rooms")
-        .where(FieldPath.documentId, isGreaterThanOrEqualTo: "yyn1234")
-        .snapshots();
-
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('채팅 목록'),
-        ),
-        body: MessageListWidget(messageStream: messageStream),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Chat List'),
       ),
+      body: ChatList(),
     );
   }
 }
 
-class MessageListWidget extends StatelessWidget {
-  final Stream<QuerySnapshot> messageStream;
-
-  MessageListWidget({required this.messageStream});
-
+class ChatList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder(
-      stream: messageStream,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
-
-        if (!snap.hasData) {
-          return Center(child: CircularProgressIndicator());
+      stream: FirebaseFirestore.instance.collection('chat').snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return CircularProgressIndicator();
         }
 
-        return ListView(
-          children: snap.data!.docs.map((DocumentSnapshot doc) {
-            Map<String, dynamic> messageData = doc.data() as Map<String, dynamic>;
+        List<QueryDocumentSnapshot> chatRooms = snapshot.data!.docs;
 
-            String messageText = messageData['text'];
-            String sender = messageData['user'];
+        return ListView.builder(
+          itemCount: chatRooms.length,
+          itemBuilder: (context, index) {
+            final chatRoom = chatRooms[index];
+            final roomId = chatRoom.id;
+
+            // 여기에서 필요한 정보를 chatRoom으로부터 가져오고 UI에 출력할 수 있습니다.
+            // 예를 들어, 상대방의 이름, 마지막 메시지 등을 가져와서 출력할 수 있습니다.
 
             return ListTile(
-              title: Text(sender),
-              subtitle: Text(messageText),
+              title: Text(roomId), // 채팅 방 이름 또는 정보를 여기에 표시
+              onTap: () {
+                // 채팅 방을 열거나 해당 채팅으로 이동하는 코드를 여기에 추가
+              },
             );
-          }).toList(),
+          },
         );
       },
     );

@@ -29,29 +29,21 @@ class PageViewWidget extends StatelessWidget {
     final PageController controller =
     PageController(initialPage: 0, viewportFraction: 0.8);
 
-    return PageView(
-      scrollDirection: Axis.horizontal,
-      controller: controller,
-      children: <Widget>[
-        Container(
-          color: Colors.blue.withOpacity(0.5),
-          child: Center(
-            child: Text('첫 번째 페이지',style: TextStyle(fontSize: 50),),
+    return Container(
+      height: 100,
+      child: PageView(
+        scrollDirection: Axis.horizontal,
+        pageSnapping: false, // false로 수정
+        controller: controller,
+        children: <Widget>[
+          Container(
+            color: Colors.blue.withOpacity(0.5),
+            child: Center(
+              child: Text('첫 번째 페이지'),
+            ),
           ),
-        ),
-        Container(
-          color: Colors.orangeAccent.withOpacity(0.5),
-          child: Center(
-            child: Text('두 번째 페이지',style: TextStyle(fontSize: 50),),
-          ),
-        ),
-        Container(
-          color: Colors.cyanAccent.withOpacity(0.5),
-          child: Center(
-            child: Text('세 번째 페이지',style: TextStyle(fontSize: 50),),
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

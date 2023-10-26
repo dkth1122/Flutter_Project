@@ -1,254 +1,105 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
-import 'package:project_flutter/join/userModel.dart';
-import 'package:provider/provider.dart';
 
-final String chatRoomId = ''; // 여기에 원하는 chatRoomId를 지정
+class ChatApp extends StatefulWidget {
+  @override
+  State createState() => ChatAppState();
+}
 
-class ChatApp extends StatelessWidget {
-
-  final String chatRoomId;
-  ChatApp({required this.chatRoomId});
+class ChatAppState extends State<ChatApp> {
+  final CollectionReference chatCollection =
+  FirebaseFirestore.instance.collection('chat');
+  TextEditingController messageController = TextEditingController();
+  String roomId = "user1_user2";
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Chat App',
-      home: ChatScreen(chatRoomId: chatRoomId),
-    );
-  }
-}
-
-class ChatScreen extends StatefulWidget {
-
-  final String chatRoomId;
-  ChatScreen({required this.chatRoomId});
-
-  @override
-  State createState() => ChatScreenState();
-}
-
-class ChatScreenState extends State<ChatScreen> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final TextEditingController _messageController = TextEditingController();
-  bool _isLoading = false;
-
-  late String userAId;
-  late String userBId;
-  late String chatRoomId;
-
-  @override
-  void initState() {
-    super.initState();
-    UserModel um = Provider.of<UserModel>(context, listen: false);
-    userBId = "UserB";
-    if (um.isLogin) {
-      // 사용자가 로그인한 경우
-      userAId = um.userId!;
-
-    } else {
-      // 사용자가 로그인하지 않은 경우
-      userAId = "없음";
-      print("로그인 안됨");
-    }
-    chatRoomId = 'chat_room_${userAId}_${userBId}';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          '상대방 아이디',
-          style: TextStyle(color: Colors.black),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Chat App'),
         ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-      ),
-
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(30.0),
-            child: Text("상대방이 계좌이체 등 직접 결제를 요구하면 거절하시고 \n 즉시 고객센터로 알려주세요", style: TextStyle(fontSize: 12,), textAlign: TextAlign.center,),
-          ),
-          Expanded(
-            child: ChatMessages(chatRoomId: chatRoomId, userAId: userAId),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    controller: _messageController,
-                    decoration: InputDecoration(hintText: '메시지 입력'),
-                  ),
-                ),
-                IconButton(
-                  icon: Icon(Icons.send, color: Colors.grey,),
-                  onPressed: () {
-                    _handleOnSubmit();
-                  },
-                ),
-              ],
+        body: Column(
+          children: <Widget>[
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: chatCollection
+                    .doc(roomId)
+                    .collection('message')
+                    .orderBy('sendTime')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (!snapshot.hasData) return CircularProgressIndicator();
+                  final messages = snapshot.data?.docs;
+                  List<Widget> messageWidgets = [];
+                  for (var message in messages!) {
+                    final messageText = message['text'];
+                    final messageSender = message['sender'];
+                    final messageWidget = MessageWidget(
+                      sender: messageSender,
+                      text: messageText,
+                    );
+                    messageWidgets.add(messageWidget);
+                  }
+                  return ListView(
+                    children: messageWidgets,
+                  );
+                },
+              ),
             ),
-          ),
-          if (_isLoading)
-            CircularProgressIndicator(),
-        ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: <Widget>[
+                  Expanded(
+                    child: TextField(
+                      controller: messageController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter a message...',
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.send),
+                    onPressed: () {
+                      sendMessage(roomId, 'user1', messageController.text);
+                      messageController.clear();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  void _handleOnSubmit() {
-    final String text = _messageController.text;
-    if (text.isNotEmpty) {
-      setState(() {
-        _isLoading = true;
-      });
-
-      _firestore.collection('chat_rooms/$chatRoomId/messages').add({
-        'text': text,
-        'timestamp': FieldValue.serverTimestamp(),
-        'user': userAId,
-      }).then((_) {
-        _messageController.clear();
-      }).catchError((error) {
-        print('Error: $error');
-      }).whenComplete(() {
-        setState(() {
-          _isLoading = false;
-        });
-      });
-    }
+  void sendMessage(String roomId, String sender, String text) {
+    chatCollection.doc(roomId).collection('message').add({
+      'sendTime': DateTime.now(),
+      'sender': sender,
+      'text': text,
+    });
   }
 }
 
-class ChatMessages extends StatelessWidget {
-  final String chatRoomId;
-  final String userAId;
-
-  ChatMessages({
-    required this.chatRoomId,
-    required this.userAId,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection('chat_rooms/$chatRoomId/messages')
-          .orderBy('timestamp', descending: true)
-          .snapshots(),
-
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-
-        final messages = snapshot.data?.docs;
-
-        if (messages != null && messages.isNotEmpty) {
-          List<Widget> messageWidgets = [];
-          for (var message in messages) {
-            final messageText = message['text'];
-            final messageTimestamp = message['timestamp'];
-            final user = message['user'];
-
-            final isCurrentUser = user == userAId;
-
-            final messageWidget = ChatMessage(
-              text: messageText,
-              sendTime: messageTimestamp != null
-                  ? DateFormat('yy.MM.dd \n h:mm').format(messageTimestamp.toDate())
-                  : DateFormat('yy.MM.dd \n h:mm').format(DateTime.now()),
-              isCurrentUser: isCurrentUser,
-            );
-
-
-            messageWidgets.add(messageWidget);
-          }
-
-          return ListView(
-            reverse: true,
-            children: messageWidgets,
-          );
-        } else {
-          return Center(
-            child: Text('No messages available.'),
-          );
-        }
-      },
-    );
-  }
-}
-
-class ChatMessage extends StatelessWidget {
+class MessageWidget extends StatelessWidget {
+  final String sender;
   final String text;
-  final String sendTime; // DateTime 대신 String으로 유지
-  final bool isCurrentUser;
 
-  ChatMessage({
-    required this.text,
-    required this.sendTime,
-    required this.isCurrentUser,
-  });
+  MessageWidget({required this.sender, required this.text});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: Row(
-        mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
-        children: <Widget>[
-          isCurrentUser
-              ? Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-            child: Text(
-              '${sendTime.toString()}',
-              style: TextStyle(fontSize: 10, color: Colors.grey),
-              textAlign: TextAlign.left, // 자신의 메시지의 경우에는 왼쪽에 표시
-            ),
-          )
-              : Padding(
-            padding: const EdgeInsets.only(left: 8.0, right: 8.0),
-            child: Text(
-              '${sendTime.toString()}',
-              style: TextStyle(fontSize: 10, color: Colors.grey),
-              textAlign: TextAlign.right, // 상대방 메시지의 경우에는 오른쪽에 표시
-            ),
-          ),
-
-          Column(
-            crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(8.0),
-                decoration: BoxDecoration(
-                  color: isCurrentUser ? Colors.orange : Colors.grey,
-                  borderRadius: isCurrentUser
-                      ? BorderRadius.only(
-                    topLeft: Radius.circular(8.0),
-                    topRight: Radius.circular(8.0),
-                    bottomLeft: Radius.circular(8.0),
-                  )
-                      : BorderRadius.only(
-                    topLeft: Radius.circular(8.0),
-                    topRight: Radius.circular(8.0),
-                    bottomRight: Radius.circular(8.0),
-                  ),
-                ),
-                child: Text(
-                  text,
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ],
-          ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('$sender: ', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text(text),
         ],
       ),
     );
