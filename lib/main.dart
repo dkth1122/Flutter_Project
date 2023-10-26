@@ -9,6 +9,7 @@ import 'package:project_flutter/test.dart';
 import 'package:provider/provider.dart';
 import 'chat/chat.dart';
 import 'firebase_options.dart';
+import 'join/login_email.dart';
 import 'join/userModel.dart';
 
 void main() async {
@@ -120,14 +121,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             _cntProduct(),
-            SizedBox(
-              height: 300,
-              child: Stack(
-                children: [
-                  sliderWidget3(),
-                ],
-              ),
-            ),
+
           ],
         ),
       ),
@@ -166,12 +160,16 @@ class _HomePageState extends State<HomePage> {
                 icon: Icon(Icons.chat_outlined)
             ),
             IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => MyPage())
-                  );
-                },
-                icon: Icon(Icons.person)
+              onPressed: () async {
+                final userModel = Provider.of<UserModel>(context, listen: false);
+                if (userModel.isLogin) {
+                  // 사용자가 로그인한 경우에만 MyPage로 이동
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyPage()));
+                } else {
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
+                }
+              },
+              icon: Icon(Icons.person),
             ),
             IconButton(
                 onPressed: (){
@@ -422,7 +420,7 @@ class _HomePageState extends State<HomePage> {
             Map<String, dynamic> data = document.data() as Map<String, dynamic>;
             return ListTile(
               leading: Image.asset(
-                'cat1.jpeg',
+                'assets/cat1.jpeg',
                 width: 200,
                 height: 300,
                 fit: BoxFit.cover,
@@ -436,49 +434,5 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget sliderWidget3() {
-    return CarouselSlider(
-      carouselController: _controller,
-      items: [
-        Column(
-          children: [
-            Container(
-              height: 100,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: imagePaths1.map((imagePath) {
-                  // return Image.asset(imagePath);
-                  return Image.asset(imagePath);
-                }).toList(),
-              ),
-            ),
-          ],
-        ),
-        Column(
-          children: [
-            Container(
-              height: 100,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: imagePaths3.map((imagePath) {
-                  return Image.asset(imagePath);
-                }).toList(),
-              ),
-            ),
-          ],
-        ),
-      ],
-      options: CarouselOptions(
-        height: 300,
-        viewportFraction: 1,
-        autoPlay: false,
-        enableInfiniteScroll: false,
-        onPageChanged: (index, reason) {
-          setState(() {
-            _current2 = index;
-          });
-        },
-      ),
-    );
-  }
+
 }
