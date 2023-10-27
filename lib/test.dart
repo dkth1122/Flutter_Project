@@ -59,6 +59,7 @@ class _TestState extends State<Test> {
       if (isExpanded) {
         containerSize = 100.0; // 작아짐
         bottomAppBarColor = Colors.white; // 클릭하면 다시 원래 색상으로
+        rotation = 0;
       } else {
         containerSize = 300.0; // 확장
         bottomAppBarColor = Color.fromRGBO(222, 222, 222, 1.0); // 클릭하면 회색으로 변경
