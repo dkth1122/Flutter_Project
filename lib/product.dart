@@ -13,7 +13,7 @@ class Product extends StatefulWidget {
 }
 
 class _ProductState extends State<Product> {
-  late Stream<QuerySnapshot>? productStream;
+  late Stream<QuerySnapshot> productStream; // late 키워드로 지연 초기화
 
   @override
   void initState() {
@@ -23,20 +23,6 @@ class _ProductState extends State<Product> {
         productStream = FirebaseFirestore.instance.collection("product").snapshots();
       });
     });
-    String user = "";
-
-    UserModel um =Provider.of<UserModel>(context, listen: false);
-
-    if (um.isLogin) {
-      // 사용자가 로그인한 경우
-      user = um.userId!;
-      print(user);
-
-    } else {
-      // 사용자가 로그인하지 않은 경우
-      user = "없음";
-      print("로그인 안됨");
-    }
   }
 
   @override
@@ -57,6 +43,9 @@ class _ProductState extends State<Product> {
         ),
       );
     }
+
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+    String user = um.isLogin ? um.userId! : "없음";
 
     return Scaffold(
       appBar: AppBar(
@@ -84,7 +73,7 @@ class _ProductState extends State<Product> {
       body: Container(
         padding: const EdgeInsets.all(10),
         child: StreamBuilder<QuerySnapshot>(
-          stream: productStream!,
+          stream: productStream,
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
@@ -215,7 +204,10 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Product(),
+      home: ChangeNotifierProvider(
+        create: (context) => UserModel(),
+        child: Product(),
+      ),
     );
   }
 }

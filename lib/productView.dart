@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project_flutter/productPayment.dart';
@@ -22,12 +24,30 @@ class ProductView extends StatefulWidget {
 class _ProductViewState extends State<ProductView> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isFavorite = false;
+  late Stream<QuerySnapshot>? productStream;
 
   @override
   void initState() {
     super.initState();
+
     _tabController = TabController(length: 2, vsync: this);
 
+    Firebase.initializeApp().then((value) {
+      setState(() {
+        productStream = FirebaseFirestore.instance.collection("product").snapshots();
+      });
+    });
+    String user = "";
+
+    UserModel um =Provider.of<UserModel>(context, listen: false);
+
+    if (um.isLogin) {
+      user = um.userId!;
+      print(user);
+    } else {
+      user = "없음";
+      print("로그인 안됨");
+    }
   }
 
   @override
@@ -54,7 +74,7 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
         children: [
           TabBar(
             controller: _tabController,
-            labelColor: Colors.black, // 폰트 컬러 검정색으로 변경
+            labelColor: Colors.black,
             tabs: const [
               Tab(text: '상품 상세'),
               Tab(text: '후기'),
@@ -79,7 +99,6 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
               flex: 8,
               child: ElevatedButton(
                 onPressed: () {
-                  // 구매하기 버튼 동작 추가
                   showDialog(
                     context: context,
                     builder: (context) {
@@ -95,7 +114,7 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
                           ),
                           TextButton(
                             onPressed: () {
-                              Navigator.pop(context); // 구매 확인 다이얼로그 닫기
+                              Navigator.pop(context);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -126,7 +145,6 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
               flex: 2,
               child: IconButton(
                 onPressed: () {
-                  // 찜하기 버튼 동작 추가
                   setState(() {
                     _toggleFavorite();
                   });
@@ -145,7 +163,7 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
   }
 
   Widget _buildProductDetailTab() {
-    final formattedPrice = NumberFormat("#,###").format(int.parse(widget.price));
+    final formattedPrice = NumberFormat("#,###").format(int.parse(widget.price.replaceAll(',', '')));
 
     return Center(
       child: Column(
