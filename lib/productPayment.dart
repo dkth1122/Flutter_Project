@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:project_flutter/join/userModel.dart';
+import 'package:provider/provider.dart';
 
 class ProductPayment extends StatefulWidget {
   final String productName;
