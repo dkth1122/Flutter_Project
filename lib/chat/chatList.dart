@@ -1,48 +1,96 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class ChatListScreen extends StatefulWidget {
+import '../join/userModel.dart';
+import 'chat.dart';
+
+class ChatList extends StatefulWidget {
   @override
-  _ChatListScreenState createState() => _ChatListScreenState();
+  _ChatListState createState() => _ChatListState();
 }
 
-class _ChatListScreenState extends State<ChatListScreen> {
+
+class _ChatListState extends State<ChatList> {
+
+  String user1 = "";
+  String user2 = "";
+
+  @override
+  void initState() {
+    super.initState();
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+    user2 = "UserB";
+    if (um.isLogin) {
+      // 사용자가 로그인한 경우
+      user1 = um.userId!;
+
+    } else {
+      // 사용자가 로그인하지 않은 경우
+      user1 = "yyn1234";
+      print("로그인 안됨");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Chat List'),
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(title: Text("채팅 목록")),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(30),
+            child: Column(
+              children: [
+                SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+
+                  },
+                  child: Text("새 채팅 시작"),
+                ),
+                SizedBox(height: 10),
+                Expanded(child: _listChat()),
+              ],
+            ),
+          ),
+        ),
       ),
-      body: ChatList(),
     );
   }
-}
 
-class ChatList extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
+  Widget _listChat() {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('chat').snapshots(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return CircularProgressIndicator();
+      stream: FirebaseFirestore.instance.collection("chat").snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
+        if (snap.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // 로딩 중인 경우 표시
         }
 
-        List<QueryDocumentSnapshot> chatRooms = snapshot.data!.docs;
+        final chatList = snap.data?.docs;
 
-        return ListView.builder(
-          itemCount: chatRooms.length,
+        return chatList == null || chatList.isEmpty
+            ? Center(child: Text('No chats available'))
+            : ListView.builder(
+          itemCount: chatList.length,
           itemBuilder: (context, index) {
-            final chatRoom = chatRooms[index];
-            final roomId = chatRoom.id;
-
-            // 여기에서 필요한 정보를 chatRoom으로부터 가져오고 UI에 출력할 수 있습니다.
-            // 예를 들어, 상대방의 이름, 마지막 메시지 등을 가져와서 출력할 수 있습니다.
+            final document = chatList[index];
+            final data = document.data() as Map<String, dynamic>?;
+            if (data == null || !data.containsKey('user1') || !data.containsKey('user2')) {
+              return Container();
+            }
 
             return ListTile(
-              title: Text(roomId), // 채팅 방 이름 또는 정보를 여기에 표시
+              title: Text(data['user2']),
+              subtitle: Text(data['user1']),
               onTap: () {
-                // 채팅 방을 열거나 해당 채팅으로 이동하는 코드를 여기에 추가
+                print("아이디 ===> ${document.id}");
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatApp(roomId: document.id),
+                  ),
+                );
               },
             );
           },
@@ -50,4 +98,7 @@ class ChatList extends StatelessWidget {
       },
     );
   }
+
+
+
 }
