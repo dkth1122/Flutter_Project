@@ -25,21 +25,17 @@ class _ProductState extends State<Product> {
     });
     String user = "";
 
-    @override
-    void initState() {
-      super.initState();
-      UserModel um =Provider.of<UserModel>(context, listen: false);
+    UserModel um =Provider.of<UserModel>(context, listen: false);
 
-      if (um.isLogin) {
-        // 사용자가 로그인한 경우
-        user = um.userId!;
-        print(user);
+    if (um.isLogin) {
+      // 사용자가 로그인한 경우
+      user = um.userId!;
+      print(user);
 
-      } else {
-        // 사용자가 로그인하지 않은 경우
-        user = "없음";
-        print("로그인 안됨");
-      }
+    } else {
+      // 사용자가 로그인하지 않은 경우
+      user = "없음";
+      print("로그인 안됨");
     }
   }
 
