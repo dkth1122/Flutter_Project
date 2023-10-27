@@ -21,7 +21,8 @@ class ProductView extends StatefulWidget {
   _ProductViewState createState() => _ProductViewState();
 }
 
-class _ProductViewState extends State<ProductView> with SingleTickerProviderStateMixin {
+class _ProductViewState extends State<ProductView>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isFavorite = false;
   late Stream<QuerySnapshot>? productStream;
@@ -34,12 +35,13 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
 
     Firebase.initializeApp().then((value) {
       setState(() {
-        productStream = FirebaseFirestore.instance.collection("product").snapshots();
+        productStream =
+            FirebaseFirestore.instance.collection("product").snapshots();
       });
     });
     String user = "";
 
-    UserModel um =Provider.of<UserModel>(context, listen: false);
+    UserModel um = Provider.of<UserModel>(context, listen: false);
 
     if (um.isLogin) {
       user = um.userId!;
@@ -48,6 +50,18 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
       user = "없음";
       print("로그인 안됨");
     }
+
+    // 'like' 컬렉션에서 해당 유저(user)와 상품명(productName)을 가지는 문서를 조회하여 _isFavorite 값을 설정합니다.
+    FirebaseFirestore.instance
+        .collection('like')
+        .where('user', isEqualTo: user)
+        .where('productName', isEqualTo: widget.productName)
+        .get()
+        .then((QuerySnapshot snapshot) {
+      setState(() {
+        _isFavorite = snapshot.docs.isNotEmpty;
+      });
+    });
   }
 
   @override
@@ -57,8 +71,42 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
   }
 
   void _toggleFavorite() {
-    setState(() {
-      _isFavorite = !_isFavorite;
+    String user = "";
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+
+    if (um.isLogin) {
+      user = um.userId!;
+      print(user);
+    } else {
+      user = "없음";
+      print("로그인 안됨");
+    }
+
+    // 'like' 컬렉션에서 해당 유저(user)와 상품명(productName)을 가지는 문서를 조회합니다.
+    FirebaseFirestore.instance
+        .collection('like')
+        .where('user', isEqualTo: user)
+        .where('productName', isEqualTo: widget.productName)
+        .get()
+        .then((QuerySnapshot snapshot) {
+      if (snapshot.docs.isNotEmpty) {
+        // 이미 좋아요가 눌려있는 경우, 해당 문서를 삭제합니다.
+        snapshot.docs.first.reference.delete().then((value) {
+          setState(() {
+            _isFavorite = false;
+          });
+        });
+      } else {
+        // 좋아요가 눌려있지 않은 경우, 'like' 컬렉션에 새로운 문서를 추가합니다.
+        FirebaseFirestore.instance.collection('like').add({
+          'user': user,
+          'productName': widget.productName,
+        }).then((value) {
+          setState(() {
+            _isFavorite = true;
+          });
+        });
+      }
     });
   }
 
@@ -145,9 +193,7 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
               flex: 2,
               child: IconButton(
                 onPressed: () {
-                  setState(() {
-                    _toggleFavorite();
-                  });
+                  _toggleFavorite();
                 },
                 icon: Icon(
                   _isFavorite ? Icons.favorite : Icons.favorite_border,
@@ -163,7 +209,8 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
   }
 
   Widget _buildProductDetailTab() {
-    final formattedPrice = NumberFormat("#,###").format(int.parse(widget.price.replaceAll(',', '')));
+    final formattedPrice = NumberFormat("#,###")
+        .format(int.parse(widget.price.replaceAll(',', '')));
 
     return Center(
       child: Column(
