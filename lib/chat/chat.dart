@@ -103,6 +103,8 @@ class ChatScreenState extends State<ChatScreen> {
                       // 이미지 저장
                       Directory dir = await getApplicationDocumentsDirectory();
                       Directory imgDir = Directory('${dir.path}/img');
+                      String name = DateTime.now().millisecondsSinceEpoch.toString();
+
                       if (!await imgDir.exists()) {
                         await imgDir.create(); // 폴더 생성
                         try {
