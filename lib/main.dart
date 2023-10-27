@@ -5,7 +5,9 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:project_flutter/chat/chatList.dart';
 import 'package:project_flutter/myPage/my_page.dart';
 import 'package:project_flutter/product.dart';
+import 'package:project_flutter/search/search.dart';
 import 'package:project_flutter/test.dart';
+import 'package:project_flutter/test2.dart';
 import 'package:provider/provider.dart';
 import 'chat/chat.dart';
 import 'firebase_options.dart';
@@ -49,7 +51,7 @@ class _HomePageState extends State<HomePage> {
   // 현재는 가격 낮은 순으로 정렬했지만 cnt가 추가되면 조회수 높은 순으로 할 예정
   final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").orderBy("price").limit(3).snapshots();
   final Stream<QuerySnapshot> productStream2 = FirebaseFirestore.instance.collection("product").snapshots();
-
+  FocusNode myFocusNode = FocusNode();
 
   List imageList = [
     "https://cdn.pixabay.com/photo/2014/04/14/20/11/pink-324175_1280.jpg",
@@ -74,19 +76,22 @@ class _HomePageState extends State<HomePage> {
             Container(
               padding: EdgeInsets.all(20),
               child: TextField(
+                readOnly: true, // 이 속성을 true로 설정하여 키보드가 나타나지 않도록 함
                 decoration: InputDecoration(
-                    hintText: "검색어를 입력하세요",
-                    suffixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(25)
-                    ),
-                    filled: true,
-                    fillColor: Color.fromRGBO(211, 211, 211, 0.7019607843137254)
-
+                  hintText: "검색어를 입력하세요",
+                  suffixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  filled: true,
+                  fillColor: Color.fromRGBO(211, 211, 211, 0.7019607843137254),
                 ),
-                onChanged: (text) {
+                onTap: () {
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => Search())
+                  );
                 },
-              ),
+              )
             ),
             SizedBox(
               height: 100,
@@ -188,6 +193,14 @@ class _HomePageState extends State<HomePage> {
                 onPressed: (){
                   Navigator.push(
                       context, MaterialPageRoute(builder: (context) => Test())
+                  );
+                },
+                icon: Icon(Icons.telegram_sharp)
+            ),
+            IconButton(
+                onPressed: (){
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => Test2())
                   );
                 },
                 icon: Icon(Icons.telegram_sharp)
