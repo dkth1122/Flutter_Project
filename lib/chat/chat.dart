@@ -41,15 +41,13 @@ class ChatScreenState extends State<ChatScreen> {
 
   File? _image; // 이미지 파일을 저장할 변수
 
-
-
-
   @override
   void initState() {
     super.initState();
     UserModel um = Provider.of<UserModel>(context, listen: false);
     if (um.isLogin) {
       user1 = um.userId!;
+      print(user1);
     } else {
       user1 = "없음";
       print("로그인 안됨");
@@ -99,29 +97,20 @@ class ChatScreenState extends State<ChatScreen> {
                   },
                 ),
                 IconButton(
-                    onPressed: () async{
-                      // 이미지 저장
-                      Directory dir = await getApplicationDocumentsDirectory();
-                      Directory imgDir = Directory('${dir.path}/img');
-                      String name = DateTime.now().millisecondsSinceEpoch.toString();
+                  onPressed: () async {
+                    // 이미지 선택
+                    final picker = ImagePicker();
+                    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+                    // 또는 ImageSource.camera를 사용하여 카메라에서 이미지를 가져올 수도 있습니다.
 
-                      if (!await imgDir.exists()) {
-                        await imgDir.create(); // 폴더 생성
-                        try {
-                          File targetFile = File('${imgDir.path}}/$name');
-                          // targetFile.path 얘를 db에 저장 후 호출 때 사용
-                          // 보통 안드로이드 => /data/user/0/com.example.indie_spot/app_flutter
-                          // 아이폰 => /Users/your_user_name/Library/Developer/CoreSimulator/Devices/DEVICE_ID/data/Containers/Data/Application/APP_ID/Documents
-                          print('저장경로 확인 ==> ${targetFile.path}');
-                          // _image는 File객체
-                          await _image!.copy(targetFile.path);
-                          // 저장 후 호출 시에는 Image.file(imageFile) 형태로 사용할 것
-                        } catch (e) {
-                          print("에러메세지: $e");
-                        }
-                      }
-                    },
-                    icon: Icon(Icons.photo_size_select_actual, color: Colors.grey,)
+                    if (pickedFile != null) {
+                      _image = File(pickedFile.path); // 선택한 이미지를 _image 변수에 할당
+                      // 나머지 이미지 저장 및 업로드 코드는 그대로 두세요.
+                    } else {
+                      print('이미지를 선택하지 않았습니다.');
+                    }
+                  },
+                  icon: Icon(Icons.photo_size_select_actual, color: Colors.grey),
                 )
               ],
             ),
@@ -176,7 +165,7 @@ class ChatMessages extends StatelessWidget {
           .collection('chat')
           .doc(roomId)
           .collection('message')
-          .orderBy('sendTime', descending:true )
+          .orderBy('sendTime', descending: true)
           .snapshots(),
 
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -191,19 +180,23 @@ class ChatMessages extends StatelessWidget {
         if (messages != null && messages.isNotEmpty) {
           List<Widget> messageWidgets = [];
           for (var message in messages) {
-            final messageText = message['text'];
-            final messageTimestamp = message['sendTime'];
-            //final user = message['user'];
+            final messageData = message.data();
+            if (messageData != null) {
+              final Map<String, dynamic> messageMap = messageData as Map<String, dynamic>;
 
-            //final isCurrentUser = user == user1;
+              final messageText = messageMap['text'];
+              final messageTimestamp = messageMap['sendTime'];
 
-            final messageWidget = ChatMessage(
-              text: messageText,
-              sendTime: messageTimestamp != null ? messageTimestamp.toDate(): DateTime.now(), isCurrentUser: true,
-              //isCurrentUser: isCurrentUser,
-            );
+              if (messageText != null && messageTimestamp != null) {
+                final messageWidget = ChatMessage(
+                  text: messageText,
+                  sendTime: (messageTimestamp as Timestamp).toDate(),
+                  isCurrentUser: messageMap['user'] == user1 ? true : false, // 현재 사용자 여부 설정
+                );
 
-            messageWidgets.add(messageWidget);
+                messageWidgets.add(messageWidget);
+              }
+            }
           }
 
           return ListView(
@@ -240,15 +233,18 @@ class ChatMessage extends StatelessWidget {
         children: <Widget>[
           if (!isCurrentUser)
             Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: Text(
-                DateFormat('yy.MM.dd\na h:mm').format(sendTime),
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
+              padding: EdgeInsets.only(right: 8.0),
             ),
-          Column(
+          Row(
             crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(3.0),
+                child: Text(
+                  DateFormat('yy.MM.dd\n HH:mm').format(sendTime),
+                  style: TextStyle(fontSize: 10, color: Colors.grey),
+                ),
+              ),
               Container(
                 padding: EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
@@ -260,7 +256,6 @@ class ChatMessage extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
               ),
-              // Add an image upload button here
             ],
           ),
         ],
