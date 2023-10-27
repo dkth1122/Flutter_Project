@@ -59,6 +59,8 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
+
+
   void _logOut() {
     // 사용자 데이터 초기화 (예: Provider를 사용하면 해당 Provider를 초기화)
     Provider.of<UserModel>(context, listen: false).logout();

@@ -76,13 +76,7 @@ class _MyPageState extends State<MyPage> {
               Text(data['nick'], style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),),
               ElevatedButton(
                 onPressed: () {
-                  if (data['status'] == 'C') {
-                    // 'C'인 경우 전문가로 전환
-                    // 전문가로 전환하는 작업 수행
-                  } else {
-                    // 'C'가 아닌 경우 의뢰인으로 전환
-                    // 의뢰인으로 전환하는 작업 수행
-                  }
+                    _toggleExpertStatus();
                 },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Colors.white),
@@ -109,18 +103,26 @@ class _MyPageState extends State<MyPage> {
 
 
   void _toggleExpertStatus() {
-    final userRef = FirebaseFirestore.instance.collection("userList").doc(data['docId']);
-    String newStatus = isExpert ? 'C' : 'E'; // 상태 전환
+    String newStatus = isExpert ? 'C' : 'E';
 
-    userRef.update({'status': newStatus}).then((_) {
-      setState(() {
-        isExpert = !isExpert; // 전문가 여부 업데이트
+    FirebaseFirestore.instance.collection("userList")
+        .where('userId', isEqualTo: data['userId'])
+        .get()
+        .then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        doc.reference.update({'status': newStatus}).then((_) {
+          setState(() {
+            isExpert = !isExpert;
+          });
+        }).catchError((error) {
+          print('Firestore 업데이트 실패: $error');
+        });
       });
     }).catchError((error) {
-      print('Firestore 업데이트 실패: $error');
-      // 에러 처리 로직 추가
+      print('Firestore 쿼리 실패: $error');
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
