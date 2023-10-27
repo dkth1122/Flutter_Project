@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:project_flutter/productPayment.dart';
 
 class ProductView extends StatefulWidget {
   final String productName;
@@ -90,10 +92,15 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
                           ),
                           TextButton(
                             onPressed: () {
-                              // 여기에 구매 로직을 추가하세요.
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('구매가 완료되었습니다.')),
+                              Navigator.pop(context); // 구매 확인 다이얼로그 닫기
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProductPayment(
+                                    productName: widget.productName,
+                                    price: widget.price,
+                                  ),
+                                ),
                               );
                             },
                             child: const Text('구매'),
@@ -135,6 +142,8 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
   }
 
   Widget _buildProductDetailTab() {
+    final formattedPrice = NumberFormat("#,###").format(int.parse(widget.price));
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -155,7 +164,7 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
           ),
           const SizedBox(height: 10),
           Text(
-            '가격: ${widget.price} 원',
+            '가격: $formattedPrice 원',
             style: const TextStyle(
               fontSize: 16,
             ),

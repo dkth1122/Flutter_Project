@@ -5,6 +5,7 @@ import 'package:project_flutter/productAdd.dart';
 import 'package:project_flutter/productView.dart';
 import 'package:project_flutter/join/userModel.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class Product extends StatefulWidget {
   @override
@@ -116,6 +117,8 @@ class _ProductState extends State<Product> {
                 final price = document['price'] as int;
                 final imageUrl = document['iUrl'] as String;
 
+                final formattedPrice = NumberFormat("#,###").format(price);
+
                 return GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -157,7 +160,7 @@ class _ProductState extends State<Product> {
                                     MaterialPageRoute(
                                       builder: (context) => ProductView(
                                         productName: productName,
-                                        price: price.toString(),
+                                        price: formattedPrice,
                                         imageUrl: imageUrl,
                                       ),
                                     ),
@@ -178,14 +181,14 @@ class _ProductState extends State<Product> {
                                     MaterialPageRoute(
                                       builder: (context) => ProductView(
                                         productName: productName,
-                                        price: price.toString(),
+                                        price: formattedPrice,
                                         imageUrl: imageUrl,
                                       ),
                                     ),
                                   );
                                 },
                                 child: Text(
-                                  '가격: $price 원',
+                                  '가격: $formattedPrice 원',
                                   style: const TextStyle(
                                     color: Colors.black,
                                     fontSize: 12,
