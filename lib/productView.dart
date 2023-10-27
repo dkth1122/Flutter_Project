@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project_flutter/productPayment.dart';
+import 'package:project_flutter/join/userModel.dart';
+import 'package:provider/provider.dart';
 
 class ProductView extends StatefulWidget {
   final String productName;
@@ -25,6 +27,7 @@ class _ProductViewState extends State<ProductView> with SingleTickerProviderStat
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+
   }
 
   @override
