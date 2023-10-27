@@ -112,35 +112,35 @@ class _TestState extends State<Test> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white
-              ),
-              child: InkWell(
-                onTap: () {
-                  _animateContainerSize();
-                },
-                child: GestureDetector(
-                  onPanStart: (details) {
-                    setState(() {
-                      initialPosition = details.localPosition;
-                    });
-                  },
-                  onPanUpdate: (details) {
-                    setState(() {
-                      // Calculate the rotation angle based on the drag direction
-                      double angle = (details.localPosition - initialPosition).direction;
-                      rotation = angle;
-                      currentPosition = details.localPosition;
-                    });
-                  },
-                  onPanEnd: (details) {
-                    setState(() {
-                    });
-                  },
-                  child: Transform.rotate(
-                    angle: rotation,
+            GestureDetector(
+              onPanStart: (details) {
+                setState(() {
+                  initialPosition = details.localPosition;
+                });
+              },
+              onPanUpdate: (details) {
+                setState(() {
+                  // Calculate the rotation angle based on the drag direction
+                  double angle = (details.localPosition - initialPosition).direction;
+                  rotation = angle;
+                  currentPosition = details.localPosition;
+                });
+              },
+              onPanEnd: (details) {
+                setState(() {
+                });
+              },
+              child: Transform.rotate(
+                angle: rotation,
+                child: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white
+                  ),
+                  child: InkWell(
+                    onTap: () {
+                      _animateContainerSize();
+                    },
                     child: AnimatedContainer(
                       duration: Duration(milliseconds: 300),
                       width: containerSize,
