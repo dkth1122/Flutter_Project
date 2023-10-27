@@ -33,14 +33,21 @@ class MyApp extends StatelessWidget {
 class MyPage extends StatefulWidget {
   late Map<String, dynamic> data; // 'data' 변수 선언
 
+
   @override
   State<MyPage> createState() => _MyPageState();
 }
 
 class _MyPageState extends State<MyPage> {
 
-
   late Map<String, dynamic> data;
+  late bool isExpert; // 전문가 여부 상태 변수 추가
+
+  @override
+  void initState() {
+    super.initState();
+    isExpert = false; // 처음에는 의뢰인 상태
+  }
   Widget _userInfo() {
     UserModel userModel = Provider.of<UserModel>(context);
 
@@ -53,11 +60,13 @@ class _MyPageState extends State<MyPage> {
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
         if (snap.hasData) {
           data = snap.data!.docs[0].data() as Map<String, dynamic>;
+          isExpert = data['status'] == 'E'; // 데이터에서 전문가 여부 업데이트
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                child : Text(data['status'] == 'C' ? '의뢰인' : '전문가'),
+                child : Text(isExpert ? '전문가' : '의뢰인'),
                 padding: EdgeInsets.fromLTRB(5, 1, 5, 1),
                 decoration: BoxDecoration(
                   color: Colors.yellow,
@@ -98,6 +107,20 @@ class _MyPageState extends State<MyPage> {
     );
   }
 
+
+  void _toggleExpertStatus() {
+    final userRef = FirebaseFirestore.instance.collection("userList").doc(data['docId']);
+    String newStatus = isExpert ? 'C' : 'E'; // 상태 전환
+
+    userRef.update({'status': newStatus}).then((_) {
+      setState(() {
+        isExpert = !isExpert; // 전문가 여부 업데이트
+      });
+    }).catchError((error) {
+      print('Firestore 업데이트 실패: $error');
+      // 에러 처리 로직 추가
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -173,7 +196,7 @@ class _MyPageState extends State<MyPage> {
                       thickness: 5.0,
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(20.0),
+                      padding: const EdgeInsets.all(10.0),
                       child: Column(
                         children: [
                           Text("내 프로젝트", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
@@ -198,11 +221,11 @@ class _MyPageState extends State<MyPage> {
                               ],
                             ),
                             margin: EdgeInsets.all(20.0),
-                            width: 450,
-                            height: 100,
+                            width: 500,
+                            height: 150,
                             decoration: BoxDecoration(
                               border: Border.all(
-                                color: Color(0xfff48752),
+                                color: Colors.grey,
                                 width: 1.0,
                               ),
                               borderRadius: BorderRadius.circular(4.0),
@@ -220,25 +243,26 @@ class _MyPageState extends State<MyPage> {
                       physics: NeverScrollableScrollPhysics(),
                       children: [
                         ListTile(
-                          leading: Icon(Icons.star),
-                          title: Text('첫 번째 아이템'),
-                          subtitle: Text('첫 번째 아이템 설명'),
+                          leading: Icon(Icons.shopping_bag_outlined),
+                          title: Text('구매관리'),
+                          trailing: Icon(Icons.arrow_forward_ios_rounded),
                           onTap: () {
                             // 첫 번째 아이템이 클릭됐을 때 수행할 작업
                           },
                         ),
                         ListTile(
-                          leading: Icon(Icons.star),
-                          title: Text('두 번째 아이템'),
-                          subtitle: Text('두 번째 아이템 설명'),
+                          leading: Icon(Icons.credit_card),
+                          title: Text('결제/환불내역'),
+                          trailing: Icon(Icons.arrow_forward_ios_rounded),
                           onTap: () {
                             // 두 번째 아이템이 클릭됐을 때 수행할 작업
                           },
                         ),
                         ListTile(
-                          leading: Icon(Icons.star),
-                          title: Text('세 번째 아이템'),
-                          subtitle: Text('세 번째 아이템 설명'),
+                          leading: Icon(Icons.question_mark),
+                          title: Text('고객센터'),
+                          trailing: Icon(Icons.arrow_forward_ios_rounded),
+
                           onTap: () {
                             // 세 번째 아이템이 클릭됐을 때 수행할 작업
                           },
