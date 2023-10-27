@@ -51,7 +51,6 @@ class _ProductViewState extends State<ProductView>
       print("로그인 안됨");
     }
 
-    // 'like' 컬렉션에서 해당 유저(user)와 상품명(productName)을 가지는 문서를 조회하여 _isFavorite 값을 설정합니다.
     FirebaseFirestore.instance
         .collection('like')
         .where('user', isEqualTo: user)
@@ -62,12 +61,31 @@ class _ProductViewState extends State<ProductView>
         _isFavorite = snapshot.docs.isNotEmpty;
       });
     });
+
+    _incrementProductCount();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  void _incrementProductCount() {
+    FirebaseFirestore.instance
+        .collection('product')
+        .where('pName', isEqualTo: widget.productName)
+        .get()
+        .then((QuerySnapshot snapshot) {
+      snapshot.docs.forEach((document) {
+        final currentCount = document['cnt'] as int;
+        document.reference.update({'cnt': currentCount + 1});
+      });
+
+      setState(() {
+        // UI 업데이트
+      });
+    });
   }
 
   void _toggleFavorite() {
@@ -82,7 +100,6 @@ class _ProductViewState extends State<ProductView>
       print("로그인 안됨");
     }
 
-    // 'like' 컬렉션에서 해당 유저(user)와 상품명(productName)을 가지는 문서를 조회합니다.
     FirebaseFirestore.instance
         .collection('like')
         .where('user', isEqualTo: user)
@@ -90,14 +107,12 @@ class _ProductViewState extends State<ProductView>
         .get()
         .then((QuerySnapshot snapshot) {
       if (snapshot.docs.isNotEmpty) {
-        // 이미 좋아요가 눌려있는 경우, 해당 문서를 삭제합니다.
         snapshot.docs.first.reference.delete().then((value) {
           setState(() {
             _isFavorite = false;
           });
         });
       } else {
-        // 좋아요가 눌려있지 않은 경우, 'like' 컬렉션에 새로운 문서를 추가합니다.
         FirebaseFirestore.instance.collection('like').add({
           'user': user,
           'productName': widget.productName,
@@ -212,33 +227,55 @@ class _ProductViewState extends State<ProductView>
     final formattedPrice = NumberFormat("#,###")
         .format(int.parse(widget.price.replaceAll(',', '')));
 
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.network(
-            widget.imageUrl,
-            width: 200,
-            height: 200,
-            fit: BoxFit.cover,
-          ),
-          const SizedBox(height: 20),
-          Text(
-            widget.productName,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            '가격: $formattedPrice 원',
-            style: const TextStyle(
-              fontSize: 16,
-            ),
-          ),
-        ],
-      ),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('product').where('pName', isEqualTo: widget.productName).snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          final productDocs = snapshot.data!.docs;
+          if (productDocs.isNotEmpty) {
+            final productData = productDocs.first.data() as Map<String, dynamic>;
+            final productCount = productData['cnt'] as int;
+
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.network(
+                    widget.imageUrl,
+                    width: 200,
+                    height: 200,
+                    fit: BoxFit.cover,
+                  ),
+                  const SizedBox(height: 20),
+                  Text(
+                    widget.productName,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    '가격: $formattedPrice 원',
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    '조회수: $productCount',
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }
+        }
+
+        return const SizedBox();
+      },
     );
   }
 
