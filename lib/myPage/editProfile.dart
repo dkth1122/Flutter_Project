@@ -1,11 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/myPage/userData.dart';
 
 class EditProfile extends StatefulWidget {
-  final UserData? userData; // 생성자에서 데이터 받기
-
-  EditProfile({required this.userData}); // 생성자 업데이트
-
+  final Map<String, dynamic> data;
+  EditProfile({required this.data});
   @override
   State<EditProfile> createState() => _EditProfileState();
 }
@@ -40,10 +39,147 @@ class _EditProfileState extends State<EditProfile> {
           ],
         ),
 
-        body: Container(
-          child: Text(widget.userData?.name ?? '사용자 ID가 없습니다.'),
+        body: Column(
+          children: [
+            Stack(
+              alignment: Alignment.bottomRight, // 카메라 버튼을 오른쪽 하단에 배치
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: CircleAvatar(
+                    radius: 70,
+                    backgroundImage: AssetImage('assets/profile.png'),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(1.0), // 카메라 버튼과 CircleAvatar 사이의 간격을 조절
+                    child: InkWell(
+                      onTap: () {
+                        // 클릭시 모달 팝업을 띄워준다.
+                        showModalBottomSheet(context: context, builder: ((builder) => bottomSheet()));
+                      },
+                      child: Icon(
+                        Icons.camera_alt,
+                        color: Colors.grey,
+                        size: 40,
+                      ),
+                    )
+                ),
+              ],
+            ),
+
+
+
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: '아이디',
+                  labelStyle: TextStyle(
+                    color: Color(0xff328772),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  hintText: widget.data['userId'],
+                ),),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: '닉네임',
+                  labelStyle: TextStyle(
+                    color: Color(0xff328772),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  hintText: widget.data['nick'],
+                ),),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: '이메일',
+                  labelStyle: TextStyle(
+                    color: Color(0xff328772),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  hintText: widget.data['email'],
+                ),),
+            ),
+
+
+          ],
+
+
+          ),
+
         ),
-      ),
+      );
+  }
+
+  Widget bottomSheet() {
+    return Container(
+        height: 100,
+        width: MediaQuery.of(context).size.width,
+        margin: EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 20
+        ),
+        child: Column(
+          children: <Widget>[
+            Text(
+              'Choose Profile photo',
+              style: TextStyle(
+                fontSize: 20,
+              ),
+            ),
+            SizedBox(height: 20,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                TextButton.icon(
+                  icon: Icon(Icons.camera, size: 40),
+                  onPressed: () {
+                    // takePhoto(ImageSource.camera);
+                  },
+                  label: Text('Camera', style: TextStyle(fontSize: 20)),
+                ),
+                TextButton.icon(
+                  icon: Icon(Icons.photo_library, size: 40),
+                  onPressed: () {
+                    // takePhoto(ImageSource.gallery);
+                  },
+                  label: Text('Gallery', style: TextStyle(fontSize: 20)),
+                ),
+              ],
+            )
+
+          ],
+        )
     );
   }
 }

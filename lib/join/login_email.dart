@@ -40,7 +40,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final FirebaseFirestore _fs = FirebaseFirestore.instance; // Firestore 인스턴스를 가져옵니다.
-  final TextEditingController _id = TextEditingController();
+  final TextEditingController _userId = TextEditingController();
   final TextEditingController _pw = TextEditingController();
 
   @override
@@ -55,7 +55,7 @@ class _LoginPageState extends State<LoginPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
-              controller: _id,
+              controller: _userId,
               decoration: InputDecoration(
                 labelText: '아이디',
                 labelStyle: TextStyle(
@@ -138,11 +138,11 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _login() async {
-    String id = _id.text;
+    String id = _userId.text;
     String password = _pw.text;
 
     final userDocs = await _fs.collection('userList')
-        .where('id', isEqualTo: id)
+        .where('userId', isEqualTo: id)
         .where('pw', isEqualTo: password).get();
 
     if (userDocs.docs.isNotEmpty) {
@@ -154,7 +154,7 @@ class _LoginPageState extends State<LoginPage> {
           builder: (context) => HomePage(),
         ),
       );
-      _id.clear();
+      _userId.clear();
       _pw.clear();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
