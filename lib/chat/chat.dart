@@ -1,7 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-
+import 'package:image_picker/image_picker.dart';
 import '../join/userModel.dart';
 
 class ChatApp extends StatelessWidget {
@@ -36,6 +39,11 @@ class ChatScreenState extends State<ChatScreen> {
 
   late String user1;
 
+  File? _image; // 이미지 파일을 저장할 변수
+
+
+
+
   @override
   void initState() {
     super.initState();
@@ -52,7 +60,22 @@ class ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat App'),
+        title: Text('Chat App', textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),// 제목 텍스트 설정
+        backgroundColor: Colors.white, // AppBar 배경색 설정
+        actions: <Widget>[ // 오른쪽 상단에 아이콘 추가
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              // 설정 아이콘을 눌렀을 때 수행할 동작
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.search),
+            onPressed: () {
+              // 검색 아이콘을 눌렀을 때 수행할 동작
+            },
+          ),
+        ],
       ),
       body: Column(
         children: <Widget>[
@@ -70,11 +93,34 @@ class ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send),
+                  icon: Icon(Icons.send, color: Colors.grey,),
                   onPressed: () {
                     _handleOnSubmit();
                   },
                 ),
+                IconButton(
+                    onPressed: () async{
+                      // 이미지 저장
+                      Directory dir = await getApplicationDocumentsDirectory();
+                      Directory imgDir = Directory('${dir.path}/img');
+                      if (!await imgDir.exists()) {
+                        await imgDir.create(); // 폴더 생성
+                        try {
+                          File targetFile = File('${imgDir.path}}/$name');
+                          // targetFile.path 얘를 db에 저장 후 호출 때 사용
+                          // 보통 안드로이드 => /data/user/0/com.example.indie_spot/app_flutter
+                          // 아이폰 => /Users/your_user_name/Library/Developer/CoreSimulator/Devices/DEVICE_ID/data/Containers/Data/Application/APP_ID/Documents
+                          print('저장경로 확인 ==> ${targetFile.path}');
+                          // _image는 File객체
+                          await _image!.copy(targetFile.path);
+                          // 저장 후 호출 시에는 Image.file(imageFile) 형태로 사용할 것
+                        } catch (e) {
+                          print("에러메세지: $e");
+                        }
+                      }
+                    },
+                    icon: Icon(Icons.photo_size_select_actual, color: Colors.grey,)
+                )
               ],
             ),
           ),
@@ -190,6 +236,14 @@ class ChatMessage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: isCurrentUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: <Widget>[
+          if (!isCurrentUser)
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Text(
+                DateFormat('yy.MM.dd\na h:mm').format(sendTime),
+                style: TextStyle(fontSize: 12, color: Colors.grey),
+              ),
+            ),
           Column(
             crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: <Widget>[
@@ -204,10 +258,7 @@ class ChatMessage extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
               ),
-              Text(
-                '${sendTime.toLocal()}',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
-              ),
+              // Add an image upload button here
             ],
           ),
         ],
