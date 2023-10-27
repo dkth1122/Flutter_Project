@@ -233,13 +233,13 @@ class ChatMessage extends StatelessWidget {
         children: <Widget>[
           if (!isCurrentUser)
             Padding(
-              padding: EdgeInsets.only(right: 8.0),
+              padding: EdgeInsets.only(left: 8.0), // 왼쪽 여백 추가
             ),
           Row(
-            crossAxisAlignment: isCurrentUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: <Widget>[
+              if (isCurrentUser)
               Padding(
-                padding: const EdgeInsets.all(3.0),
+                padding:  const EdgeInsets.only(right: 5),
                 child: Text(
                   DateFormat('yy.MM.dd\n HH:mm').format(sendTime),
                   style: TextStyle(fontSize: 10, color: Colors.grey),
@@ -256,6 +256,14 @@ class ChatMessage extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
               ),
+              if (!isCurrentUser)
+                Padding(
+                  padding: const EdgeInsets.only(left: 5),
+                  child: Text(
+                    DateFormat('yy.MM.dd\n HH:mm').format(sendTime),
+                    style: TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
+                ),
             ],
           ),
         ],
