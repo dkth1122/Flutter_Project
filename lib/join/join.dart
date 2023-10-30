@@ -113,7 +113,7 @@ class _JoinState extends State<Join> {
     // 여기까지 도달하면 모든 검사를 통과한 것이므로 회원가입을 처리
     try {
       await _fs.collection('userList').add({
-        'id': _id.text,
+        'userId': _id.text,
         'pw': _pw.text,
         'email': _email.text,
         'name': _name.text,
@@ -151,7 +151,7 @@ class _JoinState extends State<Join> {
     try {
       final QuerySnapshot query = await _fs
           .collection('userList')
-          .where('id', isEqualTo: _id.text)
+          .where('userId', isEqualTo: _id.text)
           .get();
       if (query.docs.isNotEmpty) {
         isDuplicate = true;

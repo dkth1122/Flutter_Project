@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:project_flutter/main.dart';
 import 'package:project_flutter/myPage/userData.dart';
 import 'package:provider/provider.dart';
@@ -14,6 +15,9 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   final TextEditingController _email = TextEditingController();
+
+  final ImagePicker _imagePicker = ImagePicker();
+  XFile? _image;
 
   Padding buildTextField(String labelText, String hintText, String value) {
     return Padding(
@@ -94,7 +98,7 @@ class _EditProfileState extends State<EditProfile> {
             },
           ),
           actions: [
-            IconButton(
+              IconButton(
               icon: Icon(Icons.save),
               onPressed: () {
                 final email = _email.text;
@@ -222,15 +226,25 @@ class _EditProfileState extends State<EditProfile> {
             children: <Widget>[
               TextButton.icon(
                 icon: Icon(Icons.camera, size: 40),
-                onPressed: () {
-                  // takePhoto(ImageSource.camera);
+                onPressed: () async{
+                  XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
+                  if (image != null) {
+                    setState(() {
+                      _image = image;
+                    });
+                  }
                 },
                 label: Text('Camera', style: TextStyle(fontSize: 20)),
               ),
               TextButton.icon(
                 icon: Icon(Icons.photo_library, size: 40),
-                onPressed: () {
-                  // takePhoto(ImageSource.gallery);
+                onPressed: () async{
+                  XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
+                  if (image != null) {
+                    setState(() {
+                      _image = image;
+                    });
+                  }
                 },
                 label: Text('Gallery', style: TextStyle(fontSize: 20)),
               ),
