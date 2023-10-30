@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class VacationSettingsPage extends StatefulWidget {
+class Vacation extends StatefulWidget {
   @override
-  _VacationSettingsPageState createState() => _VacationSettingsPageState();
+  _VacationState createState() => _VacationState();
 }
 
-class _VacationSettingsPageState extends State<VacationSettingsPage> {
+class _VacationState extends State<Vacation> {
   // Declare state variables and methods for managing vacation settings
 
   @override

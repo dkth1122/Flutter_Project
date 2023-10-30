@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class AdRequestPage extends StatefulWidget {
+class AdRequest extends StatefulWidget {
   @override
-  _AdRequestPageState createState() => _AdRequestPageState();
+  _AdRequestState createState() => _AdRequestState();
 }
 
-class _AdRequestPageState extends State<AdRequestPage> {
+class _AdRequestState extends State<AdRequest> {
   // Declare state variables and methods for ad request management
 
   @override

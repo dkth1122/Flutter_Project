@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class EarningsManagementPage extends StatefulWidget {
+class Revenue extends StatefulWidget {
   @override
-  _EarningsManagementPageState createState() => _EarningsManagementPageState();
+  _RevenueState createState() => _RevenueState();
 }
 
-class _EarningsManagementPageState extends State<EarningsManagementPage> {
+class _RevenueState extends State<Revenue> {
   // Declare state variables and methods for managing earnings data
 
   @override

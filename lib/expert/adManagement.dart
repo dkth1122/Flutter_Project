@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class AdManagementPage extends StatefulWidget {
+class AdManagement extends StatefulWidget {
   @override
-  _AdManagementPageState createState() => _AdManagementPageState();
+  _AdManagementState createState() => _AdManagementState();
 }
 
-class _AdManagementPageState extends State<AdManagementPage> {
+class _AdManagementState extends State<AdManagement> {
   // Declare state variables and methods for managing ads
 
   @override

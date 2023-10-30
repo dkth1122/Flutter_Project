@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class PortfolioPage extends StatefulWidget {
+class Portfolio extends StatefulWidget {
   @override
-  _PortfolioPageState createState() => _PortfolioPageState();
+  _PortfolioState createState() => _PortfolioState();
 }
 
-class _PortfolioPageState extends State<PortfolioPage> {
+class _PortfolioState extends State<Portfolio> {
   // Declare state variables and methods for managing the portfolio
 
   @override

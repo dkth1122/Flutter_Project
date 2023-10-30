@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class MessageResponseManagementPage extends StatefulWidget {
+class MessageResponse extends StatefulWidget {
   @override
-  _MessageResponseManagementPageState createState() => _MessageResponseManagementPageState();
+  _MessageResponseState createState() => _MessageResponseState();
 }
 
-class _MessageResponseManagementPageState extends State<MessageResponseManagementPage> {
+class _MessageResponseState extends State<MessageResponse> {
   // Declare state variables and methods for managing message responses
 
   @override

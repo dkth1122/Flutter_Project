@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class ExpertRatingPage extends StatefulWidget {
+class ExpertRating extends StatefulWidget {
   @override
-  _ExpertRatingPageState createState() => _ExpertRatingPageState();
+  _ExpertRatingState createState() => _ExpertRatingState();
 }
 
-class _ExpertRatingPageState extends State<ExpertRatingPage> {
+class _ExpertRatingState extends State<ExpertRating> {
   // Declare state variables and methods for managing expert ratings
 
   @override
