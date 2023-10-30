@@ -7,23 +7,23 @@ import 'package:project_flutter/product.dart';
 
 void main() {
   runApp(MaterialApp(
-    home: Test(),
+    home: BottomBar(),
     // ... (앱 설정 및 라우팅 설정 등)
   ));
 }
 
-class Test extends StatefulWidget {
-  const Test({Key? key}) : super(key: key);
+class BottomBar extends StatefulWidget {
+  const BottomBar({Key? key}) : super(key: key);
 
   @override
-  State<Test> createState() => _TestState();
+  State<BottomBar> createState() => _BottomBarState();
 }
 
-class _TestState extends State<Test> {
+class _BottomBarState extends State<BottomBar> {
   double rotation = 0.0;
   Offset initialPosition = Offset(0, 0);
   Offset currentPosition = Offset(0, 0);
-  double containerSize = 100.0; // 초기 컨테이너 크기
+  double containerSize = 60.0; // 초기 컨테이너 크기
   bool isExpanded = false; // 컨테이너 확장 여부
   Color bottomAppBarColor = Colors.white; // BottomAppBar의 배경색
 
@@ -51,13 +51,13 @@ class _TestState extends State<Test> {
   List<IconData> iconData = [
     Icons.access_time_filled, Icons.check_box, Icons.person, Icons.chat, Icons.access_alarms_rounded, Icons.back_hand, Icons.cabin_outlined, Icons.dark_mode
   ];
-  List<Widget> pageChange = [Test(),Product(),LoginPage(),Test(),Test(),Test(),Test(),Test()];
+  List<Widget> pageChange = [BottomBar(),Product(),LoginPage(),BottomBar(),BottomBar(),BottomBar(),BottomBar(),BottomBar()];
   List<double> iconRotations = [pi / 2, 135 * (pi / 180), pi, 225 * (pi / 180), 270 * (pi / 180), 315 * (pi / 180), 360 * (pi / 180), 0]; // 각 아이콘의 회전 각도
 
   void _animateContainerSize() {
     setState(() {
       if (isExpanded) {
-        containerSize = 100.0; // 작아짐
+        containerSize = 60.0; // 작아짐
         bottomAppBarColor = Colors.white; // 클릭하면 다시 원래 색상으로
         rotation = 0;
       } else {
@@ -99,74 +99,70 @@ class _TestState extends State<Test> {
   Widget build(BuildContext context) {
     iconOffsets = calculateIconOffsets(); // 아이콘 좌표를 계산
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("테스트"),
-      ),
-      body: Center(
-        child: Image.asset('assets/cat1.jpeg'),
-      ),
-      extendBody: true, // body를 침범하도록 함
-      bottomNavigationBar: BottomAppBar(
-        color: bottomAppBarColor, // BottomAppBar의 배경색을 변수에 따라 변경
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            GestureDetector(
-              onPanStart: (details) {
-                setState(() {
-                  initialPosition = details.localPosition;
-                });
-              },
-              onPanUpdate: (details) {
-                setState(() {
-                  // Calculate the rotation angle based on the drag direction
-                  double angle = (details.localPosition - initialPosition).direction;
-                  rotation = angle;
-                  currentPosition = details.localPosition;
-                });
-              },
-              onPanEnd: (details) {
-                setState(() {
-                });
-              },
-              child: Transform.rotate(
-                angle: rotation,
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.white
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      _animateContainerSize();
-                    },
-                    child: AnimatedContainer(
-                      duration: Duration(milliseconds: 300),
-                      width: containerSize,
-                      height: containerSize,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: <Widget>[
-                          Image.asset('assets/naver.png'),
-                          if (isExpanded)
-                            for (int i = 0; i < iconOffsets.length; i++)
-                              buildAddButton(
-                                  iconOffsets[i],
-                                  addButtonTexts[i],
-                                  iconData[i],
-                                  iconRotations[i],
-                                  i
-                              ),
-                        ],
-                      ),
+    return BottomAppBar(
+      color: bottomAppBarColor, // BottomAppBar의 배경색을 변수에 따라 변경
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onPanStart: (details) {
+              setState(() {
+                initialPosition = details.localPosition;
+              });
+            },
+            onPanUpdate: (details) {
+              setState(() {
+                // Calculate the rotation angle based on the drag direction
+                double angle = (details.localPosition - initialPosition).direction;
+                rotation = angle;
+                currentPosition = details.localPosition;
+              });
+            },
+            onPanEnd: (details) {
+              setState(() {
+              });
+            },
+            child: Transform.rotate(
+              angle: rotation,
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white
+                ),
+                child: InkWell(
+                  onTap: () {
+                    _animateContainerSize();
+                  },
+                  child: AnimatedContainer(
+                    duration: Duration(milliseconds: 300),
+                    width: containerSize,
+                    height: containerSize,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: <Widget>[
+                        Image.asset(
+                          'assets/naver.png',
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        ),
+                        if (isExpanded)
+                          for (int i = 0; i < iconOffsets.length; i++)
+                            buildAddButton(
+                                iconOffsets[i],
+                                addButtonTexts[i],
+                                iconData[i],
+                                iconRotations[i],
+                                i
+                            ),
+                      ],
                     ),
                   ),
                 ),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

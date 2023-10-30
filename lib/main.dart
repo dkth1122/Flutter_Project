@@ -6,7 +6,7 @@ import 'package:project_flutter/chat/chatList.dart';
 import 'package:project_flutter/myPage/my_page.dart';
 import 'package:project_flutter/product.dart';
 import 'package:project_flutter/search/search.dart';
-import 'package:project_flutter/test.dart';
+import 'package:project_flutter/bottomBar.dart';
 import 'package:project_flutter/test2.dart';
 import 'package:provider/provider.dart';
 import 'chat/chat.dart';
@@ -188,14 +188,6 @@ class _HomePageState extends State<HomePage> {
                 }
               },
               icon: Icon(Icons.person),
-            ),
-            IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Test())
-                  );
-                },
-                icon: Icon(Icons.telegram_sharp)
             ),
             IconButton(
                 onPressed: (){
