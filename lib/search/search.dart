@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:project_flutter/search/searchSuccess.dart';
 import 'package:provider/provider.dart';
 import '../firebase_options.dart';
 import '../join/userModel.dart';
@@ -59,6 +60,29 @@ class _SearchState extends State<Search> {
     }
   }
 
+  void _deleteAllSearch() async {
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+    if (um.isLogin) {
+      String user = um.userId!;
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('userList')
+          .where('userId', isEqualTo: user)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        String docId = querySnapshot.docs.first.id;
+        QuerySnapshot latelySearchSnapshot = await FirebaseFirestore.instance
+            .collection('userList')
+            .doc(docId)
+            .collection('latelySearch')
+            .get();
+
+        for (DocumentSnapshot doc in latelySearchSnapshot.docs) {
+          await doc.reference.delete();
+        }
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,14 +103,32 @@ class _SearchState extends State<Search> {
             controller: _latelySearch,
           ),
           ElevatedButton(
-            onPressed: _addSearch,
+            onPressed: () {
+              if (_latelySearch.text.isNotEmpty) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SearchSuccess(searchText: _latelySearch.text),
+                  ),
+                );
+                _addSearch();
+              } else {
+                // 빈 값일 때 처리할 내용 추가 (예: 경고 또는 아무 작업 없음)
+              }
+            },
             child: Text("검색"),
           ),
           if (um.isLogin) // Display only if user is logged in
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text("최근 검색어", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                TextButton(
+                  onPressed: (){
+                    _deleteAllSearch();
+                  },
+                  child: Text("전체삭제")
+                )
               ],
             ),
           SizedBox(height: 10,),
@@ -96,7 +138,6 @@ class _SearchState extends State<Search> {
       ),
     );
   }
-
   Widget _listSearch() {
     UserModel um = Provider.of<UserModel>(context, listen: false);
     if (um.isLogin) {
@@ -111,7 +152,7 @@ class _SearchState extends State<Search> {
             .limit(1)
             .snapshots(),
         builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
-          if (!snap.hasData) {
+          if (!snap.hasData || snap.data == null) {
             return Center(child: CircularProgressIndicator());
           }
 
@@ -125,41 +166,52 @@ class _SearchState extends State<Search> {
                   .orderBy("timestamp", descending: true)
                   .snapshots(),
               builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> latelySearchSnap) {
+                if (latelySearchSnap.data != null && latelySearchSnap.data!.docs.isNotEmpty) {
+                  return Container(
+                    height: 50, // 높이를 50으로 고정
+                    child: ListView.builder(
+                      controller: controller,
+                      itemCount: latelySearchSnap.data!.docs.length,
+                      scrollDirection: Axis.horizontal,
+                      itemBuilder: (context, index) {
+                        DocumentSnapshot doc = latelySearchSnap.data!.docs[index];
+                        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-                return Container(
-                  height: 50, // 높이를 50으로 고정
-                  child: ListView.builder(
-                    controller: controller,
-                    itemCount: latelySearchSnap.data!.docs.length,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      DocumentSnapshot doc = latelySearchSnap.data!.docs[index];
-                      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-                      return Container(
-                        margin: EdgeInsets.symmetric(horizontal: 5.0),
-                        color: Color.fromRGBO(225, 225, 225, 0.7019607843137254),
-                        child: Row(
-                          children: [
-                            TextButton(
-                              child: Text('${data['latelySearch']}', style: TextStyle(color: Colors.black, fontSize: 14),),
-                              onPressed: (){
-                                setState(() {
-                                  _latelySearch.text = data['latelySearch'];
-                                });
-                              },
-                            ),
-                            IconButton(
-                              icon: Icon(Icons.clear), // 'X' 아이콘 사용
-                              color: Colors.grey, // 아이콘 색상 설정
-                              onPressed: () {},
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                  ),
-                );
+                        return Container(
+                          margin: EdgeInsets.symmetric(horizontal: 5.0),
+                          color: Color.fromRGBO(225, 225, 225, 0.7019607843137254),
+                          child: Row(
+                            children: [
+                              TextButton(
+                                child: Text('${data['latelySearch']}', style: TextStyle(color: Colors.black, fontSize: 14),),
+                                onPressed: (){
+                                  setState(() {
+                                    _latelySearch.text = data['latelySearch'];
+                                  });
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => SearchSuccess(searchText: _latelySearch.text),
+                                    ),
+                                  );
+                                },
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.clear), // 'X' 아이콘 사용
+                                color: Colors.grey, // 아이콘 색상 설정
+                                onPressed: (){
+                                  doc.reference.delete();
+                                },
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                } else {
+                  return Container(); // .docs가 null이거나 비어있는 경우
+                }
               },
             );
           } else {
@@ -171,4 +223,5 @@ class _SearchState extends State<Search> {
       return Container();
     }
   }
+
 }
