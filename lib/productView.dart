@@ -6,6 +6,8 @@ import 'package:project_flutter/productPayment.dart';
 import 'package:project_flutter/join/userModel.dart';
 import 'package:provider/provider.dart';
 
+import 'join/login_email.dart';
+
 class ProductView extends StatefulWidget {
   final String productName;
   final String price;
@@ -88,6 +90,34 @@ class _ProductViewState extends State<ProductView>
     });
   }
 
+  void _showLoginAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('알림'),
+          content: Text('로그인 후 이용 가능한 서비스입니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
+    ).then((value) {
+      if (value != null && value is bool && value) {
+        // 로그인 페이지로 이동하는 코드 작성
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+      }
+    });
+  }
+
   void _toggleFavorite() {
     String user = "";
     UserModel um = Provider.of<UserModel>(context, listen: false);
@@ -98,6 +128,11 @@ class _ProductViewState extends State<ProductView>
     } else {
       user = "없음";
       print("로그인 안됨");
+
+      // 로그인이 되지 않은 경우에만 알림창 표시 후 함수 종료
+      _showLoginAlert(context);
+
+      return;
     }
 
     FirebaseFirestore.instance
@@ -134,6 +169,7 @@ class _ProductViewState extends State<ProductView>
         ),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           TabBar(
             controller: _tabController,
@@ -144,12 +180,15 @@ class _ProductViewState extends State<ProductView>
             ],
           ),
           Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildProductDetailTab(),
-                _buildReviewTab(),
-              ],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildProductDetailTab(),
+                  _buildReviewTab(),
+                ],
+              ),
             ),
           ),
         ],
@@ -236,7 +275,8 @@ class _ProductViewState extends State<ProductView>
             final productData = productDocs.first.data() as Map<String, dynamic>;
             final productCount = productData['cnt'] as int;
 
-            return Center(
+            return Align(
+              alignment: Alignment.topCenter,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -267,6 +307,9 @@ class _ProductViewState extends State<ProductView>
                     style: const TextStyle(
                       fontSize: 16,
                     ),
+                  ),
+                  Divider( // 추가된 부분
+                    color : Colors.grey ,
                   ),
                 ],
               ),
