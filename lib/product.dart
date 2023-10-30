@@ -13,7 +13,7 @@ class Product extends StatefulWidget {
 }
 
 class _ProductState extends State<Product> {
-  late Stream<QuerySnapshot>? productStream;
+  late Stream<QuerySnapshot>? productStream = null;
 
   @override
   void initState() {
@@ -137,12 +137,12 @@ class _ProductState extends State<Product> {
                     ),
                     child: Stack(
                       children: [
-                        Positioned.fill(
+                        /*Positioned.fill(
                           child: Image.network(
                             imageUrl,
                             fit: BoxFit.cover,
                           ),
-                        ),
+                        ),*/
                         Positioned(
                           bottom: 8,
                           left: 8,

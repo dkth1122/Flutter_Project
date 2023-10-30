@@ -267,59 +267,114 @@ class _ProductViewState extends State<ProductView>
         .format(int.parse(widget.price.replaceAll(',', '')));
 
     return StreamBuilder<QuerySnapshot>(
-      stream: FirebaseFirestore.instance.collection('product').where('pName', isEqualTo: widget.productName).snapshots(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          final productDocs = snapshot.data!.docs;
-          if (productDocs.isNotEmpty) {
-            final productData = productDocs.first.data() as Map<String, dynamic>;
-            final productCount = productData['cnt'] as int;
+        stream: FirebaseFirestore.instance.collection('product').where('pName', isEqualTo: widget.productName).snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final productDocs = snapshot.data!.docs;
+            if (productDocs.isNotEmpty) {
+              final productData = productDocs.first.data() as Map<String, dynamic>;
+              final productCount = productData['cnt'] as int;
 
-            return Align(
-              alignment: Alignment.topCenter,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.network(
-                    widget.imageUrl,
-                    width: 200,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  ),
-                  const SizedBox(height: 20),
-                  Text(
-                    widget.productName,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    '가격: $formattedPrice 원',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    '조회수: $productCount',
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                  Divider( // 추가된 부분
-                    color : Colors.grey ,
-                  ),
-                ],
-              ),
-            );
-          }
-        }
+              // 상품 작성자 정보 가져오기
+              final user = productData['user'] as String;
 
-        return const SizedBox();
-      },
-    );
+              return Align(
+                  alignment: Alignment.topCenter,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        child: Image.asset('dog1.PNG'),
+                      ),
+                     /* Image.network(
+                        widget.imageUrl,
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),*/
+                      const SizedBox(height :20),
+                      Text(
+                        widget.productName,
+                        style :const TextStyle (
+                          fontSize :20 ,
+                          fontWeight :FontWeight.bold ,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(
+                        '${productData['pDetail']}',
+                        style: const TextStyle(
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height :10),
+                      Text (
+                        '가격 : $formattedPrice 원',
+                        style :const TextStyle (
+                          fontSize :16 ,
+                        ),
+                      ),
+                      const SizedBox(height :10),
+                      Text (
+                        '조회수 : $productCount',
+                        style :const TextStyle (
+                          fontSize :16 ,
+                        ),
+                      ),
+
+                      Divider(color :Colors.grey),
+
+                      StreamBuilder<QuerySnapshot>(
+                        stream:
+                        FirebaseFirestore.instance.collection('userList').where('userId', isEqualTo:user).snapshots(),
+                        builder:(context, snapshot){
+                          if(snapshot.hasData){
+                            final userDocs=snapshot.data!.docs;
+                            if(userDocs.isNotEmpty){
+                              final userData=userDocs.first.data() as Map<String,dynamic>;
+                              /*final userProfileImage=userData['userProfile'] as String;*/
+                              final userNick=userData['nick'] as String;
+
+                              return Row(
+                                children:[
+                                  CircleAvatar( // 원 모양 프로필 이미지
+                                    radius: 40,
+                                    backgroundImage: AssetImage('dog4.png'),
+                                    /*NetworkImage(userProfileImage),*/
+                                  ),
+                                  SizedBox(width :8),
+                                  Text(userNick), // 닉네임 출력
+                                  Expanded(
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        TextButton(
+                                          onPressed: () {
+                                            // 버튼이 클릭되었을 때 실행될 코드 작성
+                                            print('버튼이 클릭되었습니다.');
+                                          },
+                                          child: Text('1:1문의하기'),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ],
+                              );
+                            }
+                          }
+                          return SizedBox();
+                        },
+                      ),
+
+                      Divider(color :Colors.grey),
+
+                    ],
+                  ),);
+              }
+              }
+
+                  return const SizedBox();
+            });
   }
 
   Widget _buildReviewTab() {
