@@ -80,9 +80,18 @@ class _SearchSuccessState extends State<SearchSuccess> {
                 );
               },
               child: ListTile(
-                leading: Image.asset('assets/cat1.jpeg'),
+                leading: Image.network(
+                  data['iUrl'],
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                ),
                 title: Text(data['pName']),
-                subtitle: Text('내용 : ${data['pDetail']}'),
+                subtitle: Text(
+                  data['pDetail'].length > 15
+                      ? '${data['pDetail'].substring(0, 15)}...'
+                      : data['pDetail'],
+                ),
                 trailing: Text('${(data['price'])}원'),
               ),
             );

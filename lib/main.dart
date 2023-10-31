@@ -10,6 +10,7 @@ import 'package:project_flutter/bottomBar.dart';
 import 'package:project_flutter/test.dart';
 import 'package:project_flutter/test2.dart';
 import 'package:provider/provider.dart';
+import 'category/categoryProduct.dart';
 import 'chat/chat.dart';
 import 'firebase_options.dart';
 import 'join/login_email.dart';
@@ -57,7 +58,7 @@ class _HomePageState extends State<HomePage> {
   List<String> imageBanner = ['assets/banner1.webp','assets/banner2.webp','assets/banner3.webp','assets/banner4.webp','assets/banner5.webp'];
   List<String> imagePaths1 = ['assets/category_ux.png','assets/category_web.png','assets/category_shop.png','assets/category_mobile.png',];
   List<String> imagePaths2 = ['assets/category_program.png','assets/category_trend.png','assets/category_data.png','assets/category_rest.png',];
-  List<String> categories = ["UX기획zz", "웹", "커머스", "모바일"];
+  List<String> categories = ["UX기획", "웹", "커머스", "모바일"];
   List<String> categories2 = ["프로그램", "트렌드", "데이터", "기타"];
   @override
   Widget build(BuildContext context) {
@@ -152,11 +153,6 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-
-
-
-
-
       bottomNavigationBar: BottomAppBar(
         height: 60,
         child: Row(
@@ -282,11 +278,19 @@ class _HomePageState extends State<HomePage> {
                   Expanded(
                     child: Column(
                       children: [
-                        Image.asset(
-                          imagePaths1[i],
-                          width: 90,
-                          height: 90,
-                          fit: BoxFit.cover,
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context, MaterialPageRoute(builder: (context) => CategoryProduct(sendText : categories[i]))
+                            );
+
+                          },
+                          child: Image.asset(
+                            imagePaths1[i],
+                            width: 90,
+                            height: 90,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                         Text(categories[i])
                       ],
@@ -305,11 +309,18 @@ class _HomePageState extends State<HomePage> {
                   Expanded(
                     child: Column(
                       children: [
-                        Image.asset(
-                          imagePaths2[i],
-                          width: 90,
-                          height: 90,
-                          fit: BoxFit.cover,
+                        InkWell(
+                          onTap: () {
+                            Navigator.push(
+                                context, MaterialPageRoute(builder: (context) => CategoryProduct(sendText : categories2[i]))
+                            );
+                          },
+                          child: Image.asset(
+                            imagePaths2[i],
+                            width: 90,
+                            height: 90,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                         Text(categories2[i])
                       ],
