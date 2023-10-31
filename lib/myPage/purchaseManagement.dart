@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PurchaseManagementPage extends StatelessWidget {
+  List<String> filterOptions = ['옵션 1', '옵션 2', '옵션 3'];
 
   void _showInfoModal(BuildContext context) {
     showModalBottomSheet(
@@ -9,7 +10,7 @@ class PurchaseManagementPage extends StatelessWidget {
         return Container(
           padding: EdgeInsets.all(16),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: MainAxisSize.max,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -34,6 +35,42 @@ class PurchaseManagementPage extends StatelessWidget {
       },
     );
   }
+
+  void _showFilterOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return ListView(
+          children: filterOptions.map((option) {
+            return ListTile(
+              title: Text(option),
+              onTap: () {
+                // 선택한 옵션에 대한 필터링 로직을 여기에 구현합니다.
+                Navigator.pop(context); // 모달 바텀 시트를 닫습니다.
+              },
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _filterButton({
+    IconData? icon, // Make the icon parameter nullable
+    String? text, // Make the text parameter nullable
+    required VoidCallback onPressed,
+  }) {
+    return ElevatedButton.icon(
+      icon: Icon(icon ?? Icons.arrow_drop_down, color: Colors.grey),
+      label: Text(text ?? "기본 텍스트", style: TextStyle(color: Colors.grey),),
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all(Colors.white),
+        side: MaterialStateProperty.all(BorderSide(color: Colors.grey, width: 1.0)),
+      ),
+      onPressed: onPressed,
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -62,21 +99,66 @@ class PurchaseManagementPage extends StatelessWidget {
           ),
         ],
       ),
-      body: ListView(
-        children: [
-          ListTile(
-            title: Text("주문 1"),
-            subtitle: Text("상품 1"),
-            trailing: Text("가격: \$10"),
+      body: Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.all(16.0),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: '검색',
+                prefixIcon: Icon(Icons.search),
+              ),
+              // Implement your search functionality here
+            ),
           ),
-          ListTile(
-            title: Text("주문 2"),
-            subtitle: Text("상품 2"),
-            trailing: Text("가격: \$20"),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _filterButton(
+                icon: Icons.arrow_drop_down,
+                text: '상품유형',
+                onPressed: () {
+                  _showFilterOptions(context);
+                },
+              ),
+              SizedBox(width: 10), // 버튼 사이에 간격을 추가합니다
+              _filterButton(
+                icon: Icons.arrow_drop_down,
+                text: '주문상태',
+                onPressed: () {
+                  _showFilterOptions(context);
+                },
+              ),
+              SizedBox(width: 10), // 버튼 사이에 간격을 추가합니다
+              _filterButton(
+                icon: Icons.arrow_drop_down,
+                text: '주문기간',
+                onPressed: () {
+                  _showFilterOptions(context);
+                },
+              ),
+            ],
           ),
-          // 추가적인 주문 항목을 원하는 만큼 반복
+          Expanded(
+            child: ListView(
+              children: [
+                ListTile(
+                  title: Text("주문 1"),
+                  subtitle: Text("상품 1"),
+                  trailing: Text("가격: \$10"),
+                ),
+                ListTile(
+                  title: Text("주문 2"),
+                  subtitle: Text("상품 2"),
+                  trailing: Text("가격: \$20"),
+                ),
+                // Additional order items
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
+
 }
