@@ -125,7 +125,9 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("상품등록")),
+      appBar: AppBar(title: Text("상품등록"),
+        backgroundColor: Color(0xff328772),
+      ),
       body: Padding(
         padding: EdgeInsets.all(20.0),
         child: Column(
