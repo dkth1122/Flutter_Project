@@ -60,10 +60,11 @@ class _HomePageState extends State<HomePage> {
     "https://cdn.pixabay.com/photo/2015/06/19/20/13/sunset-815270_1280.jpg",
     "https://cdn.pixabay.com/photo/2016/01/08/05/24/sunflower-1127174_1280.jpg",
   ];
-  List<String> imagePaths1 = ['assets/cat1.jpeg','assets/cat2.jpeg','assets/cat3.jpeg','assets/cat4.jpeg',];
-  List<String> imagePaths2 = ['assets/cat1.jpeg','assets/cat2.jpeg','assets/cat3.jpeg','assets/cat4.jpeg',];
-  List<String> imagePaths3 = ['assets/cat1.jpeg','assets/cat2.jpeg','assets/cat3.jpeg','assets/cat4.jpeg',];
-  List<String> imagePaths4 = ['assets/cat1.jpeg','assets/cat2.jpeg','assets/cat3.jpeg','assets/cat4.jpeg',];
+  List<String> imageBanner = ['banner/banner1.webp','banner/banner2.webp','banner/banner3.webp','banner/banner4.webp','banner/banner5.webp'];
+  List<String> imagePaths1 = ['category/ux.png','category/web.png','category/shop.png','category/mobile.png',];
+  List<String> imagePaths2 = ['category/program.png','category/trend.png','category/data.png','category/rest.png',];
+  List<String> categories = ["UX기획", "웹", "커머스", "모바일"];
+  List<String> categories2 = ["프로그램", "트렌드", "데이터", "기타"];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,6 +75,7 @@ class _HomePageState extends State<HomePage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
+            // 검색어
             Container(
               padding: EdgeInsets.all(20),
               child: TextField(
@@ -94,8 +96,9 @@ class _HomePageState extends State<HomePage> {
                 },
               )
             ),
+            // 슬라이드
             SizedBox(
-              height: 100,
+              height: 150,
               child: Stack(
                 children: [
                   sliderWidget(),
@@ -104,8 +107,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             SizedBox(height: 20,),
+            // 카테고리
             SizedBox(
-              height: 300,
+              height: 130,
               child: Stack(
                 children: [
                   sliderWidget2(),
@@ -113,11 +117,11 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-            SizedBox(height: 20,),
-            // 인기 서비스
+            SizedBox(height: 10,),
+            // 인기 서비스 제목
             Row(
               children: [
-                SizedBox(width: 10,),
+                SizedBox(width: 20,),
                 Text(
                   "인기 서비스",
                   style: TextStyle(
@@ -128,12 +132,13 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
+            // 인기 서비스
             Container(
               height: 250,
               child: _heartProduct()
             ),
             SizedBox(height: 20,),
-            // Row는 가장 많이 본 서비스
+            // 가장 많이 본 서비스 제목
             Row(
               children: [
                 SizedBox(width: 20,),
@@ -147,6 +152,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
+            // 가장 많이 본 서비스
             _cntProduct(),
 
           ],
@@ -207,17 +213,15 @@ class _HomePageState extends State<HomePage> {
   Widget sliderWidget() {
     return CarouselSlider(
       carouselController: _controller,
-      items: imageList.map(
-            (imgLink) {
+      items: imageBanner.map(
+            (imagePath) {
           return Builder(
             builder: (context) {
               return SizedBox(
                 width: MediaQuery.of(context).size.width,
-                child: Image(
+                child: Image.asset(
+                  imagePath,
                   fit: BoxFit.cover,
-                  image: NetworkImage(
-                    imgLink,
-                  ),
                 ),
               );
             },
@@ -225,10 +229,10 @@ class _HomePageState extends State<HomePage> {
         },
       ).toList(),
       options: CarouselOptions(
-        height: 100,
+        height: 150,
         viewportFraction: 1.0,
         autoPlay: true,
-        autoPlayInterval: const Duration(seconds: 1),
+        autoPlayInterval: const Duration(seconds: 2),
         onPageChanged: (index, reason) {
           setState(() {
             _current = index;
@@ -269,121 +273,53 @@ class _HomePageState extends State<HomePage> {
       items: [
         Column(
           children: [
-            Container(
-              height: 100,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: imagePaths1.map((imagePath) {
-                  return InkWell(
-                    onTap: () {
-                    },
-                    child: ClipOval(
-                      child: Image.asset(imagePath, width: 100, height: 100, fit: BoxFit.cover),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                for (int i = 0; i < 4; i++)
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          imagePaths1[i],
+                          width: 90,
+                          height: 90,
+                          fit: BoxFit.cover,
+                        ),
+                        Text(categories[i])
+                      ],
                     ),
-                  );
-                }).toList(),
-              ),
-            ),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text("UX기획"),
-                  Text("웹"),
-                  Text("커머스"),
-                  Text("모바일"),
-                ],
-              ),
-            ),
-            SizedBox(height: 20,),
-            Container(
-              height: 100,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: imagePaths2.map((imagePath) {
-                  return InkWell(
-                    onTap: () {
-                    },
-                    child: ClipOval(
-                      child: Image.asset(imagePath, width: 100, height: 100, fit: BoxFit.cover),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text("프로그램"),
-                  Text("트렌드"),
-                  Text("데이터"),
-                  Text("기타"),
-                ],
-              ),
+                  ),
+              ],
             ),
           ],
         ),
         Column(
           children: [
-            Container(
-              height: 100,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: imagePaths3.map((imagePath) {
-                  return InkWell(
-                    onTap: () {
-                    },
-                    child: ClipOval(
-                      child: Image.asset(imagePath, width: 100, height: 100, fit: BoxFit.cover),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: <Widget>[
+                for (int i = 0; i < 4; i++)
+                  Expanded(
+                    child: Column(
+                      children: [
+                        Image.asset(
+                          imagePaths2[i],
+                          width: 90,
+                          height: 90,
+                          fit: BoxFit.cover,
+                        ),
+                        Text(categories2[i])
+                      ],
                     ),
-                  );
-                }).toList(),
-              ),
-            ),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text("프로그램"),
-                  Text("프로그램"),
-                  Text("프로그램"),
-                  Text("프로그램"),
-                ],
-              ),
-            ),
-            SizedBox(height: 10,),
-            Container(
-              height: 100,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: imagePaths4.map((imagePath) {
-                  return InkWell(
-                    onTap: () {
-                    },
-                    child: ClipOval(
-                      child: Image.asset(imagePath, width: 100, height: 100, fit: BoxFit.cover),
-                    ),
-                  );
-                }).toList(),
-              ),
-            ),
-            Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text("프로그램"),
-                  Text("프로그램"),
-                  Text("프로그램"),
-                  Text("프로그램"),
-                ],
-              ),
+                  ),
+              ],
             ),
           ],
         ),
       ],
       options: CarouselOptions(
-        height: 300,
+        height: 200,
         viewportFraction: 1,
         autoPlay: false,
         enableInfiniteScroll: false,

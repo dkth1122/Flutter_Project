@@ -92,7 +92,6 @@ class _SearchState extends State<Search> {
       user = um.userId!;
       print(user);
     } else {
-      user = "없음";
       print("로그인 안됨");
     }
     return Scaffold(
@@ -101,6 +100,7 @@ class _SearchState extends State<Search> {
         children: [
           TextField(
             controller: _latelySearch,
+            autofocus: true,
           ),
           ElevatedButton(
             onPressed: () {
