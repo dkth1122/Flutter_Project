@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:project_flutter/main.dart';
-import 'package:project_flutter/myPage/userData.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 import '../join/userModel.dart';
 
@@ -77,6 +77,64 @@ class _EditProfileState extends State<EditProfile> {
       ),
     );
   }
+
+  void _showChangePasswordDialog() {
+    TextEditingController currentPasswordController = TextEditingController();
+    TextEditingController newPasswordController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('비밀번호 변경'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              TextField(
+                controller: currentPasswordController,
+                decoration: InputDecoration(labelText: '현재 비밀번호'),
+                obscureText: true,
+              ),
+              TextField(
+                controller: newPasswordController,
+                decoration: InputDecoration(labelText: '새로운 비밀번호'),
+                obscureText: true,
+              ),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: () async {
+                String currentPassword = currentPasswordController.text;
+                String newPassword = newPasswordController.text;
+
+                // Firebase Authentication을 사용하여 비밀번호 변경
+                try {
+                  await FirebaseAuth.instance.currentUser?.updatePassword(newPassword);
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('비밀번호가 성공적으로 변경되었습니다.'),
+                  ));
+                  Navigator.pop(context);
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('비밀번호 변경에 실패했습니다. 다시 시도해주세요.'),
+                  ));
+                }
+              },
+              child: Text('저장'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -178,11 +236,12 @@ class _EditProfileState extends State<EditProfile> {
                     },
                   ),
                   ListTile(
-                    title: Text('비밀번호변경'),
+                    title: Text('비밀번호 변경'),
                     onTap: () {
-                      // 첫 번째 아이템이 클릭됐을 때 수행할 작업
+                      _showChangePasswordDialog();
                     },
                   ),
+
                   ListTile(
                     title: Text('로그아웃'),
                     onTap: () {
