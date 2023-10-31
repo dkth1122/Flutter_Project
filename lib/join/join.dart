@@ -266,56 +266,52 @@ class _JoinState extends State<Join> {
       appBar: AppBar(
         title: Text('회원가입'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+      body: SingleChildScrollView(
+          child:
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: TextField(
+                controller: _id,
+                onChanged: (value) {
+                  String id = _id.text;
+                  if (!isIdValid(id)) {
+                    setState(() {
+                      idValidationMessage = '유효하지 않은 아이디 형식입니다. (6자 이상의 영어소문자와 숫자의 조합)';
+                    });
+                  } else {
+                    isIdAlreadyRegistered(id).then((isDuplicate) {
+                      if (isDuplicate) {
+                        setState(() {
+                          idValidationMessage = '이미 가입된 아이디 입니다.';
+                        });
+                      } else {
+                        setState(() {
+                          idValidationMessage = '사용 가능한 아이디 입니다.';
+                        });
+                      }
+                    });
+                  }
+                },
+                decoration: InputDecoration(
+                  labelText: '아이디',
+                  labelStyle: TextStyle(
+                    color: Color(0xff328772),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  hintText: "영어소문자와 숫자를 조합한 6자리 이상",
+                  suffixIcon: idValidationMessage == '사용 가능한 아이디 입니다.' ? Icon(Icons.check) : null,
 
-        Padding(
-
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _id,
-              onChanged: (value) {
-                String id = _id.text;
-                if (!isIdValid(id)) {
-                  setState(() {
-                    idValidationMessage = '유효하지 않은 아이디 형식입니다. (6자 이상의 영어소문자와 숫자의 조합)';
-                  });
-                } else {
-                  isIdAlreadyRegistered(id).then((isDuplicate) {
-                    if (isDuplicate) {
-                      setState(() {
-                        idValidationMessage = '이미 가입된 아이디 입니다.';
-                      });
-                    } else {
-                      setState(() {
-                        idValidationMessage = '사용 가능한 아이디 입니다.';
-                      });
-                    }
-                  });
-                }
-              },
-              decoration: InputDecoration(
-                labelText: '아이디',
-                labelStyle: TextStyle(
-                  color: Color(0xff328772),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                hintText: "영어소문자와 숫자를 조합한 6자리 이상",
-                suffixIcon: idValidationMessage == '사용 가능한 아이디 입니다.' ? Icon(Icons.check) : null,
-
               ),
             ),
             if (idValidationMessage.isNotEmpty)
@@ -325,9 +321,6 @@ class _JoinState extends State<Join> {
                   color: idValidationMessage == '사용 가능한 아이디 입니다.' ? Colors.blue : Colors.red,
                 ),
               ),
-          ],
-        ),
-      ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextField(
@@ -561,6 +554,7 @@ class _JoinState extends State<Join> {
                 ),
               ),
             ),
+
             Text(
               emailValidationMessage,
               style: TextStyle(
@@ -620,9 +614,9 @@ class _JoinState extends State<Join> {
             ElevatedButton(
               onPressed: _register,
               child: Text('회원가입'),
-            ),
-          ],
-        ),
+             ),
+          ]
+      ),
       ),
     );
   }
