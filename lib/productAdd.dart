@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:project_flutter/join/userModel.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
@@ -14,8 +18,6 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,7 +27,6 @@ class MyApp extends StatelessWidget {
 }
 
 class HomeScreen extends StatefulWidget {
-
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -34,7 +35,8 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _pName = TextEditingController();
   final TextEditingController _pDetail = TextEditingController();
   final TextEditingController _price = TextEditingController();
-  final TextEditingController _iUrl = TextEditingController();
+  final ImagePicker _picker = ImagePicker();
+  String imageUrl = "";
   final TextEditingController _cnt = TextEditingController();
   final TextEditingController _user = TextEditingController();
   String user = "";
@@ -42,13 +44,12 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    UserModel um =Provider.of<UserModel>(context, listen: false);
+    UserModel um = Provider.of<UserModel>(context, listen: false);
 
     if (um.isLogin) {
       // 사용자가 로그인한 경우
       user = um.userId!;
       print(user);
-
     } else {
       // 사용자가 로그인하지 않은 경우
       user = "없음";
@@ -58,15 +59,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String? _selectedCategory;
 
-  final List<String> categories = ['UX기획','웹','커머스','모바일','프로그램','트렌드','데이터','기타',];
+  final List<String> categories = [    'UX기획',    '웹',    '커머스',    '모바일',    '프로그램',    '트렌드',    '데이터',    '기타',  ];
 
   void _addProduct() async {
-
-
     if (_pName.text.isNotEmpty &&
         _pDetail.text.isNotEmpty &&
         _price.text.isNotEmpty &&
-        _iUrl.text.isNotEmpty &&
         _selectedCategory != null) {
       CollectionReference product =
       FirebaseFirestore.instance.collection('product');
@@ -75,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
         'pName': _pName.text,
         'pDetail': _pDetail.text,
         'price': int.parse(_price.text),
-        'iUrl': _iUrl.text,
+        'iUrl': imageUrl,
         'category': _selectedCategory,
         'cnt': 0,
         'user': user,
@@ -85,10 +83,41 @@ class _HomeScreenState extends State<HomeScreen> {
       _pName.clear();
       _pDetail.clear();
       _price.clear();
-      _iUrl.clear();
+      imageUrl = "";
       _cnt.clear();
     } else {
       print("내용을 입력해주세요.");
+    }
+  }
+
+  Future<void> uploadImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image == null) return;
+
+    File imageFile = File(image.path);
+
+    try {
+      // Firebase Storage에 이미지 업로드
+      final Reference storageRef = FirebaseStorage.instance
+          .ref()
+          .child('images/${DateTime.now()}.png');
+      await storageRef.putFile(imageFile);
+
+      // 이미지의 다운로드 URL을 얻기
+      imageUrl = await storageRef.getDownloadURL();
+
+      await FirebaseFirestore.instance
+          .collection('images')
+          .add({'url': imageUrl});
+
+      // 업로드 성공
+      print('이미지 업로드 완료: $imageUrl');
+
+      // 이미지가 업로드된 후 상태를 갱신하여 이미지를 표시
+      setState(() {});
+    } catch (e) {
+      // 업로드 실패
+      print('이미지 업로드 실패: $e');
     }
   }
 
@@ -96,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("product")
-          .orderBy("timestamp", descending: true)
+          .orderBy("sendTime", descending: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
         if (!snap.hasData) {
@@ -110,11 +139,6 @@ class _HomeScreenState extends State<HomeScreen> {
               DocumentSnapshot doc = snap.data!.docs[index];
               Map<String, dynamic> data =
               doc.data() as Map<String, dynamic>;
-
-              return ListTile(
-                title: Text('${index + 1}. ${data['title']}'),
-                onTap: () {},
-              );
             },
           ),
         );
@@ -125,7 +149,11 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("상품등록"),
+      appBar: AppBar(
+        title: Text(
+          "상품등록",
+          style: TextStyle(color: Colors.white),
+        ),
         backgroundColor: Color(0xff328772),
       ),
       body: Padding(
@@ -148,9 +176,17 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: InputDecoration(labelText: "가격"),
             ),
             SizedBox(height: 20),
-            TextField(
-              controller: _iUrl,
-              decoration: InputDecoration(labelText: "상품 이미지"),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                imageUrl.isNotEmpty
+                    ? Image.network(imageUrl)
+                    : Text('이미지가 없습니다.'),
+                ElevatedButton(
+                  onPressed: uploadImage,
+                  child: Text('이미지 업로드'),
+                ),
+              ],
             ),
             SizedBox(height: 20),
             DropdownButtonFormField<String>(
