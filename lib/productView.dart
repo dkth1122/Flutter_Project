@@ -169,6 +169,7 @@ class _ProductViewState extends State<ProductView>
         title: const Text(
           "상세보기",
         ),
+        backgroundColor: Color(0xff328772),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -176,6 +177,7 @@ class _ProductViewState extends State<ProductView>
           TabBar(
             controller: _tabController,
             labelColor: Colors.black,
+            indicatorColor: Color(0xfff48752),
             tabs: const [
               Tab(text: '상품 상세'),
               Tab(text: '후기'),
@@ -236,6 +238,9 @@ class _ProductViewState extends State<ProductView>
                     },
                   );
                 },
+                style: ElevatedButton.styleFrom(
+                  primary: Color(0xfff48752), // 구매하기 버튼 색상 변경
+                ),
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16.0),
                   child: Text(

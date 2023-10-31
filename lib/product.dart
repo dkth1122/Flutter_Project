@@ -38,6 +38,8 @@ class _ProductState extends State<Product> {
     '최신 등록 순',
     '평점 높은 순',
     '후기 많은 순',
+    '가격 높은 순',
+    '가격 낮은 순',
   ];
 
   @override
