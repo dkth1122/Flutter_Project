@@ -23,20 +23,23 @@ class _Test2State extends State<Test2> {
 
     try {
       // Firebase Storage에 이미지 업로드
-      final Reference storageRef =
-      FirebaseStorage.instance.ref().child('images/${DateTime.now()}.png');
+      final Reference storageRef = FirebaseStorage.instance
+          .ref()
+          .child('images/${DateTime.now()}.png');
       await storageRef.putFile(imageFile);
 
       // 이미지의 다운로드 URL을 얻기
       imageUrl = await storageRef.getDownloadURL();
 
-      // Firestore에 다운로드 URL 저장 (예를 들어, 'images' 컬렉션)
       await FirebaseFirestore.instance
           .collection('images')
           .add({'url': imageUrl});
 
       // 업로드 성공
       print('이미지 업로드 완료: $imageUrl');
+
+      // 이미지가 업로드된 후 상태를 갱신하여 이미지를 표시
+      setState(() {});
     } catch (e) {
       // 업로드 실패
       print('이미지 업로드 실패: $e');
