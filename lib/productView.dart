@@ -51,7 +51,7 @@ class _ProductViewState extends State<ProductView>
       sessionId = um.userId!;
       print(sessionId);
     } else {
-      sessionId = um.userId!;
+      sessionId = "";
       print("상품페이지 로그인 안됨");
       print(sessionId);
     }

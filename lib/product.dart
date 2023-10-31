@@ -182,7 +182,7 @@ class _ProductState extends State<Product> {
                           );
                         },
                         child: Container(
-                          width: 100,
+                          width: 150,
                           height: 100,
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
@@ -190,15 +190,18 @@ class _ProductState extends State<Product> {
                           ),
                           child: Stack(
                             children: [
-                              Positioned.fill(
+                              Container(
+                                width: double.infinity,
+                                height: double.infinity,
                                 child: Image.network(
                                   imageUrl,
-                                  fit: BoxFit.cover,
+                                  fit: BoxFit.cover, // 이미지가 위에 딱 붙도록 설정
                                 ),
                               ),
                               Positioned(
-                                bottom: 8,
-                                left: 8,
+                                bottom: 0, // 박스의 아래에 위치하도록 수정
+                                left: 0,
+                                right: 0,
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -218,8 +221,8 @@ class _ProductState extends State<Product> {
                                       child: Text(
                                         productName,
                                         style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 15,
+                                          color: Colors.white,
+                                          fontSize: 12,
                                         ),
                                       ),
                                     ),
@@ -237,10 +240,10 @@ class _ProductState extends State<Product> {
                                         );
                                       },
                                       child: Text(
-                                        '가격: $formattedPrice 원',
+                                        '$formattedPrice 원',
                                         style: const TextStyle(
-                                          color: Colors.black,
-                                          fontSize: 12,
+                                          color: Colors.white,
+                                          fontSize:10,
                                         ),
                                       ),
                                     ),
