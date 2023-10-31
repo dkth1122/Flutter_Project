@@ -148,24 +148,25 @@ class _ProductState extends State<Product> {
 
                   final productList = snapshot.data!.docs;
 
+                  final filteredProductList = productList.where((document) {
+                    final category = document['category'] as String;
+                    return selectedCategory == '전체' || category == selectedCategory;
+                  }).toList();
+
                   return GridView.builder(
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 3,
                       crossAxisSpacing: 8,
                       mainAxisSpacing: 8,
                     ),
-                    itemCount: productList.length,
+                    itemCount: filteredProductList.length, // 수정된 부분: 선택된 카테고리에 속하는 상품의 개수로 설정
                     itemBuilder: (context, index) {
-                      final document = productList[index];
+                      final document = filteredProductList[index];
                       final productName = document['pName'] as String;
                       final price = document['price'] as int;
                       final imageUrl = document['iUrl'] as String;
 
                       final formattedPrice = NumberFormat("#,###").format(price);
-
-                      if (selectedCategory != '전체' && document['category'] != selectedCategory) {
-                        return Container();
-                      }
 
                       return GestureDetector(
                         onTap: () {
