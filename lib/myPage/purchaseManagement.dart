@@ -1,7 +1,21 @@
 import 'package:flutter/material.dart';
+class PurchaseManagementPage extends StatefulWidget {
+  @override
+  _PurchaseManagementPageState createState() => _PurchaseManagementPageState();
+}
 
-class PurchaseManagementPage extends StatelessWidget {
-  List<String> filterOptions = ['옵션 1', '옵션 2', '옵션 3'];
+class _PurchaseManagementPageState extends State<PurchaseManagementPage> {
+  List<String> optionsButton1 = [
+    'UX기획',
+    '웹',
+    '커머스',
+    '모바일',
+    '프로그램',
+    '트렌드',
+    '데이터',
+    '기타',];
+  List<String> optionsButton2 = ["전체상태", "진행중", "주문취소", "구매확정"];
+
 
   void _showInfoModal(BuildContext context) {
     showModalBottomSheet(
@@ -36,17 +50,16 @@ class PurchaseManagementPage extends StatelessWidget {
     );
   }
 
-  void _showFilterOptions(BuildContext context) {
+  void _showFilterOptions(BuildContext context, List<String> options) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
         return ListView(
-          children: filterOptions.map((option) {
+          children: options.map((option) {
             return ListTile(
               title: Text(option),
               onTap: () {
-                // 선택한 옵션에 대한 필터링 로직을 여기에 구현합니다.
-                Navigator.pop(context); // 모달 바텀 시트를 닫습니다.
+                Navigator.pop(context);
               },
             );
           }).toList(),
@@ -70,6 +83,41 @@ class PurchaseManagementPage extends StatelessWidget {
       onPressed: onPressed,
     );
   }
+
+  void showDateRangePickerModal(BuildContext context) {
+    DateTimeRange? selectedDateRange; // 모달 다이얼로그 내에서만 사용
+
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              Text('날짜 범위 선택'),
+              ElevatedButton(
+                onPressed: () async {
+                  final DateTimeRange? picked = await showDateRangePicker(
+                    context: context,
+                    firstDate: DateTime(2020),
+                    lastDate: DateTime(2030),
+                  );
+
+                  if (picked != null) {
+                    selectedDateRange = picked; // 모달 다이얼로그 내에서 변수에 선택한 범위 저장
+                  }
+                },
+                child: Text('날짜 범위 선택'),
+              ),
+              if (selectedDateRange != null) // 선택한 날짜 범위를 표시
+                Text('선택한 시작 날짜: ${selectedDateRange!.start}\n선택한 종료 날짜: ${selectedDateRange!.end}'),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
 
 
   @override
@@ -118,7 +166,7 @@ class PurchaseManagementPage extends StatelessWidget {
                 icon: Icons.arrow_drop_down,
                 text: '상품유형',
                 onPressed: () {
-                  _showFilterOptions(context);
+                  _showFilterOptions(context, optionsButton1);
                 },
               ),
               SizedBox(width: 10), // 버튼 사이에 간격을 추가합니다
@@ -126,16 +174,16 @@ class PurchaseManagementPage extends StatelessWidget {
                 icon: Icons.arrow_drop_down,
                 text: '주문상태',
                 onPressed: () {
-                  _showFilterOptions(context);
+                  _showFilterOptions(context, optionsButton2);
                 },
               ),
               SizedBox(width: 10), // 버튼 사이에 간격을 추가합니다
               _filterButton(
                 icon: Icons.arrow_drop_down,
                 text: '주문기간',
-                onPressed: () {
-                  _showFilterOptions(context);
-                },
+                onPressed: () async {
+                  showDateRangePickerModal(context);
+                }
               ),
             ],
           ),
