@@ -69,6 +69,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('용채'),
+        backgroundColor: Color(0xff328772),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -287,10 +288,10 @@ class _HomePageState extends State<HomePage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text("프로그램"),
-                  Text("프로그램"),
-                  Text("프로그램"),
-                  Text("프로그램"),
+                  Text("UX기획"),
+                  Text("웹"),
+                  Text("커머스"),
+                  Text("모바일"),
                 ],
               ),
             ),
@@ -315,9 +316,9 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Text("프로그램"),
-                  Text("프로그램"),
-                  Text("프로그램"),
-                  Text("프로그램"),
+                  Text("트렌드"),
+                  Text("데이터"),
+                  Text("기타"),
                 ],
               ),
             ),
