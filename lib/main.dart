@@ -7,6 +7,7 @@ import 'package:project_flutter/myPage/my_page.dart';
 import 'package:project_flutter/product.dart';
 import 'package:project_flutter/search/search.dart';
 import 'package:project_flutter/bottomBar.dart';
+import 'package:project_flutter/test.dart';
 import 'package:project_flutter/test2.dart';
 import 'package:provider/provider.dart';
 import 'chat/chat.dart';
@@ -49,21 +50,14 @@ class _HomePageState extends State<HomePage> {
   final CarouselController _controller = CarouselController();
   // 1초에 한번씩 로딩되는 문제를 해결하기 위해 밖으로 뺏음
   // 현재는 가격 낮은 순으로 정렬했지만 cnt가 추가되면 조회수 높은 순으로 할 예정
-  final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").orderBy("price").limit(3).snapshots();
+  final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").orderBy("cnt", descending: true).limit(3).snapshots();
   final Stream<QuerySnapshot> productStream2 = FirebaseFirestore.instance.collection("product").snapshots();
   FocusNode myFocusNode = FocusNode();
 
-  List imageList = [
-    "https://cdn.pixabay.com/photo/2014/04/14/20/11/pink-324175_1280.jpg",
-    "https://cdn.pixabay.com/photo/2014/02/27/16/10/flowers-276014_1280.jpg",
-    "https://cdn.pixabay.com/photo/2012/03/01/00/55/flowers-19830_1280.jpg",
-    "https://cdn.pixabay.com/photo/2015/06/19/20/13/sunset-815270_1280.jpg",
-    "https://cdn.pixabay.com/photo/2016/01/08/05/24/sunflower-1127174_1280.jpg",
-  ];
-  List<String> imageBanner = ['banner/banner1.webp','banner/banner2.webp','banner/banner3.webp','banner/banner4.webp','banner/banner5.webp'];
-  List<String> imagePaths1 = ['category/ux.png','category/web.png','category/shop.png','category/mobile.png',];
-  List<String> imagePaths2 = ['category/program.png','category/trend.png','category/data.png','category/rest.png',];
-  List<String> categories = ["UX기획", "웹", "커머스", "모바일"];
+  List<String> imageBanner = ['assets/banner1.webp','assets/banner2.webp','assets/banner3.webp','assets/banner4.webp','assets/banner5.webp'];
+  List<String> imagePaths1 = ['assets/category_ux.png','assets/category_web.png','assets/category_shop.png','assets/category_mobile.png',];
+  List<String> imagePaths2 = ['assets/category_program.png','assets/category_trend.png','assets/category_data.png','assets/category_rest.png',];
+  List<String> categories = ["UX기획zz", "웹", "커머스", "모바일"];
   List<String> categories2 = ["프로그램", "트렌드", "데이터", "기타"];
   @override
   Widget build(BuildContext context) {
@@ -204,6 +198,14 @@ class _HomePageState extends State<HomePage> {
                 },
                 icon: Icon(Icons.telegram_sharp)
             ),
+            IconButton(
+                onPressed: (){
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => Test())
+                  );
+                },
+                icon: Icon(Icons.telegram_sharp)
+            ),
           ],
         ),
       ),
@@ -247,7 +249,7 @@ class _HomePageState extends State<HomePage> {
       alignment: Alignment.bottomCenter,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: imageList.asMap().entries.map((entry) {
+        children: imageBanner.asMap().entries.map((entry) {
           return GestureDetector(
             onTap: () => _controller.animateToPage(entry.key),
             child: Container(
@@ -359,35 +361,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _cntProduct() {
-    return StreamBuilder(
-      stream: productStream,
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
-        if (!snap.hasData) {
-          return Transform.scale(
-            scale: 0.1,
-            child: CircularProgressIndicator(strokeWidth: 20,),
-          );
-        }
-        return Column(
-          children: snap.data!.docs.map((DocumentSnapshot document) {
-            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-            return ListTile(
-              leading: Image.asset(
-                'assets/cat1.jpeg',
-                width: 200,
-                height: 300,
-                fit: BoxFit.cover,
-              ),
-              title: Text(data['pDetail']),
-              subtitle: Text("가격 : ${data['price']}"),
-            );
-          }).toList(),
-        );
-      },
-    );
-  }
-
   Widget _heartProduct() {
     return StreamBuilder(
       stream: productStream2,
@@ -412,14 +385,18 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   children: [
                     SizedBox(height: 10),
-                    Image.asset(
-                      'assets/cat1.jpeg',
+                    Image.network(
+                      data['iUrl'],
                       width: 300,
                       height: 150,
                       fit: BoxFit.cover,
                     ),
                     ListTile(
-                      title: Text(data['pDetail']),
+                      title: Text(
+                        data['pDetail'].length > 15
+                            ? '${data['pDetail'].substring(0, 15)}...'
+                            : data['pDetail'],
+                      ),
                       subtitle: Text("가격 : ${data['price']}"),
                     ),
                   ],
@@ -431,4 +408,39 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+
+  Widget _cntProduct() {
+    return StreamBuilder(
+      stream: productStream,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
+        if (!snap.hasData) {
+          return Transform.scale(
+            scale: 0.1,
+            child: CircularProgressIndicator(strokeWidth: 20,),
+          );
+        }
+        return Column(
+          children: snap.data!.docs.map((DocumentSnapshot document) {
+            Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+            return ListTile(
+              leading: Image.network(
+                data['iUrl'],
+                width: 200,
+                height: 300,
+                fit: BoxFit.cover,
+              ),
+              title: Text(data['pName']),
+              subtitle: Text(
+                data['pDetail'].length > 10
+                    ? '${data['pDetail'].substring(0, 10)}...'
+                    : data['pDetail'],
+              ),
+              trailing: Text('조회수: ${data['cnt'].toString()}'),
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
 }
