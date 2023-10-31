@@ -189,12 +189,12 @@ class _ProductState extends State<Product> {
                           ),
                           child: Stack(
                             children: [
-                              /*Positioned.fill(
+                              Positioned.fill(
                                 child: Image.network(
                                   imageUrl,
                                   fit: BoxFit.cover,
                                 ),
-                              ),*/
+                              ),
                               Positioned(
                                 bottom: 8,
                                 left: 8,

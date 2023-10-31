@@ -290,15 +290,15 @@ class _ProductViewState extends State<ProductView>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    ClipRRect(
+/*                    ClipRRect(
                       child: Image.asset('dog1.PNG'),
+                    ),*/
+                    Image.network(
+                      widget.imageUrl,
+                      width: 200,
+                      height: 200,
+                      fit: BoxFit.cover,
                     ),
-                    /* Image.network(
-                        widget.imageUrl,
-                        width: 200,
-                        height: 200,
-                        fit: BoxFit.cover,
-                      ),*/
                     const SizedBox(height :20),
                     Text(
                       widget.productName,
