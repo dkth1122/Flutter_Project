@@ -239,7 +239,7 @@ class _ProductViewState extends State<ProductView>
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xfff48752), // 구매하기 버튼 색상 변경
+                  primary: Color(0xfff48752),
                 ),
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16.0),

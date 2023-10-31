@@ -185,6 +185,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 ElevatedButton(
                   onPressed: uploadImage,
                   child: Text('이미지 업로드'),
+                  style: ElevatedButton.styleFrom(
+                    primary: Color(0xfff48752),
+                  ),
                 ),
               ],
             ),
@@ -208,6 +211,9 @@ class _HomeScreenState extends State<HomeScreen> {
             ElevatedButton(
               onPressed: _addProduct,
               child: Text("상품 추가"),
+              style: ElevatedButton.styleFrom(
+                primary: Color(0xfff48752),
+              ),
             ),
             SizedBox(height: 20),
             _listProduct(),
