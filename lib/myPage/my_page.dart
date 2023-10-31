@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/myPage/editProfile.dart';
+import 'package:project_flutter/myPage/purchaseManagement.dart';
 import 'package:provider/provider.dart';
 import '../chat/chatList.dart';
 import '../firebase_options.dart';
@@ -243,7 +244,8 @@ class _MyPageState extends State<MyPage> {
                   title: Text('구매관리'),
                   trailing: Icon(Icons.arrow_forward_ios_rounded),
                   onTap: () {
-                    // 첫 번째 아이템이 클릭됐을 때 수행할 작업
+                   Navigator.push(context, MaterialPageRoute(
+                       builder: (context) => PurchaseManagementPage()));
                   },
                 ),
                 ListTile(
