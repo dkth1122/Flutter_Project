@@ -6,6 +6,7 @@ import 'package:project_flutter/chat/chat.dart';
 import 'package:project_flutter/productPayment.dart';
 import 'package:project_flutter/join/userModel.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import 'join/login_email.dart';
 
@@ -159,6 +160,15 @@ class _ProductViewState extends State<ProductView>
           });
         });
       }
+    });
+  }
+
+  void submitReview(int star, String reviewDe, String pName, String user) {
+    FirebaseFirestore.instance.collection('review').add({
+      'star': star,
+      'reviewDe': reviewDe,
+      'pName': pName,
+      'user': user,
     });
   }
 
@@ -433,18 +443,73 @@ class _ProductViewState extends State<ProductView>
   }
 
   Widget _buildReviewTab() {
+    double rating = 0;
+    TextEditingController reviewController = TextEditingController();
+
     return Center(
-      child: Text(
-        '후기',
-        style: const TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Text(
+            '후기',
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          RatingBar.builder(
+            initialRating: rating,
+            minRating: 0,
+            maxRating: 5,
+            direction: Axis.horizontal,
+            allowHalfRating: false,
+            itemCount: 5,
+            itemSize: 24,
+            itemBuilder: (context, _) => Icon(
+              Icons.star,
+              color: Colors.amber,
+            ),
+            onRatingUpdate: (newRating) {
+              rating = newRating;
+            },
+          ),
+          SizedBox(height: 16),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: reviewController,
+                    decoration: InputDecoration(
+                      border: InputBorder.none,
+                      hintText: '후기를 입력해주세요',
+                      contentPadding: EdgeInsets.all(16),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 8),
+                IconButton(
+                  icon: Icon(Icons.send),
+                  color: Color(0xff328772),
+                  onPressed: () {
+                    String review = reviewController.text;
+                    // 후기 전송 기능 구현
+                    // review와 rating을 활용하여 후기 처리
+                  },
+                ),
+              ],
+            ),
+          ),
+          Divider(color :Colors.grey),
+        ],
       ),
     );
   }
-
-
 
 
 }
