@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:project_flutter/chat/chat.dart';
 import 'package:project_flutter/productPayment.dart';
 import 'package:project_flutter/join/userModel.dart';
 import 'package:provider/provider.dart';
@@ -41,21 +42,22 @@ class _ProductViewState extends State<ProductView>
             FirebaseFirestore.instance.collection("product").snapshots();
       });
     });
-    String user = "";
+    String sessionId = "";
 
     UserModel um = Provider.of<UserModel>(context, listen: false);
 
     if (um.isLogin) {
-      user = um.userId!;
-      print(user);
+      sessionId = um.userId!;
+      print(sessionId);
     } else {
-      user = "없음";
-      print("로그인 안됨");
+      sessionId = um.userId!;
+      print("상품페이지 로그인 안됨");
+      print(sessionId);
     }
 
     FirebaseFirestore.instance
         .collection('like')
-        .where('user', isEqualTo: user)
+        .where('user', isEqualTo: sessionId)
         .where('productName', isEqualTo: widget.productName)
         .get()
         .then((QuerySnapshot snapshot) {
@@ -167,7 +169,6 @@ class _ProductViewState extends State<ProductView>
         title: const Text(
           "상세보기",
         ),
-        backgroundColor: Color(0xff328772),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,7 +176,6 @@ class _ProductViewState extends State<ProductView>
           TabBar(
             controller: _tabController,
             labelColor: Colors.black,
-            indicatorColor: Color(0xff328772),
             tabs: const [
               Tab(text: '상품 상세'),
               Tab(text: '후기'),
@@ -236,9 +236,6 @@ class _ProductViewState extends State<ProductView>
                     },
                   );
                 },
-                style: ElevatedButton.styleFrom(
-                  primary: Color(0xfff48752), // 구매하기 버튼 색상 변경
-                ),
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16.0),
                   child: Text(
@@ -284,102 +281,150 @@ class _ProductViewState extends State<ProductView>
               final user = productData['user'] as String;
 
               return Align(
-                  alignment: Alignment.topCenter,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        child: Image.asset('dog1.PNG'),
-                      ),
-                     /* Image.network(
+                alignment: Alignment.topCenter,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    ClipRRect(
+                      child: Image.asset('dog1.PNG'),
+                    ),
+                    /* Image.network(
                         widget.imageUrl,
                         width: 200,
                         height: 200,
                         fit: BoxFit.cover,
                       ),*/
-                      const SizedBox(height :20),
-                      Text(
-                        widget.productName,
-                        style :const TextStyle (
-                          fontSize :20 ,
-                          fontWeight :FontWeight.bold ,
-                        ),
+                    const SizedBox(height :20),
+                    Text(
+                      widget.productName,
+                      style :const TextStyle (
+                        fontSize :20 ,
+                        fontWeight :FontWeight.bold ,
                       ),
-                      const SizedBox(height: 10),
-                      Text(
-                        '${productData['pDetail']}',
-                        style: const TextStyle(
-                          fontSize: 16,
-                        ),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '${productData['pDetail']}',
+                      style: const TextStyle(
+                        fontSize: 16,
                       ),
-                      const SizedBox(height :10),
-                      Text (
-                        '가격 : $formattedPrice 원',
-                        style :const TextStyle (
-                          fontSize :16 ,
-                        ),
+                    ),
+                    const SizedBox(height :10),
+                    Text (
+                      '가격 : $formattedPrice 원',
+                      style :const TextStyle (
+                        fontSize :16 ,
                       ),
-                      const SizedBox(height :10),
-                      Text (
-                        '조회수 : $productCount',
-                        style :const TextStyle (
-                          fontSize :16 ,
-                        ),
+                    ),
+                    const SizedBox(height :10),
+                    Text (
+                      '조회수 : $productCount',
+                      style :const TextStyle (
+                        fontSize :16 ,
                       ),
+                    ),
 
-                      Divider(color :Colors.grey),
+                    Divider(color :Colors.grey),
 
-                      StreamBuilder<QuerySnapshot>(
-                        stream:
-                        FirebaseFirestore.instance.collection('userList').where('userId', isEqualTo:user).snapshots(),
-                        builder:(context, snapshot){
-                          if(snapshot.hasData){
-                            final userDocs=snapshot.data!.docs;
-                            if(userDocs.isNotEmpty){
-                              final userData=userDocs.first.data() as Map<String,dynamic>;
-                              /*final userProfileImage=userData['userProfile'] as String;*/
-                              final userNick=userData['nick'] as String;
+                    StreamBuilder<QuerySnapshot>(
+                      stream:
+                      FirebaseFirestore.instance.collection('userList').where('userId', isEqualTo:user).snapshots(),
+                      builder:(context, snapshot){
+                        if(snapshot.hasData){
+                          final userDocs=snapshot.data!.docs;
+                          if(userDocs.isNotEmpty){
+                            final userData=userDocs.first.data() as Map<String,dynamic>;
+                            /*final userProfileImage=userData['userProfile'] as String;*/
+                            final userNick=userData['nick'] as String;
 
-                              return Row(
-                                children:[
-                                  CircleAvatar( // 원 모양 프로필 이미지
-                                    radius: 40,
-                                    backgroundImage: AssetImage('dog4.png'),
-                                    /*NetworkImage(userProfileImage),*/
-                                  ),
-                                  SizedBox(width :8),
-                                  Text(userNick), // 닉네임 출력
-                                  Expanded(
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        TextButton(
-                                          onPressed: () {
-                                            // 버튼이 클릭되었을 때 실행될 코드 작성
-                                            print('버튼이 클릭되었습니다.');
-                                          },
-                                          child: Text('1:1문의하기'),
+                            return Row(
+                              children:[
+                                CircleAvatar( // 원 모양 프로필 이미지
+                                  radius: 40,
+                                  backgroundImage: AssetImage('dog4.png'),
+                                  /*NetworkImage(userProfileImage),*/
+                                ),
+                                SizedBox(width :8),
+                                Text(userNick), // 닉네임 출력
+                                Expanded(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          // 버튼이 클릭되었을 때 실행될 코드 작성
+                                          print('버튼이 클릭되었습니다.');
+                                        },
+                                        child: TextButton(
+                                          onPressed: () async{
+                                            UserModel um = Provider.of<UserModel>(context, listen: false);
+
+                                            // user1과 user2 중에서 큰 값을 선택하여 user1에 할당
+                                            String user1 = user.compareTo(um.userId.toString()) > 0 ? user : um.userId.toString();
+                                            String user2 = user.compareTo(um.userId.toString()) > 0 ? um.userId.toString() : user;
+
+
+                                            // Firestore 데이터베이스에 채팅방을 생성하는 함수
+                                            Future<void> createChatRoom(String roomId, String user1, String user2) async {
+                                              FirebaseFirestore firestore = FirebaseFirestore.instance;
+                                              CollectionReference chatRoomsCollection = firestore.collection("chat");
+                                              String roomId = '$user1' + '_' + '${user2}';
+
+                                              // 채팅방 ID를 사용하여 Firestore에 채팅방을 추가
+                                              await chatRoomsCollection.doc(roomId).set({
+                                                'user1': user1,
+                                                'user2': user2,
+                                                'roomId' : roomId, // 채팅방 생성 일시
+                                              });
+                                            }
+
+                                            // 두 사용자 간의 채팅방 ID 확인 및 생성
+                                            String getOrCreateChatRoomId(String user1, String user2) {
+                                              String chatRoomId = '$user1' + '_' + '$user2';
+                                              // Firestore에서 채팅방 ID를 확인하고, 존재하지 않으면 생성
+                                              bool chatRoomExists = false; // Firestore에서 채팅방 존재 여부 확인하는 로직;
+                                              if (!chatRoomExists) {
+                                                // 채팅방이 없다면 생성
+                                                createChatRoom(chatRoomId, user1, user2);
+                                              }
+                                              return chatRoomId;
+                                            }
+
+
+                                            //채팅방으로 이동
+                                            void moveToChatRoom(BuildContext context, String chatRoomId) {
+                                              Navigator.of(context).push(MaterialPageRoute(
+                                                builder: (context) => ChatApp(roomId: chatRoomId),
+                                              ));
+                                            }
+
+                                            //메소드 실행
+                                            String chatRoomId = getOrCreateChatRoomId(user1, user2);
+                                            moveToChatRoom(context, chatRoomId);
+                                          } ,
+                                          child: Text("1:1문의하기"),
                                         ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              );
-                            }
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            );
                           }
-                          return SizedBox();
-                        },
-                      ),
+                        }
+                        return SizedBox();
+                      },
+                    ),
 
-                      Divider(color :Colors.grey),
+                    Divider(color :Colors.grey),
 
-                    ],
-                  ),);
-              }
-              }
+                  ],
+                ),);
+            }
+          }
 
-                  return const SizedBox();
-            });
+          return const SizedBox();
+        });
   }
 
   Widget _buildReviewTab() {
@@ -393,4 +438,8 @@ class _ProductViewState extends State<ProductView>
       ),
     );
   }
+
+
+
+
 }
