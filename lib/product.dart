@@ -93,7 +93,7 @@ class _ProductState extends State<Product> {
                     },
                     style: ElevatedButton.styleFrom(
                       primary: selectedCategory == category ? Color(0xfff48752) : Color(0xff328772),
-                      minimumSize: Size(double.infinity, 50),
+                      minimumSize: Size(double.infinity, 90), // 버튼의 크기를 조정하려면 여기서 높이 값을 조정해주세요
                     ),
                     child: Text(category),
                   ),
