@@ -116,8 +116,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: Text(
             '포트폴리오 등록',
@@ -367,8 +366,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 
   void _showCategorySelection(BuildContext context) {

@@ -19,8 +19,7 @@ class Portfolio extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: Text('포트폴리오'),
           actions: <Widget>[
@@ -56,8 +55,7 @@ class Portfolio extends StatelessWidget {
             );
           },
         ),
-      ),
-    );
+      );
   }
 
   // Function to show portfolio details in a dialog

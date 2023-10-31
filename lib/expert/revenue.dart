@@ -19,35 +19,6 @@ class _RevenueState extends State<Revenue> {
       appBar: AppBar(
           backgroundColor: Colors.white, // 배경색
           elevation: 0, // 그림자 효과 제거
-          leading: IconButton(
-            icon: Icon(
-              Icons.menu,
-              color: Colors.black, // 좌측 아이콘 색상
-            ),
-            onPressed: () {
-              // 좌측 아이콘을 눌렀을 때 수행할 작업
-            },
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(
-                Icons.search,
-                color: Colors.black, // 검색 아이콘 색상
-              ),
-              onPressed: () {
-                // 검색 아이콘을 눌렀을 때 수행할 작업
-              },
-            ),
-            IconButton(
-              icon: Icon(
-                Icons.notifications,
-                color: Colors.black, // 알림 아이콘 색상
-              ),
-              onPressed: () {
-                // 알림 아이콘을 눌렀을 때 수행할 작업
-              },
-            ),
-          ],
           title: Text(
             '수익관리',
             style: TextStyle(
