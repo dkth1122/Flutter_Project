@@ -14,7 +14,7 @@ class EditProfile extends StatefulWidget {
 }
 
 class _EditProfileState extends State<EditProfile> {
-  final TextEditingController _email = TextEditingController();
+  TextEditingController _email = TextEditingController();
 
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _image;
@@ -32,7 +32,7 @@ class _EditProfileState extends State<EditProfile> {
           TextField(
             controller: _email,
             decoration: InputDecoration(
-              labelText: hintText,
+              labelText: labelText,
               labelStyle: TextStyle(
                 color: Color(0xff328772),
               ),
@@ -44,7 +44,7 @@ class _EditProfileState extends State<EditProfile> {
                 borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
                 borderRadius: BorderRadius.circular(10.0),
               ),
-              hintText: value,
+              hintText: hintText,
             ),
           ),
         ],
@@ -52,49 +52,59 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-  Future<void> updateUserData(String docId, String newEmail) async {
+  Future<void> updateUserData() async {
     try {
-      // Firestore 문서 업데이트
-      await FirebaseFirestore.instance.collection("userList")
-          .doc(docId)
-          .update({'email': newEmail});
+      CollectionReference users = FirebaseFirestore.instance.collection("userList");
+      QuerySnapshot snap = await users.where('userId', isEqualTo: widget.data['userId']).get();
 
+      for (QueryDocumentSnapshot doc in snap.docs) {
+        await users.doc(doc.id).update({'email': _email.text});
+
+        setState(() {
+          Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?; // 데이터를 Map으로 변환
+          if (data != null) {
+            _email.text = data['email'] ?? ''; // email 필드 가져오고, 널이면 빈 문자열 설정
+          }
+
+        });
+        _email.clear();
+      }
       // 업데이트 성공 시 사용자에게 성공 메시지 표시
       showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('업데이트 완료'),
-              content: Text('이메일이 성공적으로 업데이트되었습니다.'),
-              actions: [
-                TextButton(
-                  child: Text('확인'),
-                  onPressed: () {
-                    Navigator.of(context).pop(); // 알림 다이얼로그 닫기
-                  },
-                ),
-              ],
-            );
-          }
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('업데이트 완료'),
+            content: Text('이메일이 성공적으로 업데이트되었습니다.'),
+            actions: [
+              TextButton(
+                child: Text('확인'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // 알림 다이얼로그 닫기
+                },
+              ),
+            ],
+          );
+        },
       );
     } catch (e) {
       // 업데이트 실패 시 사용자에게 실패 메시지 표시
       showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('업데이트 실패'),
-              content: Text('이메일 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.'),
-              actions: [
-                TextButton(
-                  child: Text('확인'),
-                  onPressed: () {
-                    Navigator.of(context).pop(); // 알림 다이얼로그 닫기
-                  },
-                ),
-              ],
-            );
-          }
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('업데이트 실패'),
+            content: Text('이메일 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.'),
+            actions: [
+              TextButton(
+                child: Text('확인'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // 알림 다이얼로그 닫기
+                },
+              ),
+            ],
+          );
+        },
       );
     }
   }
@@ -149,11 +159,7 @@ class _EditProfileState extends State<EditProfile> {
             ),
             TextButton(
               onPressed: () async {
-                String email = _email.text;
-                String newPassword = newPasswordController.text;
 
-                // 이메일 및 비밀번호를 사용하여 Firestore 업데이트 로직 실행
-                updateUserData(email, newPassword);
               },
               child: Text('저장'),
             ),
@@ -193,6 +199,7 @@ class _EditProfileState extends State<EditProfile> {
             IconButton(
               icon: Icon(Icons.save),
               onPressed: () async {
+                updateUserData();
 
               }
             ),
@@ -230,7 +237,7 @@ class _EditProfileState extends State<EditProfile> {
               ],
             ),
 
-            buildTextField('이메일', widget.data['email'], "바꿀 이메일을 입력하세요."),
+            buildTextField('이메일',"바꿀 이메일을 입력하세요.", widget.data['email']),
 
             Divider(
               color: Colors.grey,

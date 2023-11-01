@@ -68,7 +68,7 @@ class _MyPageState extends State<MyPage> {
                   ),
                   Text(
                     data['nick'],
-                    style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -136,8 +136,7 @@ class _MyPageState extends State<MyPage> {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-
-
+            Navigator.pop(context);
           },
         ),
         actions: [
