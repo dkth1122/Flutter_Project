@@ -15,6 +15,8 @@ class EditProfile extends StatefulWidget {
 
 class _EditProfileState extends State<EditProfile> {
   TextEditingController _email = TextEditingController();
+  String labelText = ''; // 초기 labelText 값
+
 
   final ImagePicker _imagePicker = ImagePicker();
   XFile? _image;
@@ -27,7 +29,7 @@ class _EditProfileState extends State<EditProfile> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(labelText),
+            child: Text(value),
           ),
           TextField(
             controller: _email,
@@ -63,9 +65,9 @@ class _EditProfileState extends State<EditProfile> {
         setState(() {
           Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?; // 데이터를 Map으로 변환
           if (data != null) {
-            _email.text = data['email'] ?? ''; // email 필드 가져오고, 널이면 빈 문자열 설정
+            labelText = data['email'] ?? '';
+            labelText = _email.text; // labelText를 업데이트
           }
-
         });
         _email.clear();
       }
@@ -80,13 +82,28 @@ class _EditProfileState extends State<EditProfile> {
               TextButton(
                 child: Text('확인'),
                 onPressed: () {
-                  Navigator.of(context).pop(); // 알림 다이얼로그 닫기
+                  Navigator.of(context).pop();
+                  FocusScope.of(context).unfocus();
+                  setState(() {
+                    labelText = _email.text;
+                  });
                 },
               ),
             ],
           );
         },
       );
+
+      // Firestore에서 업데이트된 이메일 값을 가져오기
+      QuerySnapshot updatedDataSnap = await users.where('userId', isEqualTo: widget.data['userId']).get();
+      for (QueryDocumentSnapshot updatedDoc in updatedDataSnap.docs) {
+        setState(() {
+          Map<String, dynamic>? updatedData = updatedDoc.data() as Map<String, dynamic>?;
+          if (updatedData != null) {
+            labelText = updatedData['email'] ?? '';
+          }
+        });
+      }
     } catch (e) {
       // 업데이트 실패 시 사용자에게 실패 메시지 표시
       showDialog(
@@ -111,8 +128,10 @@ class _EditProfileState extends State<EditProfile> {
 
   Future<void> updateUserPassword(newPasswordController, currentPasswordController, Function(bool) setShowError) async {
     try {
-      CollectionReference users = FirebaseFirestore.instance.collection("userList");
-      QuerySnapshot snap = await users.where('userId', isEqualTo: widget.data['userId']).get();
+      CollectionReference users = FirebaseFirestore.instance.collection(
+          "userList");
+      QuerySnapshot snap = await users.where(
+          'userId', isEqualTo: widget.data['userId']).get();
 
       for (QueryDocumentSnapshot doc in snap.docs) {
         String currentPassword = currentPasswordController.text;
@@ -129,24 +148,6 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
-
-
-
-
-
-  void _logOut() {
-    // 사용자 데이터 초기화 (예: Provider를 사용하면 해당 Provider를 초기화)
-    Provider.of<UserModel>(context, listen: false).logout();
-
-    // 로그인 화면 또는 다른 원하는 화면으로 이동
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => HomePage(), // 로그인 화면으로 이동하도록 변경
-      ),
-    );
-  }
-
   void _showChangePasswordDialog() {
     TextEditingController currentPasswordController = TextEditingController();
     TextEditingController newPasswordController = TextEditingController();
@@ -160,7 +161,7 @@ class _EditProfileState extends State<EditProfile> {
             return AlertDialog(
               title: Text('비밀번호 변경'),
               content: Column(
-                mainAxisSize: MainAxisSize.max,
+                mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
                   TextField(
                     controller: currentPasswordController,
@@ -205,12 +206,18 @@ class _EditProfileState extends State<EditProfile> {
   }
 
 
+  void _logOut() {
+    // 사용자 데이터 초기화 (예: Provider를 사용하면 해당 Provider를 초기화)
+    Provider.of<UserModel>(context, listen: false).logout();
 
-
-
-
-
-
+    // 로그인 화면 또는 다른 원하는 화면으로 이동
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomePage(), // 로그인 화면으로 이동하도록 변경
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -272,7 +279,7 @@ class _EditProfileState extends State<EditProfile> {
               ],
             ),
 
-            buildTextField('이메일',"바꿀 이메일을 입력하세요.", widget.data['email']),
+            buildTextField(widget.data['email'], "바꿀 이메일을 입력하세요.", '이메일'),
 
             Divider(
               color: Colors.grey,

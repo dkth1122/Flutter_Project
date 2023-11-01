@@ -5,19 +5,10 @@ import 'package:project_flutter/join/userModel.dart';
 import 'package:project_flutter/main.dart';
 import 'package:provider/provider.dart';
 import '../admin/adminDomain.dart';
+import '../adminDomain.dart';
 import '../firebase_options.dart';
+import 'ForgotPassword.dart';
 import 'join.dart';
-
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  runApp(ChangeNotifierProvider(
-    create: (context) => UserModel(),
-    child: MyApp(),
-  ));
-}
 
 class MyApp extends StatelessWidget {
   @override
@@ -87,6 +78,11 @@ class _LoginPageState extends State<LoginPage> {
               onPressed: _login,
               child: Text('로그인'),
             ),
+
+            TextButton(onPressed: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>ForgotPasswordTabBar()
+              ));
+            }, child: Text("아이디/비밀번호 찾기")),
             Expanded(child: SizedBox(height: 10)),
             ElevatedButton(
               style: ButtonStyle(
