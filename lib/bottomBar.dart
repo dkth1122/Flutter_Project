@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:project_flutter/chat/chatList.dart';
 import 'package:project_flutter/join/login_email.dart';
 import 'package:project_flutter/product/product.dart';
 import 'package:project_flutter/test.dart';
@@ -53,9 +54,9 @@ class _BottomBarState extends State<BottomBar> {
 
   List<Offset> iconOffsets = [];
 
-  List<String> addButtonTexts = ["1", "2", "3", "4", "5", "6", "상품", "테스트"];
-  List<IconData> iconData = [Icons.access_time_filled, Icons.check_box, Icons.person, Icons.chat, Icons.access_alarms_rounded, Icons.back_hand, Icons.add_circle_outline, Icons.telegram_sharp];
-  List<Widget> pageChange = [MyApp(),MyApp(),MyApp(),MyApp(),MyApp(),MyApp(),Product(),Test()];
+  List<String> addButtonTexts = ["expert", "chat", "3", "4", "5", "6", "상품", "테스트"];
+  List<IconData> iconData = [Icons.star, Icons.message, Icons.person, Icons.chat, Icons.access_alarms_rounded, Icons.back_hand, Icons.add_circle_outline, Icons.telegram_sharp];
+  List<Widget> pageChange = [MyExpert(),ChatList(),MyApp(),MyApp(),MyApp(),MyApp(),Product(),Test()];
   List<double> iconRotations = [pi / 2, 135 * (pi / 180), pi, 225 * (pi / 180), 270 * (pi / 180), 315 * (pi / 180), 360 * (pi / 180), 45 * (pi / 180)]; // 각 아이콘의 회전 각도
 
   void _animateContainerSize() {
