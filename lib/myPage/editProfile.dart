@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:project_flutter/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:project_flutter/myPage/alertControl.dart';
 import 'package:provider/provider.dart';
 import '../join/userModel.dart';
 
@@ -292,7 +293,12 @@ class _EditProfileState extends State<EditProfile> {
                   ListTile(
                     title: Text('알림설정'),
                     onTap: () {
-                      // 첫 번째 아이템이 클릭됐을 때 수행할 작업
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AlertControl(), // 로그인 화면으로 이동하도록 변경
+                        ),
+                      );
                     },
                   ),
                   ListTile(
