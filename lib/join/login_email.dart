@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_flutter/join/userModel.dart';
 import 'package:project_flutter/main.dart';
 import 'package:provider/provider.dart';
+import '../adminDomain.dart';
 import '../firebase_options.dart';
 import 'join.dart';
 
@@ -130,12 +131,22 @@ class _LoginPageState extends State<LoginPage> {
     if (userDocs.docs.isNotEmpty) {
       Provider.of<UserModel>(context, listen: false).login(id);
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomePage(),
-        ),
-      );
+      if (id == 'admin') {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AdminDomainPage(),
+          ),
+        );
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(),
+          ),
+        );
+      }
+
       _userId.clear();
       _pw.clear();
     } else {
