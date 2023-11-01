@@ -375,6 +375,7 @@ class _ProductViewState extends State<ProductView>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
+                    Divider(color :Colors.grey),
 /*                    ClipRRect(
                       child: Image.asset('dog1.PNG'),
                     ),*/

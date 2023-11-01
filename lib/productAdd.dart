@@ -190,7 +190,12 @@ class _HomeScreenState extends State<HomeScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 imageUrl.isNotEmpty
-                    ? Image.network(imageUrl)
+                    ? Image.network(
+                  imageUrl,
+                  width: 100, // 이미지의 가로 크기를 200으로 설정
+                  height: 100, // 이미지의 세로 크기를 200으로 설정
+                  fit: BoxFit.cover, // 이미지가 위젯에 꽉 차도록 설정
+                )
                     : Text('이미지가 없습니다.'),
                 ElevatedButton(
                   onPressed: uploadImage,
