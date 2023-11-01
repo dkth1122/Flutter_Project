@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:project_flutter/chat/chatList.dart';
 import 'package:project_flutter/myPage/my_page.dart';
-import 'package:project_flutter/product.dart';
+import 'package:project_flutter/product/product.dart';
 import 'package:project_flutter/search/search.dart';
 import 'package:project_flutter/bottomBar.dart';
 import 'package:project_flutter/test.dart';

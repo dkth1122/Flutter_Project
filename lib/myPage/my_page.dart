@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import '../chat/chatList.dart';
 import '../firebase_options.dart';
 import '../join/userModel.dart';
-import '../product.dart';
+import '../product/product.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

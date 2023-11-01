@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:project_flutter/join/userModel.dart';
 import 'package:provider/provider.dart';
-import 'firebase_options.dart';
+
+import '../firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

@@ -3,12 +3,12 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project_flutter/chat/chat.dart';
-import 'package:project_flutter/productPayment.dart';
 import 'package:project_flutter/join/userModel.dart';
+import 'package:project_flutter/product/productPayment.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-import 'join/login_email.dart';
+import '../join/login_email.dart';
 
 class ProductView extends StatefulWidget {
   final String productName;

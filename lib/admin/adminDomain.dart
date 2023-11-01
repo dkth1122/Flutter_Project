@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class AdminDomainPage extends StatefulWidget {
-  const AdminDomainPage({super.key});
 
   @override
   State<AdminDomainPage> createState() => _AdminDomainPageState();

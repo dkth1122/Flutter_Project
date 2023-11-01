@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_flutter/join/userModel.dart';
 import 'package:project_flutter/main.dart';
 import 'package:provider/provider.dart';
-import '../adminDomain.dart';
+import '../admin/adminDomain.dart';
 import '../firebase_options.dart';
 import 'join.dart';
 

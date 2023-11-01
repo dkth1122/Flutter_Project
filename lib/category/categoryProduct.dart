@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import '../firebase_options.dart';
-import '../productView.dart';
+import '../product/productView.dart';
 
 
 void main() async {

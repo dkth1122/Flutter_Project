@@ -1,16 +1,16 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:project_flutter/productAdd.dart';
-import 'package:project_flutter/productView.dart';
+import 'package:project_flutter/product/productAdd.dart';
+import 'package:project_flutter/product/productView.dart';
 import 'package:project_flutter/join/userModel.dart';
 import 'package:project_flutter/test2.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
-import 'chat/chatList.dart';
-import 'join/login_email.dart';
-import 'myPage/my_page.dart';
+import '../chat/chatList.dart';
+import '../join/login_email.dart';
+import '../myPage/my_page.dart';
 
 class Product extends StatefulWidget {
   @override
