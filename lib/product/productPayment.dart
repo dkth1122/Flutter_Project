@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:project_flutter/join/userModel.dart';
 import 'package:provider/provider.dart';
 
+import '../join/login_email.dart';
+
 class ProductPayment extends StatefulWidget {
   final String productName;
   final String price;
@@ -49,11 +51,38 @@ class _ProductPaymentState extends State<ProductPayment> {
 
   @override
   Widget build(BuildContext context) {
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+    String user = um.isLogin ? um.userId! : "없음";
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('결제 페이지'),
+        backgroundColor: Color(0xff328772),
       ),
       body: Center(
+    child: user == "없음" || user == null
+    ? Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          '로그인 후 이용해주세요.',
+          style: const TextStyle(fontSize: 16),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => LoginPage()),
+            );
+          },
+          child: const Text('로그인 하러 가기'),
+          style: ElevatedButton.styleFrom(
+            primary: Color(0xfff48752),
+          ),
+        ),
+      ],
+    )
+        : Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -69,6 +98,7 @@ class _ProductPaymentState extends State<ProductPayment> {
             // ... 결제 페이지의 내용 추가 ...
           ],
         ),
+      ),
       ),
     );
   }
