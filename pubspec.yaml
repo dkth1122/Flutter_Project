@@ -68,6 +68,10 @@ dev_dependencies:
 flutter:
   assets :
     - assets/
+  fonts:
+    - family: Pretendard
+      fonts:
+        - asset: fonts/Pretendard-Light.ttf
 
 
   # The following line ensures that the Material Icons font is
