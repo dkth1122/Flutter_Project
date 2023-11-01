@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -35,6 +36,7 @@ class AddPortfolio extends StatefulWidget {
 }
 
 class _AddPortfolioState extends State<AddPortfolio> {
+
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController imageUrlController = TextEditingController();
@@ -42,8 +44,13 @@ class _AddPortfolioState extends State<AddPortfolio> {
   String selectedCategory = "UX 기획";
   List<String> selectedHashtags = []; // 선택한 해시태그 목록
 
+  // 이미지 선택 상태 변수
+  bool isThumbnailSelected = false;
+  bool isImageSelected = false;
+
   // 이미지 파일 경로를 저장하는 변수
-  String? imagePath;
+  String? thumbImagePath;
+  List<String> imagePaths = [];
 
 
   DateTime? startDate;
@@ -98,7 +105,22 @@ class _AddPortfolioState extends State<AddPortfolio> {
 
     if (pickedFile != null) {
       setState(() {
-        imagePath = pickedFile.path;
+        thumbImagePath = pickedFile.path;
+        isThumbnailSelected = true;
+      });
+    }
+  }
+
+  // 이미지 선택 메서드
+  // 이미지 선택 메서드
+  void _selectSubImage(BuildContext context) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        imagePaths.add(pickedFile.path);
+        isImageSelected = true;
       });
     }
   }
@@ -181,12 +203,22 @@ class _AddPortfolioState extends State<AddPortfolio> {
               SizedBox(height: 12.0),
               Text("썸네일 이미지 선택", style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(height: 12.0),
-              imagePath != null
-                  ? Image.file(
-                File(imagePath!),
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
+              thumbImagePath != null
+                  ? Column(
+                children: [
+                  Image.file(
+                    File(thumbImagePath!),
+                    width: 300,
+                    height: 300,
+                    fit: BoxFit.cover,
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      _selectThumbnailImage(context);
+                    },
+                    child: Text('이미지 변경'),
+                  ),
+                ],
               )
                   : ElevatedButton(
                 onPressed: () {
@@ -194,14 +226,28 @@ class _AddPortfolioState extends State<AddPortfolio> {
                 },
                 child: Text('이미지 선택'),
               ),
-
-              TextField(
-                controller: imageUrlController,
-                decoration: InputDecoration(
-                  labelText: '이미지 URL',
-                  border: OutlineInputBorder(),
-                ),
+              // 이미지 선택 부분
+              Text("서브 이미지 선택", style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 12.0),
+              ElevatedButton(
+                onPressed: () {
+                  _selectSubImage(context);
+                },
+                child: Text('이미지 선택'),
               ),
+              SizedBox(height: 12.0),
+              if (imagePaths.isNotEmpty)
+                Column(
+                  children: imagePaths.map((path) {
+                    return Image.file(
+                      File(path),
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
+                ),
+
               SizedBox(height: 12.0),
               ListTile(
                 title: Text(
@@ -501,3 +547,4 @@ class _AddPortfolioState extends State<AddPortfolio> {
     );
   }
 }
+
