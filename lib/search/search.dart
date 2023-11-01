@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/search/searchSuccess.dart';
 import 'package:provider/provider.dart';
+import '../category/categoryProduct.dart';
 import '../firebase_options.dart';
 import '../join/userModel.dart';
 
@@ -23,7 +24,20 @@ class Search extends StatefulWidget {
 }
 
 class _SearchState extends State<Search> {
+
+  //추천 검색어 시작
   final TextEditingController _latelySearch = TextEditingController();
+  List<String> searchKeywords = ["워드프레스","홈페이지","홈페이지 제작","카페24","크롤링","블로그","매크로","아임웹","애드센스","상세 패이지",];
+  TextEditingController textFieldController = TextEditingController();
+  void handleContainerTap(String keyword) {
+    setState(() {
+      _latelySearch.text = keyword;
+    });
+  }
+  //추천 검색어 끝
+  //카테고리
+  List<String> imageCartegory = ['assets/category_ux.png','assets/category_web.png','assets/category_shop.png','assets/category_mobile.png','assets/category_program.png','assets/category_trend.png','assets/category_data.png','assets/category_rest.png',];
+  List<String> categoryKeywords = ["UX기획", "웹", "커머스", "모바일","프로그램", "트렌드", "데이터", "기타"];
 
 
   void _addSearch() async {
@@ -96,45 +110,83 @@ class _SearchState extends State<Search> {
     }
     return Scaffold(
       appBar: AppBar(title: Text("검색"),),
-      body: Column(
-        children: [
-          TextField(
-            controller: _latelySearch,
-            autofocus: true,
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (_latelySearch.text.isNotEmpty) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SearchSuccess(searchText: _latelySearch.text),
+      body: Container(
+        child: ListView(
+          children: [
+            SizedBox(height: 10,),
+            TextField(
+              controller: _latelySearch,
+              autofocus: true,
+              decoration: InputDecoration(
+                contentPadding: EdgeInsets.fromLTRB(10, 5, 5, 5),
+
+                hintText: "검색어를 입력하세요",
+                suffixIcon: Icon(Icons.search),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                if (_latelySearch.text.isNotEmpty) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SearchSuccess(searchText: _latelySearch.text),
+                    ),
+                  );
+                  _addSearch();
+                } else {
+                  // 빈 값일 때 처리할 내용 추가 (예: 경고 또는 아무 작업 없음)
+                }
+              },
+              child: Text("검색"),
+              style: ButtonStyle(
+                minimumSize: MaterialStateProperty.all(Size(50, 35)),
+              ),
+            ),
+            if (um.isLogin)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    margin: EdgeInsets.fromLTRB(10, 0, 0, 0),
+                    child: Text(
+                      "최근 검색어",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    )
                   ),
-                );
-                _addSearch();
-              } else {
-                // 빈 값일 때 처리할 내용 추가 (예: 경고 또는 아무 작업 없음)
-              }
-            },
-            child: Text("검색"),
-          ),
-          if (um.isLogin) // Display only if user is logged in
+                  TextButton(
+                    onPressed: (){
+                      _deleteAllSearch();
+                    },
+                    child: Text("전체삭제")
+                  )
+                ],
+              ),
+            SizedBox(height: 20,),
+            _listSearch(),
+            SizedBox(height: 20,),
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text("최근 검색어", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                TextButton(
-                  onPressed: (){
-                    _deleteAllSearch();
-                  },
-                  child: Text("전체삭제")
-                )
+                SizedBox(width: 10,),
+                Text("추천 검색어", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
               ],
             ),
-          SizedBox(height: 10,),
-          _listSearch(),
-          Text(user)
-        ],
+            SizedBox(height: 20,),
+            recommend(),
+            SizedBox(height: 20,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(width: 10,),
+                Text("카테고리", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              ],
+            ),
+            SizedBox(height: 20,),
+            cartegory(),
+            SizedBox(height: 20,),
+          ],
+        ),
       ),
     );
   }
@@ -224,4 +276,80 @@ class _SearchState extends State<Search> {
     }
   }
 
+  Widget recommend() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Wrap(
+          children: searchKeywords.map((keyword) {
+            return GestureDetector(
+              onTap: () {
+                handleContainerTap(keyword);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SearchSuccess(searchText: _latelySearch.text),
+                  ),
+                );
+                _addSearch();
+              },
+              child: Container(
+                padding: EdgeInsets.all(10),
+                margin: EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(5)),
+                  border: Border.all(
+                    color: Colors.grey,
+                    width: 0.6,
+                  ),
+                ),
+                child: Text(keyword),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+
+  Widget cartegory() {
+    return Column(
+      children: [
+        Wrap(
+          children: categoryKeywords.asMap().entries.map((entry) {
+            final index = entry.key;
+            final keyword = categoryKeywords[index];
+            final imagePath = imageCartegory[index]; // 이미지 경로 가져오기
+
+            return GestureDetector(
+              onTap: () {
+                // 클릭할 때 검색어 전달
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CategoryProduct(sendText: keyword), // 해당 검색어를 전달
+                  ),
+                );
+              },
+              child: Column(
+                children: [
+                  InkWell(
+                    child: Container(
+                      width: 80, // 넓이 80
+                      height: 80, // 높이 80
+                      padding: EdgeInsets.all(10),
+                      margin: EdgeInsets.all(6),
+                      child: Image.asset(imagePath), // 이미지 표시
+                    ),
+                  ),
+                  Text(keyword) // 검색 키워드 출력
+                ],
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
 }

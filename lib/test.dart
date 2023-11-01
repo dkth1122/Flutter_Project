@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'category/categoryProduct.dart';
+
 class Test extends StatefulWidget {
   const Test({Key? key});
 
@@ -8,44 +10,66 @@ class Test extends StatefulWidget {
 }
 
 class _TestState extends State<Test> {
+  List<String> imageCartegory = ['assets/category_ux.png','assets/category_web.png','assets/category_shop.png','assets/category_mobile.png','assets/category_program.png','assets/category_trend.png','assets/category_data.png','assets/category_rest.png',];
+  List<String> categoryKeywords = ["UX기획", "웹", "커머스", "모바일","프로그램", "트렌드", "데이터", "기타"];
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: NestedScrollView(
-        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
-          return <Widget>[
-            SliverAppBar(
-              floating: false, // Appbar가 스크롤될 때 고정되지 않도록 설정
-              pinned: false, // Appbar가 화면 상단에 고정되도록 설정
-              flexibleSpace: FlexibleSpaceBar(
-                title: Text('이미지 테스트'),
-              ),
-            ),
-          ];
-        },
-        body: Column(
+      appBar: AppBar(title: Text("추천 검색어")),
+      body: Center(
+        child: Column(
           children: [
-            TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text("추천 검색어"),
+              ],
             ),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Image.asset('assets/cat1.jpeg'),
-                    Image.asset('assets/cat1.jpeg'),
-                    Image.asset('assets/cat1.jpeg'),
-                    Image.asset('assets/cat1.jpeg'),
-                    Image.asset('assets/cat1.jpeg'),
-                  ],
-                ),
-              ),
-            ),
+            cartegory(),
           ],
         ),
       ),
     );
   }
+
+  Widget cartegory() {
+    return Expanded(
+      child: Wrap(
+        children: categoryKeywords.asMap().entries.map((entry) {
+          final index = entry.key;
+          final keyword = categoryKeywords[index];
+          final imagePath = imageCartegory[index]; // 이미지 경로 가져오기
+
+          return GestureDetector(
+            onTap: () {
+              // 클릭할 때 검색어 전달
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => CategoryProduct(sendText: keyword), // 해당 검색어를 전달
+                ),
+              );
+            },
+            child: Column(
+              children: [
+                InkWell(
+                  child: Container(
+                    width: 80, // 넓이 80
+                    height: 80, // 높이 80
+                    padding: EdgeInsets.all(10),
+                    margin: EdgeInsets.all(6),
+                    child: Image.asset(imagePath), // 이미지 표시
+                  ),
+                ),
+                Text(keyword) // 검색 키워드 출력
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
 }
