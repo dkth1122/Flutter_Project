@@ -2,7 +2,13 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/join/login_email.dart';
-import 'package:project_flutter/product/product.dart';
+import 'package:project_flutter/product.dart';
+import 'package:project_flutter/test.dart';
+import 'package:provider/provider.dart';
+
+import 'expert/my_expert.dart';
+import 'join/userModel.dart';
+import 'myPage/my_page.dart';
 
 
 void main() {
@@ -47,12 +53,10 @@ class _BottomBarState extends State<BottomBar> {
 
   List<Offset> iconOffsets = [];
 
-  List<String> addButtonTexts = ["테스트", "상품", "로그인", "얍얍", "얍얍", "얍얍", "얍얍", "얍얍"];
-  List<IconData> iconData = [
-    Icons.access_time_filled, Icons.check_box, Icons.person, Icons.chat, Icons.access_alarms_rounded, Icons.back_hand, Icons.cabin_outlined, Icons.dark_mode
-  ];
-  List<Widget> pageChange = [BottomBar(),Product(),LoginPage(),BottomBar(),BottomBar(),BottomBar(),BottomBar(),BottomBar()];
-  List<double> iconRotations = [pi / 2, 135 * (pi / 180), pi, 225 * (pi / 180), 270 * (pi / 180), 315 * (pi / 180), 360 * (pi / 180), 0]; // 각 아이콘의 회전 각도
+  List<String> addButtonTexts = ["1", "2", "3", "4", "5", "6", "상품", "테스트"];
+  List<IconData> iconData = [Icons.access_time_filled, Icons.check_box, Icons.person, Icons.chat, Icons.access_alarms_rounded, Icons.back_hand, Icons.add_circle_outline, Icons.telegram_sharp];
+  List<Widget> pageChange = [MyApp(),MyApp(),MyApp(),MyApp(),MyApp(),MyApp(),Product(),Test()];
+  List<double> iconRotations = [pi / 2, 135 * (pi / 180), pi, 225 * (pi / 180), 270 * (pi / 180), 315 * (pi / 180), 360 * (pi / 180), 45 * (pi / 180)]; // 각 아이콘의 회전 각도
 
   void _animateContainerSize() {
     setState(() {
@@ -104,9 +108,9 @@ class _BottomBarState extends State<BottomBar> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          IconButton(
-            onPressed: (){},
-            icon: Icon(Icons.person)
+          Visibility(
+            visible: containerSize == 60.0,
+            child: _hiddenIcon(),
           ),
           GestureDetector(
             onPanStart: (details) {
@@ -130,8 +134,8 @@ class _BottomBarState extends State<BottomBar> {
               angle: rotation,
               child: Container(
                 decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white
+                    shape: BoxShape.circle,
+                    color: Colors.white
                 ),
                 child: InkWell(
                   onTap: () {
@@ -166,8 +170,40 @@ class _BottomBarState extends State<BottomBar> {
               ),
             ),
           ),
-          Text("하이")
+          Visibility(
+            visible: containerSize == 60.0,
+            child: _hiddenIcon2(),
+          )
         ],
+      ),
+    );
+  }
+  Widget _hiddenIcon(){
+    return Expanded(
+      child: IconButton(
+          onPressed: (){
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => MyExpert())
+            );
+          },
+          icon: Icon(Icons.star)
+      ),
+    );
+  }
+  Widget _hiddenIcon2(){
+    return Expanded(
+      child: IconButton(
+          onPressed: () async {
+            final userModel = Provider.of<UserModel>(context, listen: false);
+            if (!userModel.isLogin) {
+              // 사용자가 로그인하지 않은 경우에만 LoginPage로 이동
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
+            } else {
+              // 사용자가 로그인한 경우에만 MyPage로 이동
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyPage()));
+            }
+          },
+          icon: Icon(Icons.person)
       ),
     );
   }
