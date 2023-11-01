@@ -12,6 +12,7 @@ import 'package:provider/provider.dart';
 //import 'package:provider/provider.dart';
 
 import '../firebase_options.dart';
+import '../join/userModel.dart';
 import 'myPortfolio.dart';
 import 'adManagement.dart';
 import 'adRequest.dart';
@@ -31,6 +32,20 @@ class MyExpert extends StatefulWidget {
 }
 
 class _MyExpertState extends State<MyExpert> {
+  String user = "없음";
+  @override
+  void initState() {
+    super.initState();
+    // 여기에서 필요한 초기 설정을 수행하세요.
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+    if (um.isLogin) {
+      user = um.userId!;
+      print(user);
+    } else {
+      user = "없음";
+      print("로그인 안됨");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +82,7 @@ class _MyExpertState extends State<MyExpert> {
                       ),
                       SizedBox(height: 10),
                       Text(
-                        '사용자 닉네임',
+                        user,
                         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                       ),
                       Text(

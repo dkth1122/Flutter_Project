@@ -1,8 +1,12 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../join/userModel.dart';
 
 class PortfolioItem {
   String title;
@@ -31,11 +35,35 @@ class PortfolioItem {
 }
 
 class AddPortfolio extends StatefulWidget {
+
   @override
   _AddPortfolioState createState() => _AddPortfolioState();
 }
 
 class _AddPortfolioState extends State<AddPortfolio> {
+
+  late String user;
+
+  // Firestore 인스턴스 생성
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    // 여기에서 필요한 초기 설정을 수행하세요.
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+    if (um.isLogin) {
+      user = um.userId!;
+      print(user);
+    } else {
+      user = "없음";
+      print("로그인 안됨");
+    }
+  }
+
+
+
+
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -112,7 +140,6 @@ class _AddPortfolioState extends State<AddPortfolio> {
   }
 
   // 이미지 선택 메서드
-  // 이미지 선택 메서드
   void _selectSubImage(BuildContext context) async {
     final picker = ImagePicker();
     final pickedFile = await picker.getImage(source: ImageSource.gallery);
@@ -154,6 +181,66 @@ class _AddPortfolioState extends State<AddPortfolio> {
       });
     }
   }
+
+  // 썸네일 이미지 업로드
+  Future<String> uploadThumbnailImage(File imageFile, String userId) async {
+    String fileName = 'thumbnails/$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference ref = FirebaseStorage.instance.ref().child(fileName);
+    await ref.putFile(imageFile);
+    String downloadURL = await ref.getDownloadURL();
+    return downloadURL;
+  }
+
+// 서브 이미지 업로드
+  Future<String> uploadSubImage(File imageFile, String userId) async {
+    String fileName = 'sub_images/$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    Reference ref = FirebaseStorage.instance.ref().child(fileName);
+    await ref.putFile(imageFile);
+    String downloadURL = await ref.getDownloadURL();
+    return downloadURL;
+  }
+
+  //포트폴리오 등록
+  Future<void> addPortfolioToFirestore(PortfolioItem item, String userId) async {
+    try {
+
+      // Firestore 컬렉션 및 서브컬렉션 참조 생성
+      CollectionReference expertCollection = firestore.collection('expert');
+      DocumentReference expertDoc = expertCollection.doc(userId);
+      CollectionReference portfolioCollection = expertDoc.collection('portfolio');
+
+      // 이미지 업로드 및 URL 가져오기
+      String thumbnailUrl = await uploadThumbnailImage(File(thumbImagePath!), userId);
+      List<String> subImageUrls = [];
+      for (String imagePath in imagePaths) {
+        String imageUrl = await uploadSubImage(File(imagePath), userId);
+        subImageUrls.add(imageUrl);
+      }
+
+      // PortfolioItem을 Firestore에 추가
+      await portfolioCollection.add({
+        'title': item.title,
+        'description': item.description,
+        'thumbnailUrl': thumbnailUrl, // 썸네일 이미지 URL
+        'subImageUrls': subImageUrls, // 서브 이미지 URL 목록
+        'category': item.category,
+        'startDate': item.startDate,
+        'endDate': item.endDate,
+        'customer': item.customer,
+        'industry': item.industry,
+        'portfolioDescription': item.portfolioDescription,
+        'hashtags': item.hashtags,
+      });
+
+      // 데이터 추가 성공
+      print('포트폴리오가 Firestore에 추가되었습니다.');
+    } catch (e) {
+      // 데이터 추가 실패
+      print('포트폴리오 추가 중 오류 발생: $e');
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -334,44 +421,35 @@ class _AddPortfolioState extends State<AddPortfolio> {
               SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () {
-                  setState(() {
-                    String title = titleController.text;
-                    String description = descriptionController.text;
-                    String thumbnailUrl = imageUrlController.text;
+                  final portfolioItem = PortfolioItem(
+                    title: titleController.text,
+                    description: descriptionController.text,
+                    thumbnailUrl: thumbImagePath ?? "",
+                    category: selectedCategory,
+                    startDate: startDate,
+                    endDate: endDate,
+                    customer: customer,
+                    industry: industry,
+                    portfolioDescription: portfolioDescription,
+                    hashtags: selectedHashtags,
+                  );
 
-                    if (title.isNotEmpty && description.isNotEmpty && thumbnailUrl.isNotEmpty) {
-                      portfolioItems.add(PortfolioItem(
-                        title: title,
-                        description: description,
-                        thumbnailUrl: thumbnailUrl,
-                        category: selectedCategory,
-                        startDate: startDate,
-                        endDate: endDate,
-                        customer: customer,
-                        industry: industry,
-                        portfolioDescription: portfolioDescription,
-                        hashtags: selectedHashtags, // 선택한 해시태그 목록 추가
-                      ));
-                      titleController.clear();
-                      descriptionController.clear();
-                      imageUrlController.clear();
-
-                      startDate = null;
-                      endDate = null;
-                      customer = "";
-                      industry = "";
-                      portfolioDescription = "";
-                      selectedHashtags.clear(); // 선택한 해시태그 목록 초기화
-                    }
-                  });
+                  if (user != "없음") {
+                    addPortfolioToFirestore(portfolioItem, user);
+                    setState(() {
+                      portfolioItems.add(portfolioItem);
+                    });
+                  } else {
+                    // 사용자가 로그인하지 않은 경우의 처리
+                    print("로그인하세용 등록 취소");
+                  }
                 },
                 child: Text('포트폴리오 등록'),
               ),
               SizedBox(height: 16.0),
-              Expanded(
-                child: ListView.builder(
+                ListView.builder(
                   shrinkWrap: true,
-                  itemCount: portfolioItems.length,
+                  itemCount: portfolioItems.  length,
                   itemBuilder: (context, index) {
                     PortfolioItem item = portfolioItems[index];
                     return Card(
@@ -444,7 +522,6 @@ class _AddPortfolioState extends State<AddPortfolio> {
                     );
                   },
                 ),
-              ),
             ],
           ),
         ),
@@ -546,5 +623,6 @@ class _AddPortfolioState extends State<AddPortfolio> {
       },
     );
   }
+
 }
 
