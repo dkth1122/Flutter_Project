@@ -33,37 +33,28 @@ class _ChatListState extends State<ChatList> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: Text("채팅 목록")),
+    return Scaffold(
+        appBar: AppBar(title: Text("채팅 목록"), backgroundColor: Color(0xFFFCAF58),),
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(30),
             child: Column(
               children: [
                 SizedBox(height: 10),
-                ElevatedButton(
-                  onPressed: () {
-
-                  },
-                  child: Text("새 채팅 시작"),
-                ),
-                SizedBox(height: 10),
                 Expanded(child: _listChat()),
               ],
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _listChat() {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection("chat").snapshots(),
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collectionGroup("chat").snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
         if (snap.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // Display loading indicator while waiting
+          return CircularProgressIndicator();
         }
 
         final chatList = snap.data?.docs;
@@ -79,32 +70,146 @@ class _ChatListState extends State<ChatList> {
               return Container();
             }
 
-            // My user ID
             final user1Value = data['user1'] as String?;
             final user2Value = data['user2'] as String?;
-
+            String chatTitle = '';
             if (user1Value == user1 || user2Value == user1) {
-              return ListTile(
-                title: Text(user1Value ?? "No User"), // Handle nullable string
-                subtitle: Text(user2Value ?? "No User"), // Handle nullable string
-                onTap: () {
-                  print("아이디 ===> ${document.id}");
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ChatApp(roomId: document.id),
+              if (user1Value == user1) {
+                chatTitle = '$user2Value 님과의 채팅' ?? "No User";
+              } else {
+                chatTitle = '$user1Value 님과의 채팅' ?? "No User";
+              }
+
+              // 이 부분에서 서브컬렉션의 필드 값을 가져올 수 있음
+              return FutureBuilder<QuerySnapshot>(
+                future: FirebaseFirestore.instance.collection('chat').doc(document.id).collection('messages').get(),
+                builder: (context, messageSnap) {
+                  if (messageSnap.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  final messages = messageSnap.data?.docs;
+
+
+                  // 이제 messages 리스트에 서브컬렉션의 문서 목록이 있...없던데..
+                  return Card(
+                    elevation: 3,
+                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ChatApp(roomId: document.id),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.all(16),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            CircleAvatar(
+                              radius: 30,
+                              // Add profile image here
+                              backgroundImage: AssetImage('assets/dog1.PNG'),
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    chatTitle,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  // 서브컬렉션의 필드 값을 이용하여 마지막 메시지 설정
+                                  Text(
+                                    '마지막 메시지: ${getLastMessage(messages!)}',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Column(
+                              children: [
+                                Text(
+                                  '10:30 AM', // Add message timestamp here
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                CircleAvatar(
+                                  radius: 16,
+                                  backgroundColor: Color(0xFFFCAF58),
+                                  child: Text(
+                                    '2', // Add unread message count here
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   );
                 },
               );
             } else {
-              return Container(); // Don't display if it doesn't match my user ID
+              return Container();
             }
           },
         );
       },
     );
   }
+
+  String getLastMessage(List<QueryDocumentSnapshot> messages) {
+    if (messages == null || messages.isEmpty) {
+      return '메시지가 없습니다1.';
+    }
+
+    // 서브컬렉션의 메시지 목록을 정렬해서 가장 마지막 메시지의 내용을 가져옴
+    final sortedMessages = messages
+        .map((message) => message.data() as Map<String, dynamic>)
+        .where((messageData) => messageData['text'] != null || messageData['imageUrl'] != null)
+        .toList();
+
+    if (sortedMessages.isEmpty) {
+      return '메시지가 없습니다2.';
+    }
+
+    final lastMessageData = sortedMessages.last;
+    final lastMessageText = lastMessageData['text'] as String?;
+    final lastMessageImageUrl = lastMessageData['imageUrl'] as String?;
+
+    if (lastMessageText != null) {
+      return lastMessageText;
+    } else if (lastMessageImageUrl != null) {
+      return '이미지를 보냈습니다.';
+    } else {
+      return '메시지가 없습니다3.';
+    }
+  }
+
+
+
 
 
 }

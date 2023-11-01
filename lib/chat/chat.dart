@@ -15,10 +15,7 @@ class ChatApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Chat App',
-      home: ChatScreen(roomId: roomId),
-    );
+    return ChatScreen(roomId: roomId);
   }
 }
 
@@ -60,8 +57,8 @@ class ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat App', textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
+        title: Text('Chat App', textAlign: TextAlign.center, style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFFFCAF58),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
@@ -110,7 +107,20 @@ class ChatScreenState extends State<ChatScreen> {
           if (_isLoading)
             CircularProgressIndicator(),
           if (_image != null)
-            Image.file(_image!), // 선택한 이미지 표시
+            Column(
+              children: [
+                //선택한 이미지 표시
+                Image.file(_image!, width: 100, height: 100),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _image = null;
+                    });
+                  },
+                  icon: Icon(Icons.close, color: Colors.grey),
+                ),
+              ],
+            ),
         ],
       ),
     );
@@ -125,6 +135,11 @@ class ChatScreenState extends State<ChatScreen> {
       setState(() {
         _image = imageFile;
       });
+    } else {
+      // 이미지 선택이 취소되면 이미지 변수 초기화
+      setState(() {
+        _image = null;
+      });
     }
   }
 
@@ -136,31 +151,34 @@ class ChatScreenState extends State<ChatScreen> {
       });
 
       if (_image != null) {
-        final storageRef = FirebaseStorage.instance.ref().child('chat_images/${Uuid().v4()}');
+        final storageRef = FirebaseStorage.instance.ref().child('chat_images/${Uuid().v4()}.png');
         final uploadTask = storageRef.putFile(_image!);
 
         uploadTask.then((TaskSnapshot taskSnapshot) {
-          return taskSnapshot.ref.getDownloadURL();
-        }).then((downloadUrl) {
-          _firestore
-              .collection('chat')
-              .doc(roomId)
-              .collection('message')
-              .add({
-            'text': text,
-            'imageUrl': downloadUrl,
-            'sendTime': FieldValue.serverTimestamp(),
-            'user': user1,
-          }).then((_) {
-            setState(() {
-              _image = null;
-              _messageController.clear();
-            });
-          }).catchError((error) {
-            print('Error: $error');
-          }).whenComplete(() {
-            setState(() {
-              _isLoading = false;
+          return taskSnapshot.ref.getDownloadURL().then((downloadUrl) {
+            // 이미지 URL에 .png 확장자를 추가
+            downloadUrl += '.png';
+
+            _firestore
+                .collection('chat')
+                .doc(roomId)
+                .collection('message')
+                .add({
+              'text': text,
+              'imageUrl': downloadUrl, // 확장자가 추가된 이미지 URL 저장
+              'sendTime': FieldValue.serverTimestamp(),
+              'user': user1,
+            }).then((_) {
+              setState(() {
+                _image = null;
+                _messageController.clear();
+              });
+            }).catchError((error) {
+              print('Error: $error');
+            }).whenComplete(() {
+              setState(() {
+                _isLoading = false;
+              });
             });
           });
         });
@@ -185,6 +203,8 @@ class ChatScreenState extends State<ChatScreen> {
       }
     }
   }
+
+
 }
 
 class ChatMessages extends StatelessWidget {
@@ -224,13 +244,27 @@ class ChatMessages extends StatelessWidget {
 
               final messageText = messageMap['text'];
               final messageTimestamp = messageMap['sendTime'];
+              final messageImg = messageMap['imageUrl'];
+              late ChatMessage messageWidget;
+
 
               if (messageText != null && messageTimestamp != null) {
-                final messageWidget = ChatMessage(
+
+                if(messageImg != null){
+                  messageWidget = ChatMessage(
+                    text: messageText,
+                    sendTime: (messageTimestamp as Timestamp).toDate(),
+                    isCurrentUser: messageMap['user'] == user1 ? true : false,
+                    imageUrl: messageImg,
+                  );
+                }else{
+                  messageWidget = ChatMessage(
                   text: messageText,
                   sendTime: (messageTimestamp as Timestamp).toDate(),
                   isCurrentUser: messageMap['user'] == user1 ? true : false,
                 );
+
+                }
 
                 messageWidgets.add(messageWidget);
               }
@@ -243,7 +277,7 @@ class ChatMessages extends StatelessWidget {
           );
         } else {
           return Center(
-            child: Text('No messages available.'),
+            child: Text('메시지가 없습니다.'),
           );
         }
       },
@@ -252,12 +286,14 @@ class ChatMessages extends StatelessWidget {
 }
 
 class ChatMessage extends StatelessWidget {
-  final String text;
+  final String? text;
+  final String? imageUrl;
   final DateTime sendTime;
   final bool isCurrentUser;
 
   ChatMessage({
-    required this.text,
+    this.text,
+    this.imageUrl,
     required this.sendTime,
     required this.isCurrentUser,
   });
@@ -286,12 +322,23 @@ class ChatMessage extends StatelessWidget {
               Container(
                 padding: EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                  color: isCurrentUser ? Colors.orange : Colors.grey,
+                  color: isCurrentUser ? Color(0xFFFF8C42) : Color(0xFF4E598C),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
-                child: Text(
-                  text,
-                  style: TextStyle(color: Colors.white),
+                child: Column(
+                  children: <Widget>[
+                    if (text != null)
+                      Text(
+                        text!,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    if (imageUrl != null)
+                      Image.network(
+                        imageUrl!,
+                        width: 100, // 이미지의 너비 설정
+                        height: 100, // 이미지의 높이 설정
+                      ),
+                  ],
                 ),
               ),
               if (!isCurrentUser)
