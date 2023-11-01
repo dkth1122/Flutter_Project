@@ -9,7 +9,13 @@ class AdminBoard extends StatefulWidget {
 class _AdminBoardState extends State<AdminBoard> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('게시판 관리'),
+        backgroundColor: Color(0xff328772),
+      ),
+      body: Center(
+      ),
+    );
   }
 }
-

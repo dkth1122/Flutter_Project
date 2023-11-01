@@ -9,6 +9,13 @@ class AdminUser extends StatefulWidget {
 class _AdminUserState extends State<AdminUser> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('회원 관리'),
+        backgroundColor: Color(0xff328772),
+      ),
+      body: Center(
+      ),
+    );
   }
 }

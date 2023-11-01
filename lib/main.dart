@@ -10,6 +10,7 @@ import 'package:project_flutter/bottomBar.dart';
 import 'package:project_flutter/test.dart';
 import 'package:project_flutter/test2.dart';
 import 'package:provider/provider.dart';
+import 'admin/adminDomain.dart';
 import 'category/categoryProduct.dart';
 import 'chat/chat.dart';
 import 'expert/my_expert.dart';
@@ -63,6 +64,10 @@ class _HomePageState extends State<HomePage> {
   List<String> categories2 = ["프로그램", "트렌드", "데이터", "기타"];
   @override
   Widget build(BuildContext context) {
+
+    final userModel = Provider.of<UserModel>(context, listen: false);
+    bool isAdmin = userModel.userId == 'admin';
+
     return Scaffold(
       //appbar를 안하고 body를 한 이유는 스크롤 하면서 appbar를 사라지게 하기 위함
       body: NestedScrollView(
@@ -75,6 +80,19 @@ class _HomePageState extends State<HomePage> {
                 titlePadding: EdgeInsets.all(20),
                 title: Text('Fixer 4 U'),
               ),
+              actions: [
+                if (isAdmin)
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AdminDomainPage()),
+                      );
+                    },
+                    icon: Icon(Icons.admin_panel_settings),
+                  ),
+              ],
+              backgroundColor: Color(0xff328772),
             ),
           ];
         },

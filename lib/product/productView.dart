@@ -430,11 +430,11 @@ class _ProductViewState extends State<ProductView>
 
                             return Row(
                               children:[
-                                CircleAvatar( // 원 모양 프로필 이미지
+/*                                CircleAvatar( // 원 모양 프로필 이미지
                                   radius: 40,
                                   backgroundImage: AssetImage('dog4.png'),
-                                  /*NetworkImage(userProfileImage),*/
-                                ),
+                                  *//*NetworkImage(userProfileImage),*//*
+                                ),*/
                                 SizedBox(width :8),
                                 Text(userNick), // 닉네임 출력
                                 Expanded(
