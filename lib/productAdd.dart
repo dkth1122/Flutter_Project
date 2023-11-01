@@ -59,16 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String? _selectedCategory;
 
-  final List<String> categories = [
-    'UX기획',
-    '웹',
-    '커머스',
-    '모바일',
-    '프로그램',
-    '트렌드',
-    '데이터',
-    '기타',
-  ];
+  final List<String> categories = [    'UX기획',    '웹',    '커머스',    '모바일',    '프로그램',    '트렌드',    '데이터',    '기타',  ];
 
   void _addProduct() async {
     if (_pName.text.isNotEmpty &&
@@ -141,15 +132,15 @@ class _HomeScreenState extends State<HomeScreen> {
           return Center(child: CircularProgressIndicator());
         }
 
-        return Expanded(
-          child: ListView.builder(
-            itemCount: snap.data!.docs.length,
-            itemBuilder: (context, index) {
-              DocumentSnapshot doc = snap.data!.docs[index];
-              Map<String, dynamic> data =
-              doc.data() as Map<String, dynamic>;
-            },
-          ),
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: snap.data!.docs.length,
+          itemBuilder: (context, index) {
+            DocumentSnapshot doc = snap.data!.docs[index];
+            Map<String, dynamic> data =
+            doc.data() as Map<String, dynamic>;
+            // 아이템 빌더 코드...
+          },
         );
       },
     );
@@ -157,7 +148,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -166,77 +156,82 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         backgroundColor: Color(0xff328772),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(20.0),
-        child: Column(
-          children: [
-            SizedBox(height: 10),
-            TextField(
-              controller: _pName,
-              decoration: InputDecoration(labelText: "상품명"),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _pDetail,
-              decoration: InputDecoration(labelText: "상품 설명"),
-            ),
-            SizedBox(height: 20),
-            TextField(
-              controller: _price,
-              decoration: InputDecoration(labelText: "가격"),
-            ),
-            SizedBox(height: 20),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                imageUrl.isNotEmpty
-                    ? Image.network(
-                  imageUrl,
-                  width: 100, // 이미지의 가로 크기를 200으로 설정
-                  height: 100, // 이미지의 세로 크기를 200으로 설정
-                  fit: BoxFit.cover, // 이미지가 위젯에 꽉 차도록 설정
-                )
-                    : Text('이미지가 없습니다.'),
-                ElevatedButton(
-                  onPressed: uploadImage,
-                  child: Text('이미지 업로드'),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 10),
+              TextField(
+                controller: _pName,
+                decoration: InputDecoration(labelText: "상품명"),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                controller: _pDetail,
+                decoration: InputDecoration(labelText: "상품 설명"),
+              ),
+              SizedBox(height: 20),
+              TextField(
+                controller: _price,
+                decoration: InputDecoration(labelText: "가격"),
+              ),
+              SizedBox(height: 20),
+              Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    imageUrl.isNotEmpty
+                        ? Image.network(
+                      imageUrl,
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    )
+                        : Text('이미지가 없습니다.'),
+                    ElevatedButton(
+                      onPressed: uploadImage,
+                      child: Text('이미지 업로드'),
+                      style: ElevatedButton.styleFrom(
+                        primary: Color(0xfff48752),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+              DropdownButtonFormField<String>(
+                value: _selectedCategory,
+                items: categories.map((String category) {
+                  return DropdownMenuItem<String>(
+                    value: category,
+                    child: Text(category),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  setState(() {
+                    _selectedCategory = value;
+                  });
+                },
+                decoration: InputDecoration(labelText: "카테고리"),
+              ),
+              SizedBox(height: 20),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _addProduct,
+                  child: Text("상품 추가"),
                   style: ElevatedButton.styleFrom(
                     primary: Color(0xfff48752),
                   ),
                 ),
-              ],
-            ),
-            SizedBox(height: 20),
-            DropdownButtonFormField<String>(
-              value: _selectedCategory,
-              items: categories.map((String category) {
-                return DropdownMenuItem<String>(
-                  value: category,
-                  child: Text(category),
-                );
-              }).toList(),
-              onChanged: (String? value) {
-                setState(() {
-                  _selectedCategory = value;
-                });
-              },
-              decoration: InputDecoration(labelText: "카테고리"),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _addProduct,
-              child: Text("상품 추가"),
-              style: ElevatedButton.styleFrom(
-                primary: Color(0xfff48752),
               ),
-            ),
-            SizedBox(height: 20),
-            _listProduct(),
-          ],
+              SizedBox(height: 20),
+              _listProduct(),
+            ],
+          ),
         ),
       ),
     );
   }
-
 }
-
