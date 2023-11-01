@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:project_flutter/chat/chatList.dart';
 import 'package:project_flutter/myPage/my_page.dart';
 import 'package:project_flutter/product/product.dart';
+import 'package:project_flutter/product/productView.dart';
 import 'package:project_flutter/search/search.dart';
 import 'package:project_flutter/bottomBar.dart';
 import 'package:project_flutter/test.dart';
@@ -380,26 +381,40 @@ class _HomePageState extends State<HomePage> {
           controller: PageController(initialPage: initialPage, viewportFraction: 0.6),
           children: snap.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-            return Container(
-              child: Card(
-                child: Column(
-                  children: [
-                    SizedBox(height: 10),
-                    Image.network(
-                      data['iUrl'],
-                      width: 300,
-                      height: 150,
-                      fit: BoxFit.cover,
+            return InkWell(
+              onTap: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductView(
+                      productName: data['pName'],
+                      price: data['price'].toString(),
+                      imageUrl: data['iUrl'],
                     ),
-                    ListTile(
-                      title: Text(
-                        data['pDetail'].length > 15
-                            ? '${data['pDetail'].substring(0, 15)}...'
-                            : data['pDetail'],
+                  ),
+                );
+              },
+              child: Container(
+                child: Card(
+                  child: Column(
+                    children: [
+                      SizedBox(height: 10),
+                      Image.network(
+                        data['iUrl'],
+                        width: 300,
+                        height: 150,
+                        fit: BoxFit.cover,
                       ),
-                      subtitle: Text("가격 : ${data['price']}"),
-                    ),
-                  ],
+                      ListTile(
+                        title: Text(
+                          data['pDetail'].length > 15
+                              ? '${data['pDetail'].substring(0, 15)}...'
+                              : data['pDetail'],
+                        ),
+                        subtitle: Text("가격 : ${data['price']}"),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             );
@@ -422,20 +437,34 @@ class _HomePageState extends State<HomePage> {
         return Column(
           children: snap.data!.docs.map((DocumentSnapshot document) {
             Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-            return ListTile(
-              leading: Image.network(
-                data['iUrl'],
-                width: 200,
-                height: 300,
-                fit: BoxFit.cover,
+            return InkWell(
+              onTap: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProductView(
+                      productName: data['pName'],
+                      price: data['price'].toString(),
+                      imageUrl: data['iUrl'],
+                    ),
+                  ),
+                );
+              },
+              child: ListTile(
+                leading: Image.network(
+                  data['iUrl'],
+                  width: 200,
+                  height: 300,
+                  fit: BoxFit.cover,
+                ),
+                title: Text(data['pName']),
+                subtitle: Text(
+                  data['pDetail'].length > 10
+                      ? '${data['pDetail'].substring(0, 10)}...'
+                      : data['pDetail'],
+                ),
+                trailing: Text('조회수: ${data['cnt'].toString()}'),
               ),
-              title: Text(data['pName']),
-              subtitle: Text(
-                data['pDetail'].length > 10
-                    ? '${data['pDetail'].substring(0, 10)}...'
-                    : data['pDetail'],
-              ),
-              trailing: Text('조회수: ${data['cnt'].toString()}'),
             );
           }).toList(),
         );

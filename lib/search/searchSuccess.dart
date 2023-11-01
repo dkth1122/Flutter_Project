@@ -141,6 +141,10 @@ class _SearchSuccessState extends State<SearchSuccess> {
           return title.contains(widget.searchText) || description.contains(widget.searchText);
         }).toList();
 
+        if (filteredDocs.isEmpty) {
+          // 포트폴리오 데이터가 없을 때 "포트폴리오 리스트"를 숨깁니다.
+          return SizedBox.shrink();
+        }
 
         return ListView.builder(
           shrinkWrap: true,
