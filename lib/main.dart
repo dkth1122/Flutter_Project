@@ -12,6 +12,7 @@ import 'package:project_flutter/test2.dart';
 import 'package:provider/provider.dart';
 import 'category/categoryProduct.dart';
 import 'chat/chat.dart';
+import 'expert/my_expert.dart';
 import 'firebase_options.dart';
 import 'join/login_email.dart';
 import 'join/userModel.dart';
@@ -189,10 +190,10 @@ class _HomePageState extends State<HomePage> {
             IconButton(
                 onPressed: (){
                   Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => ChatList())
+                      context, MaterialPageRoute(builder: (context) => MyExpert())
                   );
                 },
-                icon: Icon(Icons.chat_outlined)
+                icon: Icon(Icons.star)
             ),
             IconButton(
               onPressed: () async {

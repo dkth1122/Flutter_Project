@@ -17,12 +17,12 @@ import 'adManagement.dart';
 import 'adRequest.dart';
 import 'messageResponse.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: MyExpert(),
-    // 이 외에 필요한 MaterialApp 설정들을 여기에 추가할 수 있습니다.
-  ));
-}
+// void main() {
+//   runApp(MaterialApp(
+//     home: MyExpert(),
+//     // 이 외에 필요한 MaterialApp 설정들을 여기에 추가할 수 있습니다.
+//   ));
+// }
 
 class MyExpert extends StatefulWidget {
 
