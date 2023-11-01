@@ -172,6 +172,81 @@ class _ProductViewState extends State<ProductView>
     });
   }
 
+  void _toggleChat() async {
+    UserModel userModel = Provider.of<UserModel>(context, listen: false);
+
+    String user = userModel.isLogin ? userModel.userId! : "없음";
+    print(user);
+
+    if (!userModel.isLogin) {
+      _showLoginAlert(context);
+      return;
+    }
+
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+
+    // user1과 user2 중에서 큰 값을 선택하여 user1에 할당
+    String user1 = user.compareTo(um.userId.toString()) > 0 ? user : um.userId.toString();
+    String user2 = user.compareTo(um.userId.toString()) > 0 ? um.userId.toString() : user;
+
+    // Firestore 데이터베이스에 채팅방을 생성하는 함수
+    Future<void> createChatRoom(String roomId, String user1, String user2) async {
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      CollectionReference chatRoomsCollection = firestore.collection("chat");
+      String roomId = '$user1' + '_' + '$user2';
+
+      // 채팅방 ID를 사용하여 Firestore에 채팅방을 추가
+      await chatRoomsCollection.doc(roomId).set({
+        'user1': user1,
+        'user2': user2,
+        'roomId' : roomId, // 채팅방 생성 일시
+      });
+    }
+
+    // 두 사용자 간의 채팅방 ID 확인 및 생성
+    String getOrCreateChatRoomId(String user1, String user2) {
+      String chatRoomId = '$user1' + '_' + '$user2';
+      // Firestore에서 채팅방 ID를 확인하고, 존재하지 않으면 생성
+      bool chatRoomExists = false; // Firestore에서 채팅방 존재 여부 확인하는 로직;
+      if (!chatRoomExists) {
+        // 채팅방이 없다면 생성
+        createChatRoom(chatRoomId, user1, user2);
+      }
+      return chatRoomId;
+    }
+
+    void _showPurchaseAlert(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('알림'),
+            content: Text('로그인 후 이용 가능한 서비스입니다.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('확인'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    //채팅방으로 이동
+    void moveToChatRoom(BuildContext context, String chatRoomId) {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => ChatApp(roomId: chatRoomId),
+      ));
+    }
+
+    //메소드 실행
+    String chatRoomId = getOrCreateChatRoomId(user1, user2);
+    moveToChatRoom(context, chatRoomId);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -371,52 +446,7 @@ class _ProductViewState extends State<ProductView>
                                           print('버튼이 클릭되었습니다.');
                                         },
                                         child: TextButton(
-                                          onPressed: () async{
-                                            UserModel um = Provider.of<UserModel>(context, listen: false);
-
-                                            // user1과 user2 중에서 큰 값을 선택하여 user1에 할당
-                                            String user1 = user.compareTo(um.userId.toString()) > 0 ? user : um.userId.toString();
-                                            String user2 = user.compareTo(um.userId.toString()) > 0 ? um.userId.toString() : user;
-
-
-                                            // Firestore 데이터베이스에 채팅방을 생성하는 함수
-                                            Future<void> createChatRoom(String roomId, String user1, String user2) async {
-                                              FirebaseFirestore firestore = FirebaseFirestore.instance;
-                                              CollectionReference chatRoomsCollection = firestore.collection("chat");
-                                              String roomId = '$user1' + '_' + '${user2}';
-
-                                              // 채팅방 ID를 사용하여 Firestore에 채팅방을 추가
-                                              await chatRoomsCollection.doc(roomId).set({
-                                                'user1': user1,
-                                                'user2': user2,
-                                                'roomId' : roomId, // 채팅방 생성 일시
-                                              });
-                                            }
-
-                                            // 두 사용자 간의 채팅방 ID 확인 및 생성
-                                            String getOrCreateChatRoomId(String user1, String user2) {
-                                              String chatRoomId = '$user1' + '_' + '$user2';
-                                              // Firestore에서 채팅방 ID를 확인하고, 존재하지 않으면 생성
-                                              bool chatRoomExists = false; // Firestore에서 채팅방 존재 여부 확인하는 로직;
-                                              if (!chatRoomExists) {
-                                                // 채팅방이 없다면 생성
-                                                createChatRoom(chatRoomId, user1, user2);
-                                              }
-                                              return chatRoomId;
-                                            }
-
-
-                                            //채팅방으로 이동
-                                            void moveToChatRoom(BuildContext context, String chatRoomId) {
-                                              Navigator.of(context).push(MaterialPageRoute(
-                                                builder: (context) => ChatApp(roomId: chatRoomId),
-                                              ));
-                                            }
-
-                                            //메소드 실행
-                                            String chatRoomId = getOrCreateChatRoomId(user1, user2);
-                                            moveToChatRoom(context, chatRoomId);
-                                          } ,
+                                          onPressed: _toggleChat,
                                           child: Text("1:1문의하기"),
                                         ),
                                       ),
