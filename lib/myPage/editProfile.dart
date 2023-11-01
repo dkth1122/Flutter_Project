@@ -29,23 +29,12 @@ class _EditProfileState extends State<EditProfile> {
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(value),
+            child: Text(value, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
           ),
           TextField(
             controller: _email,
             decoration: InputDecoration(
               labelText: labelText,
-              labelStyle: TextStyle(
-                color: Color(0xff328772),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
-                borderRadius: BorderRadius.circular(10.0),
-              ),
               hintText: hintText,
             ),
           ),
@@ -93,17 +82,6 @@ class _EditProfileState extends State<EditProfile> {
           );
         },
       );
-
-      // Firestore에서 업데이트된 이메일 값을 가져오기
-      QuerySnapshot updatedDataSnap = await users.where('userId', isEqualTo: widget.data['userId']).get();
-      for (QueryDocumentSnapshot updatedDoc in updatedDataSnap.docs) {
-        setState(() {
-          Map<String, dynamic>? updatedData = updatedDoc.data() as Map<String, dynamic>?;
-          if (updatedData != null) {
-            labelText = updatedData['email'] ?? '';
-          }
-        });
-      }
     } catch (e) {
       // 업데이트 실패 시 사용자에게 실패 메시지 표시
       showDialog(
@@ -205,11 +183,9 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
-
   void _logOut() {
     // 사용자 데이터 초기화 (예: Provider를 사용하면 해당 Provider를 초기화)
     Provider.of<UserModel>(context, listen: false).logout();
-
     // 로그인 화면 또는 다른 원하는 화면으로 이동
     Navigator.push(
       context,
@@ -221,18 +197,43 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primaryColor: Color(0xFF4E598C),
+        hintColor: Color(0xFFFCAF58),
+        fontFamily: 'Pretendard',
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: Colors.black, fontSize: 16),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          labelStyle: TextStyle(
+            color: Colors.black, // 레이블 텍스트의 색상
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          hintStyle: TextStyle(
+            color: Color(0xFFFF8C42) ,
+          ),
+
+        ),
+      ),
       home: Scaffold(
         appBar: AppBar(
           title: Text(
             "계정 설정",
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           centerTitle: true,
-          backgroundColor: Colors.white,
+          backgroundColor: Color(0xFFFCAF58), // 배경색 변경
           elevation: 1.0,
-          iconTheme: IconThemeData(color: Colors.grey),
+          iconTheme: IconThemeData(color: Colors.white),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.grey),
+            icon: Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -242,10 +243,8 @@ class _EditProfileState extends State<EditProfile> {
               icon: Icon(Icons.save),
               onPressed: () async {
                 updateUserData();
-
               }
             ),
-
 
           ],
         ),

@@ -13,9 +13,8 @@ class _TestState extends State<Test> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(title: Text("테스트"),),
       body: Center(child: Text("테스트")),
-      extendBody: true, // body를 침범하도록 함
-      bottomNavigationBar: BottomBar(),
 
     );
   }

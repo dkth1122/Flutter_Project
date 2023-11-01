@@ -13,9 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        fontFamily: 'Pretendard',
-      ),
+
       title: '로그인',
       home: LoginPage(),
     );
@@ -39,75 +37,110 @@ class _LoginPageState extends State<LoginPage> {
       decoration: InputDecoration(
         labelText: labelText,
         labelStyle: TextStyle(
-          color: Color(0xff328772),
+          color: Color(0xff424242),
         ),
-        focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
-          borderRadius: BorderRadius.circular(10.0),
-        ),
+
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('로그인', style: TextStyle(fontFamily: 'Pretendard')),
+    return MaterialApp(
+      theme: ThemeData(
+        primaryColor: Color(0xFF4E598C),
+        hintColor: Color(0xFFFCAF58),
+        fontFamily: 'Pretendard',
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: Colors.black, fontSize: 16),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          labelStyle: TextStyle(
+            color: Colors.black, // 레이블 텍스트의 색상
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          // 여기에 필요한 다른 스타일을 추가할 수 있습니다.
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildTextField('아이디', _userId),
-            SizedBox(height: 8),
-            _buildTextField('패스워드', _pw),
-            SizedBox(height: 16),
-            ElevatedButton(
-              style: ButtonStyle(
-                minimumSize: MaterialStateProperty.all(Size(500, 55)),
-                backgroundColor: MaterialStateProperty.all(Color(0xfff48752)),
-                foregroundColor: MaterialStateProperty.all(Color(0xff328772)),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('로그인',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+          backgroundColor: Color(0xFFFCAF58), // 배경색 변경
+          elevation: 1.0,
+          iconTheme: IconThemeData(color: Colors.white),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildTextField('아이디', _userId),
+              SizedBox(height: 8),
+              _buildTextField('패스워드', _pw),
+              SizedBox(height: 16),
+              ElevatedButton(
+                style: ButtonStyle(
+                  minimumSize: MaterialStateProperty.all(Size(500, 55)),
+                  backgroundColor: MaterialStateProperty.all(Color(0xFF4E598C)),
+                  foregroundColor: MaterialStateProperty.all(Colors.white),
+                ),
+                onPressed: _login,
+                child: Text('로그인'),
               ),
-              onPressed: _login,
-              child: Text('로그인'),
-            ),
 
-            TextButton(onPressed: (){
-              Navigator.push(context, MaterialPageRoute(builder: (context)=>ForgotPasswordTabBar()
-              ));
-            }, child: Text("아이디/비밀번호 찾기")),
-            Expanded(child: SizedBox(height: 10)),
-            ElevatedButton(
-              style: ButtonStyle(
-                minimumSize: MaterialStateProperty.all(Size(500, 55)),
-                backgroundColor: MaterialStateProperty.all(Colors.white),
-                side: MaterialStateProperty.all(
-                  BorderSide(
-                    color: Color(0xff424242),
-                    width: 2.0,
+              TextButton(onPressed: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>ForgotPasswordTabBar()
+                ));
+              },
+                style: TextButton.styleFrom(
+                  foregroundColor: Color(0xFF4E598C),
+                  backgroundColor: Colors.transparent, // 배경색을 투명하게 설정
+                ),
+                child: Text("아이디/비밀번호 찾기"),
+              ),
+              Expanded(child: SizedBox(height: 10)),
+              ElevatedButton(
+                style: ButtonStyle(
+                  minimumSize: MaterialStateProperty.all(Size(500, 55)),
+                  backgroundColor: MaterialStateProperty.all(Colors.white),
+                  side: MaterialStateProperty.all(
+                    BorderSide(
+                      color: Color(0xff424242),
+                      width: 2.0,
+                    ),
                   ),
                 ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => Join(),
+                    ),
+                  );
+                },
+                child: Text(
+                  '회원가입',
+                  style: TextStyle(color: Colors.black),
+                ),
               ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => Join(),
-                  ),
-                );
-              },
-              child: Text(
-                '회원가입',
-                style: TextStyle(fontFamily: 'Pretendard', color: Colors.black),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
