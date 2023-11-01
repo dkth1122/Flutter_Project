@@ -105,7 +105,7 @@ class _HomePageState extends State<HomePage> {
                   readOnly: true, // 이 속성을 true로 설정하여 키보드가 나타나지 않도록 함
                   decoration: InputDecoration(
                     contentPadding: EdgeInsets.fromLTRB(10, 5, 5, 5),
-                    
+
                     hintText: "검색어를 입력하세요",
                     suffixIcon: Icon(Icons.search),
                     border: OutlineInputBorder(
@@ -192,59 +192,8 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        height: 60,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Product())
-                  );
-                },
-                icon: Icon(Icons.add_circle_outline)
-            ),
-            IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => MyExpert())
-                  );
-                },
-                icon: Icon(Icons.star)
-            ),
-            IconButton(
-              onPressed: () async {
-                final userModel = Provider.of<UserModel>(context, listen: false);
-                if (!userModel.isLogin) {
-                  // 사용자가 로그인하지 않은 경우에만 LoginPage로 이동
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
-                } else {
-                  // 사용자가 로그인한 경우에만 MyPage로 이동
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyPage()));
-                }
-              },
-              icon: Icon(Icons.person),
-            ),
-            IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Test2())
-                  );
-                },
-                icon: Icon(Icons.telegram_sharp)
-            ),
-            IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Test())
-                  );
-                },
-                icon: Icon(Icons.telegram_sharp)
-            ),
-          ],
-        ),
-      ),
+      // extendBody: true, // body를 침범하도록 함
+      bottomNavigationBar: BottomBar(),
     );
   }
 

@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/join/login_email.dart';
-import 'package:project_flutter/product.dart';
+import 'package:project_flutter/product/product.dart';
 import 'package:project_flutter/test.dart';
 import 'package:provider/provider.dart';
 

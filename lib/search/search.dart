@@ -116,7 +116,6 @@ class _SearchState extends State<Search> {
             SizedBox(height: 10,),
             TextField(
               controller: _latelySearch,
-              autofocus: true,
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.fromLTRB(10, 5, 5, 5),
 
