@@ -30,6 +30,7 @@ class _ProductViewState extends State<ProductView>
   late TabController _tabController;
   bool _isFavorite = false;
   late Stream<QuerySnapshot>? productStream;
+  String chatUser = "";
 
   @override
   void initState() {
@@ -176,7 +177,7 @@ class _ProductViewState extends State<ProductView>
     UserModel userModel = Provider.of<UserModel>(context, listen: false);
 
     String user = userModel.isLogin ? userModel.userId! : "없음";
-    print(user);
+    print("채팅유저 ===> $chatUser");
 
     if (!userModel.isLogin) {
       _showLoginAlert(context);
@@ -185,9 +186,18 @@ class _ProductViewState extends State<ProductView>
 
     UserModel um = Provider.of<UserModel>(context, listen: false);
 
+
+    if(chatUser == um.userId.toString()){
+      // 본인에게 채팅을 보낼 때 스낵바를 표시
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("본인에게는 채팅을 보낼 수 없습니다."),
+      ));
+      return;
+    }
+
     // user1과 user2 중에서 큰 값을 선택하여 user1에 할당
-    String user1 = user.compareTo(um.userId.toString()) > 0 ? user : um.userId.toString();
-    String user2 = user.compareTo(um.userId.toString()) > 0 ? um.userId.toString() : user;
+    String user1 = user.compareTo(um.userId.toString()) > 0 ? chatUser : um.userId.toString();
+    String user2 = user.compareTo(um.userId.toString()) > 0 ? um.userId.toString() : chatUser;
 
     // Firestore 데이터베이스에 채팅방을 생성하는 함수
     Future<void> createChatRoom(String roomId, String user1, String user2) async {
@@ -369,6 +379,8 @@ class _ProductViewState extends State<ProductView>
 
               // 상품 작성자 정보 가져오기
               final user = productData['user'] as String;
+
+              chatUser = productData['user'] as String;
 
               return Align(
                 alignment: Alignment.topCenter,

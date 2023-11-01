@@ -10,7 +10,6 @@ class ChatList extends StatefulWidget {
   _ChatListState createState() => _ChatListState();
 }
 
-
 class _ChatListState extends State<ChatList> {
 
   String user1 = "";
@@ -27,7 +26,7 @@ class _ChatListState extends State<ChatList> {
 
     } else {
       // 사용자가 로그인하지 않은 경우
-      user1 = "yyn1234";
+      user1 = "없음";
       print("로그인 안됨");
     }
   }
@@ -64,7 +63,7 @@ class _ChatListState extends State<ChatList> {
       stream: FirebaseFirestore.instance.collection("chat").snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
         if (snap.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // 로딩 중인 경우 표시
+          return CircularProgressIndicator(); // Display loading indicator while waiting
         }
 
         final chatList = snap.data?.docs;
@@ -76,29 +75,36 @@ class _ChatListState extends State<ChatList> {
           itemBuilder: (context, index) {
             final document = chatList[index];
             final data = document.data() as Map<String, dynamic>?;
-            if (data == null || !data.containsKey('user1') || !data.containsKey('user2')) {
+            if (data == null || (!data.containsKey('user1') && !data.containsKey('user2'))) {
               return Container();
             }
 
-            return ListTile(
-              title: Text(data['user2']),
-              subtitle: Text(data['user1']),
-              onTap: () {
-                print("아이디 ===> ${document.id}");
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ChatApp(roomId: document.id),
-                  ),
-                );
-              },
-            );
+            // My user ID
+            final user1Value = data['user1'] as String?;
+            final user2Value = data['user2'] as String?;
+
+            if (user1Value == user1 || user2Value == user1) {
+              return ListTile(
+                title: Text(user1Value ?? "No User"), // Handle nullable string
+                subtitle: Text(user2Value ?? "No User"), // Handle nullable string
+                onTap: () {
+                  print("아이디 ===> ${document.id}");
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatApp(roomId: document.id),
+                    ),
+                  );
+                },
+              );
+            } else {
+              return Container(); // Don't display if it doesn't match my user ID
+            }
           },
         );
       },
     );
   }
-
 
 
 }

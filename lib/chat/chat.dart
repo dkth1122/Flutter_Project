@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 import '../join/userModel.dart';
 
 class ChatApp extends StatelessWidget {
@@ -58,9 +60,9 @@ class ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat App', textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),// 제목 텍스트 설정
-        backgroundColor: Colors.white, // AppBar 배경색 설정
-        actions: <Widget>[ // 오른쪽 상단에 아이콘 추가
+        title: Text('Chat App', textAlign: TextAlign.center, style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        actions: <Widget>[
           IconButton(
             icon: Icon(Icons.settings),
             onPressed: () {
@@ -91,60 +93,96 @@ class ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.send, color: Colors.grey,),
+                  icon: Icon(Icons.send, color: Colors.grey),
                   onPressed: () {
                     _handleOnSubmit();
                   },
                 ),
                 IconButton(
-                  onPressed: () async {
-                    // 이미지 선택
-                    final picker = ImagePicker();
-                    final pickedFile = await picker.getImage(source: ImageSource.gallery);
-                    // 또는 ImageSource.camera를 사용하여 카메라에서 이미지를 가져올 수도 있습니다.
-
-                    if (pickedFile != null) {
-                      _image = File(pickedFile.path); // 선택한 이미지를 _image 변수에 할당
-                      // 나머지 이미지 저장 및 업로드 코드는 그대로 두세요.
-                    } else {
-                      print('이미지를 선택하지 않았습니다.');
-                    }
+                  onPressed: () {
+                    _handleImageUpload(); // 이미지 선택
                   },
                   icon: Icon(Icons.photo_size_select_actual, color: Colors.grey),
-                )
+                ),
               ],
             ),
           ),
           if (_isLoading)
             CircularProgressIndicator(),
+          if (_image != null)
+            Image.file(_image!), // 선택한 이미지 표시
         ],
       ),
     );
   }
 
+  void _handleImageUpload() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      final imageFile = File(pickedFile.path);
+      setState(() {
+        _image = imageFile;
+      });
+    }
+  }
+
   void _handleOnSubmit() {
     final String text = _messageController.text;
-    if (text.isNotEmpty) {
+    if (text.isNotEmpty || _image != null) {
       setState(() {
         _isLoading = true;
       });
 
-      _firestore
-          .collection('chat')
-          .doc(roomId)
-          .collection('message')
-          .add({'text': text, 'sendTime': FieldValue.serverTimestamp(), 'user': user1,})
-          .then((_) {
-        _messageController.clear();
-      })
-          .catchError((error) {
-        print('Error: $error');
-      })
-          .whenComplete(() {
-        setState(() {
-          _isLoading = false;
+      if (_image != null) {
+        final storageRef = FirebaseStorage.instance.ref().child('chat_images/${Uuid().v4()}');
+        final uploadTask = storageRef.putFile(_image!);
+
+        uploadTask.then((TaskSnapshot taskSnapshot) {
+          return taskSnapshot.ref.getDownloadURL();
+        }).then((downloadUrl) {
+          _firestore
+              .collection('chat')
+              .doc(roomId)
+              .collection('message')
+              .add({
+            'text': text,
+            'imageUrl': downloadUrl,
+            'sendTime': FieldValue.serverTimestamp(),
+            'user': user1,
+          }).then((_) {
+            setState(() {
+              _image = null;
+              _messageController.clear();
+            });
+          }).catchError((error) {
+            print('Error: $error');
+          }).whenComplete(() {
+            setState(() {
+              _isLoading = false;
+            });
+          });
         });
-      });
+      } else {
+        _firestore
+            .collection('chat')
+            .doc(roomId)
+            .collection('message')
+            .add({
+          'text': text,
+          'sendTime': FieldValue.serverTimestamp(),
+          'user': user1,
+        }).then((_) {
+          _messageController.clear();
+        }).catchError((error) {
+          print('Error: $error');
+        }).whenComplete(() {
+          setState(() {
+            _isLoading = false;
+          });
+        });
+      }
     }
   }
 }
@@ -191,7 +229,7 @@ class ChatMessages extends StatelessWidget {
                 final messageWidget = ChatMessage(
                   text: messageText,
                   sendTime: (messageTimestamp as Timestamp).toDate(),
-                  isCurrentUser: messageMap['user'] == user1 ? true : false, // 현재 사용자 여부 설정
+                  isCurrentUser: messageMap['user'] == user1 ? true : false,
                 );
 
                 messageWidgets.add(messageWidget);
@@ -233,18 +271,18 @@ class ChatMessage extends StatelessWidget {
         children: <Widget>[
           if (!isCurrentUser)
             Padding(
-              padding: EdgeInsets.only(left: 8.0), // 왼쪽 여백 추가
+              padding: EdgeInsets.only(left: 8.0),
             ),
           Row(
             children: <Widget>[
               if (isCurrentUser)
-              Padding(
-                padding:  const EdgeInsets.only(right: 5),
-                child: Text(
-                  DateFormat('yy.MM.dd\n HH:mm').format(sendTime),
-                  style: TextStyle(fontSize: 10, color: Colors.grey),
+                Padding(
+                  padding: const EdgeInsets.only(right: 5),
+                  child: Text(
+                    DateFormat('yy.MM.dd\n HH:mm').format(sendTime),
+                    style: TextStyle(fontSize: 10, color: Colors.grey),
+                  ),
                 ),
-              ),
               Container(
                 padding: EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
