@@ -63,93 +63,113 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('용채'),
-        backgroundColor: Color(0xff328772),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
+      //appbar를 안하고 body를 한 이유는 스크롤 하면서 appbar를 사라지게 하기 위함
+      body: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[
+            SliverAppBar(
+              floating: false, // Appbar가 스크롤될 때 고정되지 않도록 설정
+              pinned: false, // Appbar가 화면 상단에 고정되도록 설정
+              flexibleSpace: FlexibleSpaceBar(
+                titlePadding: EdgeInsets.all(20),
+                title: Text('Fixer 4 U'),
+              ),
+            ),
+          ];
+        },
+        body: Column(
           children: [
             // 검색어
             Container(
-              padding: EdgeInsets.all(20),
-              child: TextField(
-                readOnly: true, // 이 속성을 true로 설정하여 키보드가 나타나지 않도록 함
-                decoration: InputDecoration(
-                  hintText: "검색어를 입력하세요",
-                  suffixIcon: Icon(Icons.search),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(25),
+                padding: EdgeInsets.fromLTRB(20, 25, 20, 25),
+                child: TextField(
+                  readOnly: true, // 이 속성을 true로 설정하여 키보드가 나타나지 않도록 함
+                  decoration: InputDecoration(
+                    contentPadding: EdgeInsets.fromLTRB(10, 5, 5, 5),
+                    
+                    hintText: "검색어를 입력하세요",
+                    suffixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    filled: true,
+                    fillColor: Color.fromRGBO(227, 227, 227, 0.7019607843137254),
                   ),
-                  filled: true,
-                  fillColor: Color.fromRGBO(211, 211, 211, 0.7019607843137254),
-                ),
-                onTap: () {
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Search())
-                  );
-                },
-              )
+                  onTap: () {
+                    Navigator.push(
+                        context, MaterialPageRoute(builder: (context) => Search())
+                    );
+                  },
+                )
             ),
-            // 슬라이드
-            SizedBox(
-              height: 150,
-              child: Stack(
-                children: [
-                  sliderWidget(),
-                  sliderIndicator(),
-                ],
-              ),
-            ),
-            SizedBox(height: 20,),
-            // 카테고리
-            SizedBox(
-              height: 130,
-              child: Stack(
-                children: [
-                  sliderWidget2(),
-                  sliderIndicator2(),
-                ],
-              ),
-            ),
-            SizedBox(height: 10,),
-            // 인기 서비스 제목
-            Row(
-              children: [
-                SizedBox(width: 20,),
-                Text(
-                  "인기 서비스",
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontFamily: 'Pretendard',
-                      fontWeight: FontWeight.bold
-                  ),
-                ),
-              ],
-            ),
-            // 인기 서비스
-            Container(
-              height: 250,
-              child: _heartProduct()
-            ),
-            SizedBox(height: 20,),
-            // 가장 많이 본 서비스 제목
-            Row(
-              children: [
-                SizedBox(width: 20,),
-                Text(
-                  "가장 많이 본 서비스",
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontFamily: 'Pretendard',
-                      fontWeight: FontWeight.bold
-                  ),
-                ),
-              ],
-            ),
-            // 가장 많이 본 서비스
-            _cntProduct(),
 
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    // 슬라이드
+                    SizedBox(
+                      height: 150,
+                      child: Stack(
+                        children: [
+                          sliderWidget(),
+                          sliderIndicator(),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 20,),
+                    // 카테고리
+                    SizedBox(
+                      height: 130,
+                      child: Stack(
+                        children: [
+                          sliderWidget2(),
+                          sliderIndicator2(),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 10,),
+                    // 인기 서비스 제목
+                    Row(
+                      children: [
+                        SizedBox(width: 20,),
+                        Text(
+                          "인기 서비스",
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontFamily: 'Pretendard',
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
+                    ),
+                    // 인기 서비스
+                    Container(
+                        height: 250,
+                        child: _heartProduct()
+                    ),
+                    SizedBox(height: 20,),
+                    // 가장 많이 본 서비스 제목
+                    Row(
+                      children: [
+                        SizedBox(width: 20,),
+                        Text(
+                          "가장 많이 본 서비스",
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontFamily: 'Pretendard',
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
+                    ),
+                    // 가장 많이 본 서비스
+                    _cntProduct(),
+
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -177,11 +197,12 @@ class _HomePageState extends State<HomePage> {
             IconButton(
               onPressed: () async {
                 final userModel = Provider.of<UserModel>(context, listen: false);
-                if (userModel.isLogin) {
+                if (!userModel.isLogin) {
+                  // 사용자가 로그인하지 않은 경우에만 LoginPage로 이동
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
+                } else {
                   // 사용자가 로그인한 경우에만 MyPage로 이동
                   Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyPage()));
-                } else {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
                 }
               },
               icon: Icon(Icons.person),
