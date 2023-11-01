@@ -5,7 +5,6 @@ import 'package:project_flutter/join/userModel.dart';
 import 'package:project_flutter/main.dart';
 import 'package:provider/provider.dart';
 import '../admin/adminDomain.dart';
-import '../adminDomain.dart';
 import '../firebase_options.dart';
 import 'ForgotPassword.dart';
 import 'join.dart';
