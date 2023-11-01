@@ -109,6 +109,27 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
+  Future<void> updateUserPassword(newPasswordController, currentPasswordController, Function(bool) setShowError) async {
+    try {
+      CollectionReference users = FirebaseFirestore.instance.collection("userList");
+      QuerySnapshot snap = await users.where('userId', isEqualTo: widget.data['userId']).get();
+
+      for (QueryDocumentSnapshot doc in snap.docs) {
+        String currentPassword = currentPasswordController.text;
+        String savedPassword = doc['pw'];
+        if (currentPassword == savedPassword) {
+          await users.doc(doc.id).update({'pw': newPasswordController.text});
+          Navigator.pop(context);
+        } else {
+          setShowError(true);
+        }
+      }
+    } catch (e) {
+      // 오류 처리
+    }
+  }
+
+
 
 
 
@@ -129,41 +150,55 @@ class _EditProfileState extends State<EditProfile> {
   void _showChangePasswordDialog() {
     TextEditingController currentPasswordController = TextEditingController();
     TextEditingController newPasswordController = TextEditingController();
+    bool showError = false;
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text('비밀번호 변경'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              TextField(
-                controller: currentPasswordController,
-                decoration: InputDecoration(labelText: '현재 비밀번호'),
-                obscureText: true,
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('비밀번호 변경'),
+              content: Column(
+                mainAxisSize: MainAxisSize.max,
+                children: <Widget>[
+                  TextField(
+                    controller: currentPasswordController,
+                    decoration: InputDecoration(labelText: '현재 비밀번호'),
+                    obscureText: true,
+                  ),
+                  if (showError)
+                    Text(
+                      '현재 비밀번호가 올바르지 않습니다.',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  TextField(
+                    controller: newPasswordController,
+                    decoration: InputDecoration(labelText: '새로운 비밀번호'),
+                    obscureText: true,
+                  ),
+                ],
               ),
-              TextField(
-                controller: newPasswordController,
-                decoration: InputDecoration(labelText: '새로운 비밀번호'),
-                obscureText: true,
-              ),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('취소'),
-            ),
-            TextButton(
-              onPressed: () async {
-
-              },
-              child: Text('저장'),
-            ),
-          ],
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: Text('취소'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    await updateUserPassword(newPasswordController, currentPasswordController, (bool value) {
+                      setState(() { // 이 부분이 추가된 부분
+                        showError = value;
+                      });
+                    });
+                  },
+                  child: Text('저장'),
+                ),
+              ],
+            );
+          },
         );
       },
     );

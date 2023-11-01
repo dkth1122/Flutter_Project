@@ -86,7 +86,7 @@ class _JoinState extends State<Join> {
     String nickname = _nick.text;
     if (!isNicknameValid(nickname)) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('유효하지 않은 닉네임 형식입니다. (최대 10자)')),
+        SnackBar(content: Text('유효하지 않은 닉네임 형식입니다. (최대 8자)')),
       );
       return;
     }
@@ -233,7 +233,7 @@ class _JoinState extends State<Join> {
   }
   // 정규식을 사용하여 닉네임이 최대 10자 이내인지 확인
   bool isNicknameValid(String nickname) {
-    final RegExp nicknameRegExp = RegExp(r'^[a-zA-Z0-9가-힣]{1,10}$');
+    final RegExp nicknameRegExp = RegExp(r'^[a-zA-Z0-9가-힣]{1,8}$');
     return nicknameRegExp.hasMatch(nickname);
   }
 
