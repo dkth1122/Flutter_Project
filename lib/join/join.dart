@@ -262,361 +262,330 @@ class _JoinState extends State<Join> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('회원가입'),
+    return MaterialApp(
+      theme: ThemeData(
+        primaryColor: Color(0xFF4E598C),
+        hintColor: Color(0xFFFCAF58),
+        fontFamily: 'Pretendard',
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: Colors.black, fontSize: 16),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          labelStyle: TextStyle(
+            color: Colors.black, // 레이블 텍스트의 색상
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          hintStyle: TextStyle(
+            color: Color(0xFFFF8C42) ,
+          ),
+
+        ),
       ),
-      body: SingleChildScrollView(
-          child:
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _id,
-                onChanged: (value) {
-                  String id = _id.text;
-                  if (!isIdValid(id)) {
-                    setState(() {
-                      idValidationMessage = '유효하지 않은 아이디 형식입니다. (6자 이상의 영어소문자와 숫자의 조합)';
-                    });
-                  } else {
-                    isIdAlreadyRegistered(id).then((isDuplicate) {
-                      if (isDuplicate) {
-                        setState(() {
-                          idValidationMessage = '이미 가입된 아이디 입니다.';
-                        });
-                      } else {
-                        setState(() {
-                          idValidationMessage = '사용 가능한 아이디 입니다.';
-                        });
-                      }
-                    });
-                  }
-                },
-                decoration: InputDecoration(
-                  labelText: '아이디',
-                  labelStyle: TextStyle(
-                    color: Color(0xff328772),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  hintText: "영어소문자와 숫자를 조합한 6자리 이상",
-                  suffixIcon: idValidationMessage == '사용 가능한 아이디 입니다.' ? Icon(Icons.check) : null,
-
-                ),
-              ),
-            ),
-            if (idValidationMessage.isNotEmpty)
-              Text(
-                idValidationMessage,
-                style: TextStyle(
-                  color: idValidationMessage == '사용 가능한 아이디 입니다.' ? Colors.blue : Colors.red,
-                ),
-              ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _pw,
-                obscureText: true,
-                decoration: InputDecoration(
-                  labelText: '비밀번호',
-                  labelStyle: TextStyle(
-                    color: Color(0xff328772),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  hintText: "8자 이상의 영어 소문자와 숫자 조합",
-
-
-                ),
-                onChanged: (password) {
-                  setState(() {
-                    if (isPasswordValid(password)) {
-                      passwordValidationMessage = '비밀번호가 유효합니다. 비밀번호 확인해주세요. ';
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('회원가입',
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+          centerTitle: true,
+          backgroundColor: Color(0xFFFCAF58), // 배경색 변경
+          elevation: 1.0,
+          iconTheme: IconThemeData(color: Colors.white),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
+        body: SingleChildScrollView(
+            child:
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _id,
+                  onChanged: (value) {
+                    String id = _id.text;
+                    if (!isIdValid(id)) {
+                      setState(() {
+                        idValidationMessage = '유효하지 않은 아이디 형식입니다. (6자 이상의 영어소문자와 숫자의 조합)';
+                      });
                     } else {
-                      passwordValidationMessage = '비밀번호가 유효하지 않습니다. (8자 이상의 영어 소문자와 숫자 조합)';
-                    }
-                  });
-                },
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: _pw2,
-                    obscureText: true,
-                    decoration: InputDecoration(
-                      labelText: '비밀번호 확인',
-                      labelStyle: TextStyle(
-                        color: Color(0xff328772),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-
-                    ),
-                    onChanged: (password2) {
-                      setState(() {
-                        bool isValidPassword = isPasswordValid(_pw.text);
-                        bool doPasswordsMatch = (password2 == _pw.text);
-
-                        if (isValidPassword && doPasswordsMatch) {
-                          passwordValidationMessage = '비밀번호가 유효하며 일치합니다.';
-                        } else if (!isValidPassword) {
-                          passwordValidationMessage = '비밀번호가 유효하지 않습니다. (8자 이상의 영어 소문자와 숫자 조합)';
-                        } else if (!doPasswordsMatch) {
-                          passwordValidationMessage = '비밀번호가 일치하지 않습니다.';
-                        }
-                      });
-                    },
-
-                  ),
-                  Text(
-                    passwordValidationMessage,
-                    style: TextStyle(
-                      color: passwordValidationMessage == '비밀번호가 유효하며 일치합니다.' ? Colors.blue : Colors.red,
-                    ),
-                  ),
-
-                ],
-              ),
-
-
-            ),
-
-
-
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: _name,
-                    decoration: InputDecoration(
-                      labelText: '이름',
-                      labelStyle: TextStyle(
-                        color: Color(0xff328772),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      hintText: '한글로만, 10자 이내',
-
-                    ),
-                    onChanged: (name) {
-                      setState(() {
-                        if (isNameValid(name)) {
-                          nameValidationMessage = '유효한 이름입니다.';
-                        } else {
-                          nameValidationMessage = '한글로만 최대 10자 이내로 입력하세요.';
-                        }
-                      });
-                    },
-                  ),
-                  Text(
-                    nameValidationMessage,
-                    style: TextStyle(
-                      color: nameValidationMessage == '유효한 이름입니다.' ? Colors.blue : Colors.red,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  TextField(
-                    controller: _nick,
-                    onChanged: (value) {
-                      String nickname = _nick.text;
-                      if (nickname.isEmpty) {
-                        setState(() {
-                          nickValidationMessage = '닉네임을 입력하세요';
-                        });
-                      } else if (isNicknameValid(nickname)) {
-                        isNickAlreadyRegistered(nickname).then((isDuplicate) {
-                          if (isDuplicate) {
-                            setState(() {
-                              nickValidationMessage = '이미 사용 중인 닉네임입니다.';
-                            });
-                          } else {
-                            setState(() {
-                              nickValidationMessage = '사용 가능한 닉네임입니다.';
-                            });
-                          }
-                        });
-                      } else {
-                        setState(() {
-                          nickValidationMessage = '닉네임은 최대 10자 이내로 입력하세요.';
-                        });
-                      }
-                    },
-                    decoration: InputDecoration(
-                      labelText: '닉네임',
-                      labelStyle: TextStyle(
-                        color: Color(0xff328772),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      hintText: '10자 이내, 특수기호 불가',
-
-
-                    ),
-                  ),
-                  if (nickValidationMessage.isNotEmpty)
-                    Text(
-                      nickValidationMessage,
-                      style: TextStyle(
-                        color: nickValidationMessage == '닉네임을 입력하세요' ? Colors.red :
-                        nickValidationMessage == '사용 가능한 닉네임입니다.' ? Colors.blue : Colors.red,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-
-
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _email,
-                onChanged: (email) {
-                  String emailText = _email.text;
-                  if (!isEmailValid(emailText)) {
-                    setState(() {
-                      emailValidationMessage = '유효하지 않은 이메일 형식입니다.';
-                    });
-                  } else {
-                    isEmailAlreadyRegistered(emailText).then((isDuplicate) {
-                      if (isDuplicate) {
-                        setState(() {
-                          emailValidationMessage = '중복된 이메일 주소입니다.';
-                        });
-                      } else {
-                        setState(() {
-                          emailValidationMessage = '사용 가능한 이메일 주소입니다.';
-                        });
-                      }
-                    });
-                  }
-                },
-                decoration: InputDecoration(
-                  labelText: '이메일',
-                  labelStyle: TextStyle(
-                    color: Color(0xff328772),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xff328772), width: 2.0),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xfff48752), width: 2.0),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  hintText: '이메일 형식으로 (@포함)',
-
-
-                ),
-              ),
-            ),
-
-            Text(
-              emailValidationMessage,
-              style: TextStyle(
-                color: emailValidationMessage == '사용 가능한 이메일 주소입니다.' ? Colors.blue : Colors.red,
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: TextField(
-                controller: _birth,
-                decoration: InputDecoration(
-                  labelText: '생일',
-                  labelStyle: TextStyle(
-                    color: Color(0xff328772),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Color(0xff328772),
-                      width: 2.0,
-                    ),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Color(0xfff48752),
-                      width: 2.0,
-                    ),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  // suffixIcon을 사용하여 아이콘 버튼 추가
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      showDatePicker(
-                        context: context,
-                        initialDate: DateTime.now(),
-                        firstDate: DateTime(1900),
-                        lastDate: DateTime.now(),
-                      ).then((value) {
-                        if (value != null) {
+                      isIdAlreadyRegistered(id).then((isDuplicate) {
+                        if (isDuplicate) {
                           setState(() {
-                            _dateTime = value;
-                            _birth.text = _dateTime.toString().split(" ")[0].replaceAll("-", "/"); // 선택한 날짜를 TextField에 표시
+                            idValidationMessage = '이미 가입된 아이디 입니다.';
+                          });
+                        } else {
+                          setState(() {
+                            idValidationMessage = '사용 가능한 아이디 입니다.';
                           });
                         }
                       });
-                    },
-                    icon: Icon(Icons.calendar_today), // 아이콘 지정
+                    }
+                  },
+                  decoration: InputDecoration(
+                    labelText: '아이디',
+                    hintText: "영어소문자와 숫자를 조합한 6자리 이상",
+                    suffixIcon: idValidationMessage == '사용 가능한 아이디 입니다.' ? Icon(Icons.check) : null,
+
+                  ),
+                ),
+              ),
+              if (idValidationMessage.isNotEmpty)
+                Text(
+                  idValidationMessage,
+                  style: TextStyle(
+                    color: idValidationMessage == '사용 가능한 아이디 입니다.' ? Colors.blue : Colors.red,
+                  ),
+                ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _pw,
+                  obscureText: true,
+                  decoration: InputDecoration(
+                    labelText: '비밀번호',
+                    hintText: "8자 이상의 영어 소문자와 숫자 조합",
+
+
+                  ),
+                  onChanged: (password) {
+                    setState(() {
+                      if (isPasswordValid(password)) {
+                        passwordValidationMessage = '비밀번호가 유효합니다. 비밀번호 확인해주세요. ';
+                      } else {
+                        passwordValidationMessage = '비밀번호가 유효하지 않습니다. (8자 이상의 영어 소문자와 숫자 조합)';
+                      }
+                    });
+                  },
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _pw2,
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: '비밀번호 확인',
+
+                      ),
+                      onChanged: (password2) {
+                        setState(() {
+                          bool isValidPassword = isPasswordValid(_pw.text);
+                          bool doPasswordsMatch = (password2 == _pw.text);
+
+                          if (isValidPassword && doPasswordsMatch) {
+                            passwordValidationMessage = '비밀번호가 유효하며 일치합니다.';
+                          } else if (!isValidPassword) {
+                            passwordValidationMessage = '비밀번호가 유효하지 않습니다. (8자 이상의 영어 소문자와 숫자 조합)';
+                          } else if (!doPasswordsMatch) {
+                            passwordValidationMessage = '비밀번호가 일치하지 않습니다.';
+                          }
+                        });
+                      },
+
+                    ),
+                    Text(
+                      passwordValidationMessage,
+                      style: TextStyle(
+                        color: passwordValidationMessage == '비밀번호가 유효하며 일치합니다.' ? Colors.blue : Colors.red,
+                      ),
+                    ),
+
+                  ],
+                ),
+
+
+              ),
+
+
+
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _name,
+                      decoration: InputDecoration(
+                        labelText: '이름',
+                        hintText: '한글로만, 10자 이내',
+
+                      ),
+                      onChanged: (name) {
+                        setState(() {
+                          if (isNameValid(name)) {
+                            nameValidationMessage = '유효한 이름입니다.';
+                          } else {
+                            nameValidationMessage = '한글로만 최대 10자 이내로 입력하세요.';
+                          }
+                        });
+                      },
+                    ),
+                    Text(
+                      nameValidationMessage,
+                      style: TextStyle(
+                        color: nameValidationMessage == '유효한 이름입니다.' ? Colors.blue : Colors.red,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    TextField(
+                      controller: _nick,
+                      onChanged: (value) {
+                        String nickname = _nick.text;
+                        if (nickname.isEmpty) {
+                          setState(() {
+                            nickValidationMessage = '닉네임을 입력하세요';
+                          });
+                        } else if (isNicknameValid(nickname)) {
+                          isNickAlreadyRegistered(nickname).then((isDuplicate) {
+                            if (isDuplicate) {
+                              setState(() {
+                                nickValidationMessage = '이미 사용 중인 닉네임입니다.';
+                              });
+                            } else {
+                              setState(() {
+                                nickValidationMessage = '사용 가능한 닉네임입니다.';
+                              });
+                            }
+                          });
+                        } else {
+                          setState(() {
+                            nickValidationMessage = '닉네임은 최대 10자 이내로 입력하세요.';
+                          });
+                        }
+                      },
+                      decoration: InputDecoration(
+                        labelText: '닉네임',
+                        hintText: '10자 이내, 특수기호 불가',
+
+
+                      ),
+                    ),
+                    if (nickValidationMessage.isNotEmpty)
+                      Text(
+                        nickValidationMessage,
+                        style: TextStyle(
+                          color: nickValidationMessage == '닉네임을 입력하세요' ? Colors.red :
+                          nickValidationMessage == '사용 가능한 닉네임입니다.' ? Colors.blue : Colors.red,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
+
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _email,
+                  onChanged: (email) {
+                    String emailText = _email.text;
+                    if (!isEmailValid(emailText)) {
+                      setState(() {
+                        emailValidationMessage = '유효하지 않은 이메일 형식입니다.';
+                      });
+                    } else {
+                      isEmailAlreadyRegistered(emailText).then((isDuplicate) {
+                        if (isDuplicate) {
+                          setState(() {
+                            emailValidationMessage = '중복된 이메일 주소입니다.';
+                          });
+                        } else {
+                          setState(() {
+                            emailValidationMessage = '사용 가능한 이메일 주소입니다.';
+                          });
+                        }
+                      });
+                    }
+                  },
+                  decoration: InputDecoration(
+                    labelText: '이메일',
+                    hintText: '이메일 형식으로 (@포함)',
                   ),
                 ),
               ),
 
-            ),
+              Text(
+                emailValidationMessage,
+                style: TextStyle(
+                  color: emailValidationMessage == '사용 가능한 이메일 주소입니다.' ? Colors.blue : Colors.red,
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _birth,
+                  decoration: InputDecoration(
+                    labelText: '생일',
+                    // suffixIcon을 사용하여 아이콘 버튼 추가
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(1900),
+                          lastDate: DateTime.now(),
+                          builder: (BuildContext context, Widget? child) {
+                            return Theme(
+                              data: ThemeData.light().copyWith(
+                                primaryColor: Color(0xFFFF9C784), // 선택된 날짜 색상
+                                hintColor: Color(0xFFFF9C784), // 날짜 텍스트 색상
+                                buttonTheme: ButtonThemeData(textTheme: ButtonTextTheme.primary),
+                              ),
+                              child: child!,
+                            );
+                          },
+                        ).then((value) {
+                          if (value != null) {
+                            setState(() {
+                              _dateTime = value;
+                              _birth.text = _dateTime.toString().split(" ")[0].replaceAll("-", "/"); // 선택한 날짜를 TextField에 표시
+                            });
+                          }
+                        });
+                      },
+                      icon: Icon(Icons.calendar_today), // 아이콘 지정
+                    ),
+                  ),
+                ),
+
+              ),
 
 
-            SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: _register,
-              child: Text('회원가입'),
-             ),
-          ]
-      ),
+              SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: _register,
+                child: Text('회원가입'),
+                style: ButtonStyle(
+                  minimumSize: MaterialStateProperty.all(Size(200, 55)),
+                  backgroundColor: MaterialStateProperty.all(Color(0xFF4E598C)),
+                  foregroundColor: MaterialStateProperty.all(Colors.white),
+                ),
+               ),
+            ]
+        ),
+        ),
       ),
     );
   }

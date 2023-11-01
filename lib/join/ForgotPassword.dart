@@ -52,8 +52,24 @@ class _ForgotPasswordTabBarState extends State<ForgotPasswordTabBar> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
+        primaryColor: Color(0xFF4E598C),
+        hintColor: Color(0xFFFCAF58),
         fontFamily: 'Pretendard',
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: Colors.black, fontSize: 16), // 스낵바 내용 텍스트 스타일 변경
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          labelStyle: TextStyle(
+            color: Colors.black, // 레이블 텍스트의 색상
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0), // 활성화된 텍스트 필드의 테두리 스타일
+            borderRadius: BorderRadius.circular(10.0), // 테두리의 모서리를 둥글게 만듭니다.
+          ),
+          // 여기에 필요한 다른 스타일을 추가할 수 있습니다.
+        ),
       ),
+
       home: DefaultTabController(
         length: 2, // 탭의 수 (여기서는 2개)
         child: Scaffold(
@@ -157,7 +173,7 @@ class ForgotIdPage extends StatelessWidget {
                     content: Text('찾은 아이디: $id'),
                     duration: Duration(seconds: 5), // 스낵바 표시 기간 (5초)
                     action: SnackBarAction(
-                      label: '로그인하러가기',
+                      label: '확인',
                       onPressed: () {
                         ScaffoldMessenger.of(context).removeCurrentSnackBar();
                         // LoginPage()로 이동
@@ -238,10 +254,9 @@ class ForgotPasswordPage extends StatelessWidget {
                     content: Text('찾은 비밀번호: $pw'),
                     duration: Duration(seconds: 5), // 스낵바 표시 기간 (5초)
                     action: SnackBarAction(
-                      label: '로그인하러가기',
+                      label: '확인',
                       onPressed: () {
                         ScaffoldMessenger.of(context).removeCurrentSnackBar();
-                        // LoginPage()로 이동
                       },
                     ),
                   ),

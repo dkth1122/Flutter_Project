@@ -122,89 +122,94 @@ class _PurchaseManagementPageState extends State<PurchaseManagementPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "구매관리",
-          style: TextStyle(color: Colors.grey),
-        ),
-        centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 1.0,
-        iconTheme: IconThemeData(color: Colors.grey),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.grey),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.info_outline, color: Colors.grey),
+    return MaterialApp(
+      theme: ThemeData(
+        fontFamily: 'Pretendard',
+      ),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            "구매관리",
+            style: TextStyle(color: Colors.grey),
+          ),
+          centerTitle: true,
+          backgroundColor: Colors.white,
+          elevation: 1.0,
+          iconTheme: IconThemeData(color: Colors.grey),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.grey),
             onPressed: () {
-              _showInfoModal(context);
+              Navigator.pop(context);
             },
           ),
-        ],
-      ),
-      body: Column(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(16.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: '검색',
-                prefixIcon: Icon(Icons.search),
-              ),
-              // Implement your search functionality here
+          actions: [
+            IconButton(
+              icon: Icon(Icons.info_outline, color: Colors.grey),
+              onPressed: () {
+                _showInfoModal(context);
+              },
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _filterButton(
-                icon: Icons.arrow_drop_down,
-                text: '상품유형',
-                onPressed: () {
-                  _showFilterOptions(context, optionsButton1);
-                },
+          ],
+        ),
+        body: Column(
+          children: <Widget>[
+            Padding(
+              padding: EdgeInsets.all(16.0),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: '검색',
+                  prefixIcon: Icon(Icons.search),
+                ),
+                // Implement your search functionality here
               ),
-              SizedBox(width: 10), // 버튼 사이에 간격을 추가합니다
-              _filterButton(
-                icon: Icons.arrow_drop_down,
-                text: '주문상태',
-                onPressed: () {
-                  _showFilterOptions(context, optionsButton2);
-                },
-              ),
-              SizedBox(width: 10), // 버튼 사이에 간격을 추가합니다
-              _filterButton(
-                icon: Icons.arrow_drop_down,
-                text: '주문기간',
-                onPressed: () async {
-                  showDateRangePickerModal(context);
-                }
-              ),
-            ],
-          ),
-          Expanded(
-            child: ListView(
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ListTile(
-                  title: Text("주문 1"),
-                  subtitle: Text("상품 1"),
-                  trailing: Text("가격: \$10"),
+                _filterButton(
+                  icon: Icons.arrow_drop_down,
+                  text: '상품유형',
+                  onPressed: () {
+                    _showFilterOptions(context, optionsButton1);
+                  },
                 ),
-                ListTile(
-                  title: Text("주문 2"),
-                  subtitle: Text("상품 2"),
-                  trailing: Text("가격: \$20"),
+                SizedBox(width: 10), // 버튼 사이에 간격을 추가합니다
+                _filterButton(
+                  icon: Icons.arrow_drop_down,
+                  text: '주문상태',
+                  onPressed: () {
+                    _showFilterOptions(context, optionsButton2);
+                  },
                 ),
-                // Additional order items
+                SizedBox(width: 10), // 버튼 사이에 간격을 추가합니다
+                _filterButton(
+                  icon: Icons.arrow_drop_down,
+                  text: '주문기간',
+                  onPressed: () async {
+                    showDateRangePickerModal(context);
+                  }
+                ),
               ],
             ),
-          ),
-        ],
+            Expanded(
+              child: ListView(
+                children: [
+                  ListTile(
+                    title: Text("주문 1"),
+                    subtitle: Text("상품 1"),
+                    trailing: Text("가격: \$10"),
+                  ),
+                  ListTile(
+                    title: Text("주문 2"),
+                    subtitle: Text("상품 2"),
+                    trailing: Text("가격: \$20"),
+                  ),
+                  // Additional order items
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
