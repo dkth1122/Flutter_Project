@@ -278,6 +278,7 @@ class _ProductViewState extends State<ProductView>
               Tab(text: '후기'),
             ],
           ),
+          SizedBox(height: 10),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -387,10 +388,6 @@ class _ProductViewState extends State<ProductView>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
-                    Divider(color :Colors.grey),
-/*                    ClipRRect(
-                      child: Image.asset('dog1.PNG'),
-                    ),*/
                     Image.network(
                       widget.imageUrl,
                       width: 200,
