@@ -29,14 +29,38 @@ class _SearchSuccessState extends State<SearchSuccess> {
     String searchText = widget.searchText;
     return Scaffold(
       appBar: AppBar(title: Text("검색성공"),),
-      body: Column(
-        children: [
-          Text("검색어 : $searchText"),
-          Expanded(child: searchListProduct())
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 20,),
+            Text("검색어 : $searchText", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+            SizedBox(height: 20,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(width: 10,),
+                Text("상품 리스트", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              ],
+            ),
+            SizedBox(height: 20,),
+            searchListProduct(),
+            SizedBox(height: 20,),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(width: 10,),
+                Text("포트폴리오 리스트", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              ],
+            ),
+            Text("포트폴리오 상세정보는 다이어로그로 되어있어서 불러오기가 어려움 ㅠ 현재 하드코딩 되어있어서 완성되면 가져오자"),
+            SizedBox(height: 20,),
+            searchListPortFolio(),
+          ],
+        ),
       ),
     );
   }
+
   Widget searchListProduct() {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
@@ -53,10 +77,11 @@ class _SearchSuccessState extends State<SearchSuccess> {
           String pDetail = data['pDetail'];
           String pName = data['pName'];
           return pDetail.contains(widget.searchText) || pName.contains(widget.searchText);
-        })
-            .toList();
+        }).toList();
 
         return ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
           itemCount: filteredDocs.length,
           itemBuilder: (context, index) {
             Map<String, dynamic> data = filteredDocs[index].data() as Map<String, dynamic>;
@@ -100,4 +125,52 @@ class _SearchSuccessState extends State<SearchSuccess> {
       },
     );
   }
+  Widget searchListPortFolio() {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance.collectionGroup("portfolio").snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
+        if (!snap.hasData) {
+          return CircularProgressIndicator();
+        }
+
+        final List<DocumentSnapshot> filteredDocs = snap.data!.docs
+            .where((document) {
+          Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+          String title = data['title'];
+          String description = data['description'];
+          return title.contains(widget.searchText) || description.contains(widget.searchText);
+        }).toList();
+
+
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: filteredDocs.length,
+          itemBuilder: (context, index) {
+            Map<String, dynamic> data = filteredDocs[index].data() as Map<String, dynamic>;
+
+            return InkWell(
+              onTap: () {
+              },
+              child: ListTile(
+                leading: Image.network(
+                  data['thumbnailUrl'],
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                ),
+                title: Text(data['title']),
+                subtitle: Text(
+                  data['description'].length > 15
+                      ? '${data['description'].substring(0, 15)}...'
+                      : data['description'],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
 }
