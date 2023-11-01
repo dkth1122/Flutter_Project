@@ -323,6 +323,7 @@ class _ProductViewState extends State<ProductView>
                                   builder: (context) => ProductPayment(
                                     productName: widget.productName,
                                     price: widget.price,
+                                    imageUrl : widget.imageUrl,
                                   ),
                                 ),
                               );

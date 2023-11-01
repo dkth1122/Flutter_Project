@@ -10,10 +10,12 @@ import '../join/login_email.dart';
 class ProductPayment extends StatefulWidget {
   final String productName;
   final String price;
+  final String imageUrl;
 
   const ProductPayment({
     required this.productName,
     required this.price,
+    required this.imageUrl
   });
 
   @override
@@ -26,6 +28,7 @@ class _ProductPaymentState extends State<ProductPayment> {
   String selectedCoupon = '--------------------';
   double discountPercentage = 0.0;
   int discountedPrice = 0;
+  bool agreedToTerms = false;
 
   @override
   void initState() {
@@ -89,6 +92,13 @@ class _ProductPaymentState extends State<ProductPayment> {
         : Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
+        Image.network(
+          widget.imageUrl,
+          width: 100,
+          height: 100,
+          fit: BoxFit.cover,
+        ),
+        const SizedBox(height :20),
         Text(
           '${widget.productName}',
           style: const TextStyle(fontSize: 20),
@@ -154,23 +164,81 @@ class _ProductPaymentState extends State<ProductPayment> {
         Center(
           child: Text(
             '상품가: ${NumberFormat('###,###').format(int.parse(widget.price))}원  할인가: ${NumberFormat('###,###').format(discountPercentage)}원 ',
-            style: const TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 13),
             textAlign: TextAlign.center,
           ),
         ),
         Center(
           child: Text(
             '총 ${NumberFormat('###,###').format(int.parse(widget.price) - discountPercentage)}원',
-            style: const TextStyle(fontSize: 30),
+            style: const TextStyle(fontSize: 25),
             textAlign: TextAlign.center,
           ),
         ),
         SizedBox(height: 10), // 마진 추가
         Divider(color: Colors.grey),
+        Row(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Text(
+                  '환불 규정 유의사항 동의\n· 전문가가 의뢰인의 주문 의뢰 내용에 맞게 용역을 제공하는 맞춤형 상품의 경우, 가분하거나 재판매하기 어려운 성격의 상품입니다. 주문 의뢰 내용에 따라 용역 등의 작업이 진행된 이후에는 「전자상거래법」 제17조 2항에 따라 원칙적으로 청약철회가 제한됩니다. 의뢰인은 서비스 상세페이지에 명시된 취소·환불 규정 또는 전문가와 별도 합의한 내용에 따라 청약철회를 요청할 수 있습니다.\n· 디지털 형태로 제작된 콘텐츠를 제공하는 상품의 경우, 콘텐츠 제공이 개시되면 서비스 제공이 완료된 것으로 간주합니다. 콘텐츠 제공이 개시된 이후에는 「전자상거래법」 제17조 2항에 따라 원칙적으로 청약철회가 제한됩니다. 의뢰인은 서비스 상세페이지에 등록된 디지털 콘텐츠의 일부를 미리 확인한 후 서비스를 구매할 수 있습니다.',
+                  style: TextStyle(fontSize: 13, color: Colors.grey),
+                ),
+              ),
+            ),
+          ],
+        ),
+        Row(
+          children: [
+            Expanded(
+              child: TextButton(
+                onPressed: () {
+                  setState(() {
+                    agreedToTerms = !agreedToTerms;
+                  });
+                },
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text('위 내용을 확인하였고, 결제에 동의합니다.', style: TextStyle(fontSize: 15, color: Colors.black),),
+                ),
+              ),
+            ),
+            Checkbox(
+              value: agreedToTerms,
+              onChanged: (value) {
+                setState(() {
+                  agreedToTerms = value!;
+                });
+              },
+            ),
+          ],
+        ),
         Center(
           child: ElevatedButton(
             onPressed: () {
-              // TODO: 결제 처리를 위한 함수 호출 또는 네비게이션 추가
+              if (!agreedToTerms) {
+                // 필수항목 체크해주세요 알림
+                showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text('필수 항목'),
+                      content: Text('필수 항목을 체크해주세요.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          child: Text('닫기'),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              } else {
+                // 결제 처리를 위한 함수 호출 또는 네비게이션 추가
+              }
             },
             child: Text(
               '결제하기',
