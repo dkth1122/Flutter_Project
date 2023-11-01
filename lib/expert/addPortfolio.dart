@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 
 class PortfolioItem {
@@ -36,8 +38,13 @@ class _AddPortfolioState extends State<AddPortfolio> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController imageUrlController = TextEditingController();
+
   String selectedCategory = "UX 기획";
   List<String> selectedHashtags = []; // 선택한 해시태그 목록
+
+  // 이미지 파일 경로를 저장하는 변수
+  String? imagePath;
+
 
   DateTime? startDate;
   DateTime? endDate;
@@ -83,6 +90,18 @@ class _AddPortfolioState extends State<AddPortfolio> {
       "#데이터·ML·DL 직군",
     ],
   };
+
+  // 이미지 선택 메서드
+  void _selectThumbnailImage(BuildContext context) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.getImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        imagePath = pickedFile.path;
+      });
+    }
+  }
 
   List<PortfolioItem> portfolioItems = [];
 
@@ -160,6 +179,22 @@ class _AddPortfolioState extends State<AddPortfolio> {
                 ),
               ),
               SizedBox(height: 12.0),
+              Text("썸네일 이미지 선택", style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 12.0),
+              imagePath != null
+                  ? Image.file(
+                File(imagePath!),
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              )
+                  : ElevatedButton(
+                onPressed: () {
+                  _selectThumbnailImage(context);
+                },
+                child: Text('이미지 선택'),
+              ),
+
               TextField(
                 controller: imageUrlController,
                 decoration: InputDecoration(
@@ -274,6 +309,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
                       titleController.clear();
                       descriptionController.clear();
                       imageUrlController.clear();
+
                       startDate = null;
                       endDate = null;
                       customer = "";
@@ -457,7 +493,6 @@ class _AddPortfolioState extends State<AddPortfolio> {
                   Navigator.of(context).pop();
                 },
               ),
-
               // 다른 카테고리 항목 추가
             ],
           ),
