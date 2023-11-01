@@ -102,8 +102,12 @@ class _BottomBarState extends State<BottomBar> {
     return BottomAppBar(
       color: bottomAppBarColor, // BottomAppBar의 배경색을 변수에 따라 변경
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
+          IconButton(
+            onPressed: (){},
+            icon: Icon(Icons.person)
+          ),
           GestureDetector(
             onPanStart: (details) {
               setState(() {
@@ -162,6 +166,7 @@ class _BottomBarState extends State<BottomBar> {
               ),
             ),
           ),
+          Text("하이")
         ],
       ),
     );
