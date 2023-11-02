@@ -47,6 +47,7 @@ class _MyPageState extends State<MyPage> {
         if (snap.hasData) {
           data = snap.data!.docs[0].data() as Map<String, dynamic>;
           isExpert = data['status'] == 'E';
+          // 이 부분에서 isExpert 값을 설정합니다.
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,7 +58,6 @@ class _MyPageState extends State<MyPage> {
                     isExpert ? '전문가' : '의뢰인',
                     style: TextStyle(
                       backgroundColor: Colors.yellow,
-                      // borderRadius: BorderRadius.circular(4.0),
                     ),
                   ),
                   Text(
@@ -92,7 +92,6 @@ class _MyPageState extends State<MyPage> {
       },
     );
   }
-
   void _toggleExpertStatus() {
     String newStatus = isExpert ? 'C' : 'E';
 
