@@ -59,12 +59,28 @@ class _ChatListState extends State<ChatList> {
 
         final chatList = snap.data?.docs;
 
+
+        if (chatList == null || chatList.isEmpty) {
+          return Center(child: Text('No chats available'));
+        }
+        // "status" 필드가 'D'인 채팅을 필터링
+        final filteredChatList = chatList.where((document) {
+          final data = document.data() as Map<String, dynamic>?;
+          if (data == null || (!data.containsKey('user1') && !data.containsKey('user2'))) {
+            return false;
+          }
+
+          final status = data['status'] as String?;
+          return status != 'D';
+        }).toList();
+
+
         return chatList == null || chatList.isEmpty
             ? Center(child: Text('No chats available'))
             : ListView.builder(
-          itemCount: chatList.length,
+          itemCount: filteredChatList.length,
           itemBuilder: (context, index) {
-            final document = chatList[index];
+            final document = filteredChatList[index];
             final data = document.data() as Map<String, dynamic>?;
             if (data == null ||
                 (!data.containsKey('user1') && !data.containsKey('user2'))) {
@@ -80,14 +96,11 @@ class _ChatListState extends State<ChatList> {
                 chatTitle = '$user1Value 님과의 채팅' ?? "No User";
               }
 
-
               String roomName1 = '$user1' + '_' + '${data['user1'] as String?}';
               String roomName2 = '${data['user1'] as String?}' + '_' + '$user1';
 
               String roomName3 = '${data['user2'] as String?}' + '_' + '$user1';
               String roomName4 = '$user1' + '_' + '${data['user2'] as String?}';
-
-
 
               print('$roomName1');
               print('$roomName2');
@@ -137,11 +150,13 @@ class _ChatListState extends State<ChatList> {
                           // 이제 lastMessageText 또는 lastMessageImageUrl을 사용할 수 있습니다.
                           if (lastMessageText != null) {
                             lastMessages[roomName] = lastMessageText;
-                            print("맵 ===> $lastMessages");
                           } else if (lastMessageImageUrl != null) {
                             // 이미지 처리
+                            lastMessageText = "이미지를 보냈습니다.";
+                            lastMessages[roomName] = lastMessageText;
                           } else {
-                            // 메시지가 없을 때 처리
+                            lastMessageText = "메시지가 없습니다."; // 예를 들어, 이미지 또는 텍스트가 없을 때
+                            lastMessages[roomName] = lastMessageText;
                           }
                         }
                       });
@@ -166,6 +181,10 @@ class _ChatListState extends State<ChatList> {
                         );
                         // ChatApp에서 돌아왔을 때 메시지를 읽었음을 표시
                         await _markMessagesAsRead(document.id);
+                      },
+                      onLongPress: () {
+                        // 채팅방을 나가기 위한 확인 대화 상자 표시
+                        _showLeaveChatRoomDialog(context, document.id);
                       },
                       child: Padding(
                         padding: EdgeInsets.all(16),
@@ -194,7 +213,7 @@ class _ChatListState extends State<ChatList> {
                                   SizedBox(height: 4),
                                   // 서브컬렉션의 필드 값을 이용하여 마지막 메시지 설정
                                   Text(
-                                    lastMessages[document.id] ?? '',
+                                    lastMessages[document.id] ?? '이미지를 보냈습니다.',
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey,
@@ -213,6 +232,7 @@ class _ChatListState extends State<ChatList> {
                                   ),
                                 ),
                                 SizedBox(height: 8),
+                                //알림용,,,
                                 CircleAvatar(
                                   radius: 16,
                                   backgroundColor: Color(0xFFFCAF58),
@@ -243,6 +263,7 @@ class _ChatListState extends State<ChatList> {
   }
 
 
+
   Future<void> _markMessagesAsRead(String roomId) async {
     final myId = user1; // 현재 사용자의 ID를 가져오는 방법을 구현해야 합니다.
     final messagesRef =
@@ -260,4 +281,38 @@ class _ChatListState extends State<ChatList> {
       });
     }
   }
+
+  void _showLeaveChatRoomDialog(BuildContext context, String roomId) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('채팅방 나가기'),
+          content: Text('정말로 이 채팅방을 나가시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // "status" 필드를 "D"로 설정하여 채팅방 비활성화
+                FirebaseFirestore.instance
+                    .collection('chat')
+                    .doc(roomId)
+                    .update({'status': 'D'})
+                    .then((value) {
+                  Navigator.of(context).pop();
+                });
+              },
+              child: Text('나가기'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('취소'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 }
