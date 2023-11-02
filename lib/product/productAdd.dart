@@ -39,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final ImagePicker _picker = ImagePicker();
   String imageUrl = "";
   final TextEditingController _cnt = TextEditingController();
-  final TextEditingController _user = TextEditingController();
   String user = "";
 
   @override
@@ -79,6 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
         'cnt': 0,
         'user': user,
         'sendTime': FieldValue.serverTimestamp(),
+        'likeCnt' : 0
       });
 
       _pName.clear();

@@ -60,7 +60,7 @@ class _ProductViewState extends State<ProductView>
     FirebaseFirestore.instance
         .collection('like')
         .where('user', isEqualTo: sessionId)
-        .where('productName', isEqualTo: widget.productName)
+        .where('pName', isEqualTo: widget.productName)
         .get()
         .then((QuerySnapshot snapshot) {
       setState(() {
@@ -139,14 +139,13 @@ class _ProductViewState extends State<ProductView>
 
       // 로그인이 되지 않은 경우에만 알림창 표시 후 함수 종료
       _showLoginAlert(context);
-
       return;
     }
 
     FirebaseFirestore.instance
         .collection('like')
         .where('user', isEqualTo: user)
-        .where('productName', isEqualTo: widget.productName)
+        .where('pName', isEqualTo: widget.productName)
         .get()
         .then((QuerySnapshot snapshot) {
       if (snapshot.docs.isNotEmpty) {
@@ -154,14 +153,38 @@ class _ProductViewState extends State<ProductView>
           setState(() {
             _isFavorite = false;
           });
+
+          // 좋아요 삭제 후 product 테이블 업데이트
+          FirebaseFirestore.instance
+              .collection('product')
+              .where('pName', isEqualTo: widget.productName)
+              .get()
+              .then((QuerySnapshot snapshot) {
+            snapshot.docs.forEach((document) {
+              final likeCount = document['likeCnt'] as int;
+              document.reference.update({'likeCnt': likeCount - 1});
+            });
+          });
         });
       } else {
         FirebaseFirestore.instance.collection('like').add({
           'user': user,
-          'productName': widget.productName,
+          'pName': widget.productName,
         }).then((value) {
           setState(() {
             _isFavorite = true;
+          });
+
+          // 좋아요 추가 후 product 테이블 업데이트
+          FirebaseFirestore.instance
+              .collection('product')
+              .where('pName', isEqualTo: widget.productName)
+              .get()
+              .then((QuerySnapshot snapshot) {
+            snapshot.docs.forEach((document) {
+              final likeCount = document['likeCnt'] as int;
+              document.reference.update({'likeCnt': likeCount + 1});
+            });
           });
         });
       }
@@ -543,7 +566,7 @@ class _ProductViewState extends State<ProductView>
                     SizedBox(width: 8),
                     IconButton(
                       icon: Icon(Icons.send),
-                      color: Color(0xff328772),
+                      color: Color(0xFF4E598C),
                       onPressed: () {
                         String review = reviewController.text;
                         // 후기 전송 기능 구현
