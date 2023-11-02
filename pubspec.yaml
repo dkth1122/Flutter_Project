@@ -53,6 +53,8 @@ dependencies:
   http:
   cupertino_icons: ^1.0.2
   carousel_slider:
+  flutter_native_splash: ^2.3.5
+  iamport_flutter: ^0.10.0
 
 dev_dependencies:
   flutter_test:
