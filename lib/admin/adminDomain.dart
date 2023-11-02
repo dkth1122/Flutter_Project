@@ -54,6 +54,18 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Align(
+                alignment: Alignment.center,
+                child: Text(
+                  '오늘도 파이팅!',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            ],
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

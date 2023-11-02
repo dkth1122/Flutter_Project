@@ -46,6 +46,7 @@ class _AdminUserState extends State<AdminUser> {
               children: snapshot.data!.docs.map((DocumentSnapshot document) {
                 Map<String, dynamic> data = document.data() as Map<String, dynamic>;
                 String userId = document.id;
+                String uId = data['userId'];
                 String name = data['name'] ?? '이름 없음';
                 String nick = data['nick'] ?? '';
                 String email = data['email'];
@@ -67,7 +68,7 @@ class _AdminUserState extends State<AdminUser> {
                   trailing: IconButton(
                     icon: Icon(Icons.search_outlined),
                     onPressed: () {
-                      AdminUserView user = AdminUserView(userId, name, nick, email, birth, cdatetime, banYn, delYn, status,);
+                      AdminUserView user = AdminUserView(userId, uId, name, nick, email, birth, cdatetime, banYn, delYn, status,);
                       Navigator.push(
                         context,
                         MaterialPageRoute(
