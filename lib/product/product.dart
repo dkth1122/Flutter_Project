@@ -31,10 +31,11 @@ class _ProductState extends State<Product> {
     '기타',
   ];
   String selectedCategory = '전체';
-  String selectedSort = '조회수 높은 순'; // 선택된 정렬 방식
+  String selectedSort = '기본 순'; // 선택된 정렬 방식
 
   // 정렬 방식 목록
   List<String> sortOptions = [
+    '기본 순',
     '조회수 높은 순',
     '최신 등록 순',
     '평점 높은 순',
