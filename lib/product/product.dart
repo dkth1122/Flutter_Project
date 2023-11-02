@@ -18,6 +18,7 @@ class Product extends StatefulWidget {
 }
 
 class _ProductState extends State<Product> {
+  int selectedCategoryIndex = -1;
   late Stream<QuerySnapshot>? productStream = null;
   List<String> categories = [
     'UX기획',
@@ -57,7 +58,7 @@ class _ProductState extends State<Product> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("상품페이지"),
-        backgroundColor: Color(0xff328772),
+        backgroundColor: Color(0xFF4E598C),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -82,23 +83,42 @@ class _ProductState extends State<Product> {
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            child: Row(
-              children: categories.map((String category) {
-                return Expanded(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        selectedCategory = category;
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: selectedCategory == category ? Color(0xfff48752) : Color(0xff328772),
-                      minimumSize: Size(double.infinity, 90), // 버튼의 크기를 조정하려면 여기서 높이 값을 조정해주세요
+            child: Container(
+              child: Row(
+                children: List.generate(categories.length, (index) {
+                  return Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          if (selectedCategoryIndex == index) {
+                            selectedCategory = '전체'; // 카테고리 선택 해제
+                            selectedCategoryIndex = -1; // 선택된 카테고리 인덱스 초기화
+                          } else {
+                            selectedCategory = categories[index]; // 선택한 카테고리로 업데이트
+                            selectedCategoryIndex = index; // 선택한 카테고리 인덱스로 업데이트
+                          }
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: selectedCategoryIndex == index ? Color(0xFFFCAF58) : Color(0xFF4E598C),
+                        minimumSize: Size(double.infinity, 90),
+                      ),
+                      child: Text(categories[index]),
                     ),
-                    child: Text(category),
-                  ),
-                );
-              }).toList(),
+                  );
+                }),
+              ),
+            ),
+
+          ),
+          Container(
+            height: 100, // 광고 영역의 높이를 150으로 고정
+            color: Colors.black, // 광고 영역의 배경색 설정
+            alignment: Alignment.center, // 광고 내용을 가운데로 정렬
+            child: Text(
+              '여기에 광고를 한다면 매출이 얼마나 오를까 \n 02-000-0000',
+              style: TextStyle(fontSize: 18, color: Colors.white),
+              textAlign: TextAlign.center,
             ),
           ),
           Container(
@@ -184,19 +204,16 @@ class _ProductState extends State<Product> {
                         child: Container(
                           width: 150,
                           height: 100,
-                          padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black, width: 1.0),
+                            border: Border.all(color: Colors.grey, width: 1.0),
                           ),
                           child: Stack(
                             children: [
-                              Container(
+                              Image.network(
+                                imageUrl,
                                 width: double.infinity,
                                 height: double.infinity,
-                                child: Image.network(
-                                  imageUrl,
-                                  fit: BoxFit.cover, // 이미지가 위에 딱 붙도록 설정
-                                ),
+                                fit: BoxFit.cover
                               ),
                               Positioned(
                                 bottom: 0, // 박스의 아래에 위치하도록 수정
@@ -243,7 +260,7 @@ class _ProductState extends State<Product> {
                                         '$formattedPrice 원',
                                         style: const TextStyle(
                                           color: Colors.white,
-                                          fontSize:10,
+                                          fontSize: 10,
                                         ),
                                       ),
                                     ),
@@ -254,6 +271,7 @@ class _ProductState extends State<Product> {
                           ),
                         ),
                       );
+
                     },
                   );
                 },

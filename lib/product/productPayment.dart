@@ -64,7 +64,7 @@ class _ProductPaymentState extends State<ProductPayment> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('결제 페이지'),
-        backgroundColor: Color(0xff328772),
+        backgroundColor: Color(0xFF4E598C),
       ),
       body: Center(
     child: user == "없음" || user == null
@@ -84,7 +84,7 @@ class _ProductPaymentState extends State<ProductPayment> {
           },
           child: const Text('로그인 하러 가기'),
           style: ElevatedButton.styleFrom(
-            primary: Color(0xfff48752),
+            primary: Color(0xFFFCAF58),
           ),
         ),
       ],
@@ -245,7 +245,7 @@ class _ProductPaymentState extends State<ProductPayment> {
               style: TextStyle(color: Colors.white),
             ),
             style: ElevatedButton.styleFrom(
-              primary: Color(0xfff48752),
+              primary: Color(0xFFFCAF58),
             ),
           ),
         ),

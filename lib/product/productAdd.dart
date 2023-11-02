@@ -155,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
           "상품등록",
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Color(0xff328772),
+        backgroundColor: Color(0xFF4E598C),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -195,7 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onPressed: uploadImage,
                       child: Text('이미지 업로드'),
                       style: ElevatedButton.styleFrom(
-                        primary: Color(0xfff48752),
+                        primary: Color(0xFFFCAF58),
                       ),
                     ),
                   ],
@@ -223,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: _addProduct,
                   child: Text("상품 추가"),
                   style: ElevatedButton.styleFrom(
-                    primary: Color(0xfff48752),
+                    primary: Color(0xFFFCAF58),
                   ),
                 ),
               ),
