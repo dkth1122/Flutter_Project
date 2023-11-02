@@ -8,8 +8,8 @@ class AlertControl extends StatefulWidget {
 }
 
 class _AlertControlState extends State<AlertControl> {
-  bool isPushNotificationEnabled = true; // 푸시 알림 상태 변수
-  bool isEmailNotificationEnabled = true; // 이메일 알림 상태 변수
+  bool pushFlg = false; // 푸시 알림 상태 변수
+  bool emailFlg = false; // 이메일 알림 상태 변수
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -62,10 +62,10 @@ class _AlertControlState extends State<AlertControl> {
                 title: Text("푸시 알림"),
                 subtitle: Text("푸시 알림을 설정합니다."),
                 trailing: Switch(
-                  value: isPushNotificationEnabled, // 푸시 알림 상태 변수 사용
+                  value: pushFlg, // 푸시 알림 상태 변수 사용
                   onChanged: (value) {
                     setState(() {
-                      isPushNotificationEnabled = value; // 푸시 알림 상태 업데이트
+                      pushFlg = value; // 푸시 알림 상태 업데이트
                     });
                   },
                 ),
@@ -74,10 +74,10 @@ class _AlertControlState extends State<AlertControl> {
                 title: Text("이메일 알림"),
                 subtitle: Text("이메일 알림을 설정합니다."),
                 trailing: Switch(
-                  value: true, // 이메일 알림 설정 여부에 따라 변경
+                  value: emailFlg, // 이메일 알림 설정 여부에 따라 변경
                   onChanged: (value) {
                     setState(() {
-                      value = !value;
+                      emailFlg = value;
                     });
                   },
                 ),
