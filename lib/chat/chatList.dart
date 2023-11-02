@@ -11,9 +11,9 @@ class ChatList extends StatefulWidget {
 }
 
 class _ChatListState extends State<ChatList> {
-
   String user1 = "";
   String user2 = "";
+  Map<String, String> lastMessages = {}; // 각 채팅방의 마지막 메시지를 저장할 맵
 
   @override
   void initState() {
@@ -21,11 +21,8 @@ class _ChatListState extends State<ChatList> {
     UserModel um = Provider.of<UserModel>(context, listen: false);
     user2 = "UserB";
     if (um.isLogin) {
-      // 사용자가 로그인한 경우
       user1 = um.userId!;
-
     } else {
-      // 사용자가 로그인하지 않은 경우
       user1 = "없음";
       print("로그인 안됨");
     }
@@ -34,19 +31,22 @@ class _ChatListState extends State<ChatList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(title: Text("채팅 목록"), backgroundColor: Color(0xFFFCAF58),),
-        body: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(30),
-            child: Column(
-              children: [
-                SizedBox(height: 10),
-                Expanded(child: _listChat()),
-              ],
-            ),
+      appBar: AppBar(
+        title: Text("채팅 목록"),
+        backgroundColor: Color(0xFFFCAF58),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(30),
+          child: Column(
+            children: [
+              SizedBox(height: 10),
+              Expanded(child: _listChat()),
+            ],
           ),
         ),
-      );
+      ),
+    );
   }
 
   Widget _listChat() {
@@ -66,7 +66,8 @@ class _ChatListState extends State<ChatList> {
           itemBuilder: (context, index) {
             final document = chatList[index];
             final data = document.data() as Map<String, dynamic>?;
-            if (data == null || (!data.containsKey('user1') && !data.containsKey('user2'))) {
+            if (data == null ||
+                (!data.containsKey('user1') && !data.containsKey('user2'))) {
               return Container();
             }
 
@@ -80,31 +81,79 @@ class _ChatListState extends State<ChatList> {
                 chatTitle = '$user1Value 님과의 채팅' ?? "No User";
               }
 
+              String roomName1 = '$user1' + '_' + '$user2Value';
+              String roomName2 = '$user2Value' + '_' + '$user1';
+
+
               // 이 부분에서 서브컬렉션의 필드 값을 가져올 수 있음
-              return FutureBuilder<QuerySnapshot>(
-                future: FirebaseFirestore.instance.collection('chat').doc(document.id).collection('messages').get(),
-                builder: (context, messageSnap) {
-                  if (messageSnap.connectionState == ConnectionState.waiting) {
+              return StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('chat')
+                    .where('roomId', whereIn: [roomName1, roomName2])
+                    .snapshots(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
                     return CircularProgressIndicator();
                   }
-                  final messages = messageSnap.data?.docs;
 
+                  final chatRooms = snapshot.data?.docs;
 
-                  // 이제 messages 리스트에 서브컬렉션의 문서 목록이 있...없던데..
+                  if (chatRooms != null && chatRooms.isNotEmpty) {
+                    for (var room in chatRooms) {
+                      final roomName = room['roomId'];
+
+                      // 해당 채팅방에 대한 마지막 메시지 쿼리
+                      FirebaseFirestore.instance
+                          .collection('chat')
+                          .doc(roomName)
+                          .collection('message')
+                          .orderBy('sendTime', descending: true)
+                          .limit(1) // 마지막 메시지 1개만 가져오도록 설정
+                          .get()
+                          .then((QuerySnapshot querySnapshot) {
+                        if (querySnapshot.docs.isNotEmpty) {
+                          final lastMessage = querySnapshot.docs[0];
+                          final lastMessageData =
+                          lastMessage.data() as Map<String, dynamic>;
+
+                          String lastMessageText =
+                          lastMessageData['text'] as String;
+                          var lastMessageImageUrl =
+                          lastMessageData['imageUrl'];
+
+                          // 이제 lastMessageText 또는 lastMessageImageUrl을 사용할 수 있습니다.
+                          if (lastMessageText != null) {
+                            lastMessages[roomName] = lastMessageText;
+                            setState(() {}); // 상태 업데이트
+                          } else if (lastMessageImageUrl != null) {
+                            // 이미지 처리
+                          } else {
+                            // 메시지가 없을 때 처리
+                          }
+                        }
+                      });
+                    }
+                  }
+
                   return Card(
                     elevation: 3,
-                    margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    margin:
+                    EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: InkWell(
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async {
+                        await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ChatApp(roomId: document.id),
+                            builder: (context) =>
+                                ChatApp(roomId: document.id),
                           ),
                         );
+                        // ChatApp에서 돌아왔을 때 메시지를 읽었음을 표시
+                        await _markMessagesAsRead(document.id);
                       },
                       child: Padding(
                         padding: EdgeInsets.all(16),
@@ -119,7 +168,8 @@ class _ChatListState extends State<ChatList> {
                             SizedBox(width: 16),
                             Expanded(
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
                                 children: [
                                   Text(
                                     chatTitle,
@@ -132,7 +182,7 @@ class _ChatListState extends State<ChatList> {
                                   SizedBox(height: 4),
                                   // 서브컬렉션의 필드 값을 이용하여 마지막 메시지 설정
                                   Text(
-                                    '마지막 메시지: ${getLastMessage(messages!)}',
+                                    lastMessages[document.id] ?? '',
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: Colors.grey,
@@ -180,36 +230,22 @@ class _ChatListState extends State<ChatList> {
     );
   }
 
-  String getLastMessage(List<QueryDocumentSnapshot> messages) {
-    if (messages == null || messages.isEmpty) {
-      return '메시지가 없습니다1.';
-    }
 
-    // 서브컬렉션의 메시지 목록을 정렬해서 가장 마지막 메시지의 내용을 가져옴
-    final sortedMessages = messages
-        .map((message) => message.data() as Map<String, dynamic>)
-        .where((messageData) => messageData['text'] != null || messageData['imageUrl'] != null)
-        .toList();
+  Future<void> _markMessagesAsRead(String roomId) async {
+    final myId = user1; // 현재 사용자의 ID를 가져오는 방법을 구현해야 합니다.
+    final messagesRef =
+    FirebaseFirestore.instance.collection('chat').doc(roomId).collection(
+        'message');
 
-    if (sortedMessages.isEmpty) {
-      return '메시지가 없습니다2.';
-    }
+    final messagesQuery = await messagesRef
+        .where('user', isEqualTo: myId)
+        .where('isRead', isEqualTo: false)
+        .get();
 
-    final lastMessageData = sortedMessages.last;
-    final lastMessageText = lastMessageData['text'] as String?;
-    final lastMessageImageUrl = lastMessageData['imageUrl'] as String?;
-
-    if (lastMessageText != null) {
-      return lastMessageText;
-    } else if (lastMessageImageUrl != null) {
-      return '이미지를 보냈습니다.';
-    } else {
-      return '메시지가 없습니다3.';
+    for (final messageDoc in messagesQuery.docs) {
+      await messageDoc.reference.update({
+        'isRead': true,
+      });
     }
   }
-
-
-
-
-
 }
