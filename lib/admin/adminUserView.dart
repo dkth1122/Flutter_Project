@@ -2,7 +2,30 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
-import 'adminUserView.dart';
+class AdminUserView {
+  final String userId;
+  final String name;
+  final String nick;
+  final String email;
+  final String birth;
+  final String cdatetime;
+  final String banYn;
+  final String delYn;
+  final String status;
+
+
+  AdminUserView(
+      this.userId,
+      this.name,
+      this.nick,
+      this.email,
+      this.birth,
+      this.cdatetime,
+      this.banYn,
+      this.delYn,
+      this.status,
+      );
+}
 
 class AdminUser extends StatefulWidget {
   @override
@@ -17,10 +40,7 @@ class _AdminUserState extends State<AdminUser> {
     super.initState();
     Firebase.initializeApp().then((value) {
       setState(() {
-        userListStream = FirebaseFirestore.instance.collection('userList')
-            .where('name', isNotEqualTo: '관리자계정') // '관리자계정'인 경우 제외
-            .orderBy('name') // 이름(name) 기준으로 오름차순 정렬
-            .snapshots();
+        userListStream = FirebaseFirestore.instance.collection('userList').snapshots();
       });
     });
   }
@@ -65,9 +85,19 @@ class _AdminUserState extends State<AdminUser> {
                   ),
                   subtitle: Text(userId),
                   trailing: IconButton(
-                    icon: Icon(Icons.search_outlined),
+                    icon: Icon(Icons.edit),
                     onPressed: () {
-                      AdminUserView user = AdminUserView(userId, name, nick, email, birth, cdatetime, banYn, delYn, status,);
+                      AdminUserView user = AdminUserView(
+                        userId,
+                        name,
+                        nick,
+                        email,
+                        birth,
+                        cdatetime,
+                        banYn,
+                        delYn,
+                        status,
+                      );
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -81,6 +111,37 @@ class _AdminUserState extends State<AdminUser> {
             );
           }
         },
+      ),
+    );
+  }
+}
+
+class AdminUserViewPage extends StatelessWidget {
+  final AdminUserView user;
+
+  AdminUserViewPage({required this.user});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('사용자 상세 정보'),
+        backgroundColor: Color(0xFF4E598C),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text('회원 번호 : ${user.userId}'),
+            Text('이름 : ${user.name}'),
+            Text('닉네임 : ${user.nick}'),
+            Text('이메일 : ${user.email}'),
+            Text('생일 : ${user.birth}'),
+            Text('가입일 : ${user.cdatetime}'),
+            Text('밴여부: ${user.banYn}'),
+            Text('삭제여부: ${user.delYn}'),
+          ],
+        ),
       ),
     );
   }
