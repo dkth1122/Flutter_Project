@@ -159,39 +159,33 @@ class _LoginPageState extends State<LoginPage> {
     if (userDocs.docs.isNotEmpty) {
       final userDoc = userDocs.docs.first;
       final delYn = userDoc['delYn'];
+      final banYn = userDoc['banYn'];
 
       if (delYn == 'Y') {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('탈퇴한 사용자입니다.')),
         );
+      }else if (banYn == 'Y') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('정지된 사용자입니다. 관리자에게 문의 해주세요')),
+        );
       } else {
         Provider.of<UserModel>(context, listen: false).login(id);
 
-        final banDocs = await _fs
-            .collection('ban')
-            .where('uId', isEqualTo: id)
-            .get();
-
-        if (banDocs.docs.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('정지된 계정입니다. 고객센터에게 문의해주세요.')),
+        if (id == 'admin') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AdminDomainPage(),
+            ),
           );
         } else {
-          if (id == 'admin') {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AdminDomainPage(),
-              ),
-            );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => HomePage(),
-              ),
-            );
-          }
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(),
+            ),
+          );
         }
 
         _userId.clear();
