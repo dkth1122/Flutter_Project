@@ -196,8 +196,8 @@ class _ProductViewState extends State<ProductView>
     }
 
     // user1과 user2 중에서 큰 값을 선택하여 user1에 할당
-    String user1 = user.compareTo(um.userId.toString()) > 0 ? chatUser : um.userId.toString();
-    String user2 = user.compareTo(um.userId.toString()) > 0 ? um.userId.toString() : chatUser;
+    String user1 = chatUser.compareTo(um.userId.toString()) > 0 ? chatUser : um.userId.toString();
+    String user2 = chatUser.compareTo(um.userId.toString()) > 0 ? um.userId.toString() : chatUser;
 
     // Firestore 데이터베이스에 채팅방을 생성하는 함수
     Future<void> createChatRoom(String roomId, String user1, String user2) async {
