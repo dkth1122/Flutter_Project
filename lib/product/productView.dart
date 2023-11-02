@@ -94,6 +94,10 @@ class _ProductViewState extends State<ProductView>
     });
   }
 
+  void hideKeyboard() {
+    FocusScope.of(context).requestFocus(FocusNode());
+  }
+
   void _showLoginAlert(BuildContext context) {
     showDialog(
       context: context,
@@ -264,41 +268,52 @@ class _ProductViewState extends State<ProductView>
         title: const Text(
           "상세보기",
         ),
+        bottom:
+        TabBar(
+          controller: _tabController,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.black,
+          indicatorColor: Colors.white,
+          tabs: const [
+            Tab(text: '상품 상세'),
+            Tab(text: '후기'),
+          ],
+          onTap: (int index) {
+            if (index == 0) {
+              // '상품 상세' 탭을 클릭할 때 키보드 숨김
+              hideKeyboard();
+            }
+          },
+        ),
         backgroundColor: Color(0xff328772),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          TabBar(
-            controller: _tabController,
-            labelColor: Colors.black,
-            indicatorColor: Color(0xfff48752),
-            tabs: const [
-              Tab(text: '상품 상세'),
-              Tab(text: '후기'),
-            ],
-          ),
-          SizedBox(height: 10),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildProductDetailTab(),
-                  _buildReviewTab(),
-                ],
-              ),
+      body: Container(
+        padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+        child: TabBarView(
+          controller: _tabController,
+          children: [
+            ListView(
+              children: [
+                SizedBox(height: 20,),
+                _buildProductDetailTab(),
+              ],
             ),
-          ),
-        ],
+            ListView(
+              children: [
+                SizedBox(height: 20,),
+                _buildReviewTab(),
+              ],
+            ),
+          ],
+        ),
       ),
+      extendBody: true, // body를 침범하도록 함
       bottomNavigationBar: BottomAppBar(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Expanded(
-              flex: 8,
+            Container(
+              width: 300,
               child: ElevatedButton(
                 onPressed: () {
                   showDialog(
@@ -347,8 +362,8 @@ class _ProductViewState extends State<ProductView>
                 ),
               ),
             ),
-            Expanded(
-              flex: 2,
+            Container(
+              margin: EdgeInsets.fromLTRB(0, 0, 20, 0),
               child: IconButton(
                 onPressed: () {
                   _toggleFavorite();
@@ -439,31 +454,18 @@ class _ProductViewState extends State<ProductView>
                             final userNick=userData['nick'] as String;
 
                             return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children:[
 /*                                CircleAvatar( // 원 모양 프로필 이미지
                                   radius: 40,
                                   backgroundImage: AssetImage('dog4.png'),
                                   *//*NetworkImage(userProfileImage),*//*
                                 ),*/
-                                SizedBox(width :8),
                                 Text(userNick), // 닉네임 출력
-                                Expanded(
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      TextButton(
-                                        onPressed: () {
-                                          // 버튼이 클릭되었을 때 실행될 코드 작성
-                                          print('버튼이 클릭되었습니다.');
-                                        },
-                                        child: TextButton(
-                                          onPressed: _toggleChat,
-                                          child: Text("1:1문의하기"),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
+                                TextButton(
+                                  onPressed: _toggleChat,
+                                  child: Text("1:1문의하기"),
+                                ),
                               ],
                             );
                           }
@@ -473,17 +475,10 @@ class _ProductViewState extends State<ProductView>
                     ),
 
                     Divider(color :Colors.grey),
-                    Container(
-                      height: 150, // 높이를 100으로 고정
-                      child: ListView.builder(
-                        itemCount: 1,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Text('취소 및 환불 규정\n\n가. 기본 환불 규정\n1. 전문가와 의뢰인의 상호 협의하에 청약 철회 및 환불이 가능합니다.\n2. 작업이 완료된 이후 또는 자료, 프로그램 등 서비스가 제공된 이후에는 환불이 불가합니다.\n( 소비자보호법 17조 2항의 5조. 용역 또는 「문화산업진흥 기본법」 제2조 제5호의 디지털콘텐츠의 제공이 개시된 경우에 해당) \n \n 나. 전문가 책임 사유 \n1. 전문가의 귀책사유로 당초 약정했던 서비스 미이행 혹은 보편적인 관점에서 심각하게 잘못 이행한 경우 결제 금액 전체 환불이 가능합니다. \n\n 다. 의뢰인 책임 사유 \n1. 서비스 진행 도중 의뢰인의 귀책사유로 인해 환불을 요청할 경우, 사용 금액을 아래와 같이 계산 후 총 금액의 10%를 공제하여 환불합니다.\n총 작업량의 1/3 경과 전 : 이미 납부한 요금의 2/3해당액\n총 작업량의 1/2 경과 전 : 이미 납부한 요금의 1/2해당액\n총 작업량의 1/2 경과 후 : 반환하지 않음 \n',
-                            style: TextStyle(
-                              fontSize: 12,
-                            ),
-                          );
-                        },
+                    Text(
+                      '취소 및 환불 규정\n\n가. 기본 환불 규정\n1. 전문가와 의뢰인의 상호 협의하에 청약 철회 및 환불이 가능합니다.\n2. 작업이 완료된 이후 또는 자료, 프로그램 등 서비스가 제공된 이후에는 환불이 불가합니다.\n( 소비자보호법 17조 2항의 5조. 용역 또는 「문화산업진흥 기본법」 제2조 제5호의 디지털콘텐츠의 제공이 개시된 경우에 해당) \n \n 나. 전문가 책임 사유 \n1. 전문가의 귀책사유로 당초 약정했던 서비스 미이행 혹은 보편적인 관점에서 심각하게 잘못 이행한 경우 결제 금액 전체 환불이 가능합니다. \n\n 다. 의뢰인 책임 사유 \n1. 서비스 진행 도중 의뢰인의 귀책사유로 인해 환불을 요청할 경우, 사용 금액을 아래와 같이 계산 후 총 금액의 10%를 공제하여 환불합니다.\n총 작업량의 1/3 경과 전 : 이미 납부한 요금의 2/3해당액\n총 작업량의 1/2 경과 전 : 이미 납부한 요금의 1/2해당액\n총 작업량의 1/2 경과 후 : 반환하지 않음',
+                      style: TextStyle(
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -528,35 +523,37 @@ class _ProductViewState extends State<ProductView>
           ),
           SizedBox(height: 16),
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: reviewController,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: '후기를 입력해주세요',
-                      contentPadding: EdgeInsets.all(16),
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: TextField(
+                        controller: reviewController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: '후기를 입력해주세요',
+                        ),
+                      ),
                     ),
-                  ),
+                    SizedBox(width: 8),
+                    IconButton(
+                      icon: Icon(Icons.send),
+                      color: Color(0xff328772),
+                      onPressed: () {
+                        String review = reviewController.text;
+                        // 후기 전송 기능 구현
+                        // review와 rating을 활용하여 후기 처리
+                      },
+                    ),
+                  ],
                 ),
-                SizedBox(width: 8),
-                IconButton(
-                  icon: Icon(Icons.send),
-                  color: Color(0xff328772),
-                  onPressed: () {
-                    String review = reviewController.text;
-                    // 후기 전송 기능 구현
-                    // review와 rating을 활용하여 후기 처리
-                  },
-                ),
-              ],
-            ),
+              )
+
           ),
           Divider(color :Colors.grey),
         ],
