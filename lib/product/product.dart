@@ -209,65 +209,70 @@ class _ProductState extends State<Product> {
                         child: Stack(
                           children: [
                             Image.network(
-                                imageUrl,
-                                width: double.infinity,
-                                height: double.infinity,
-                                fit: BoxFit.cover
+                              imageUrl,
+                              width: double.infinity,
+                              height: double.infinity,
+                              fit: BoxFit.cover,
                             ),
                             Positioned(
-                              bottom: 0, // 박스의 아래에 위치하도록 수정
+                              bottom: 0,
                               left: 0,
                               right: 0,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ProductView(
-                                            productName: productName,
-                                            price: formattedPrice,
-                                            imageUrl: imageUrl,
+                              child: Container(
+                                padding: EdgeInsets.all(8), // 내용과 상하 좌우 간격 조절
+                                color: Colors.black.withOpacity(0.5), // 검정색 배경 색상 및 불투명도 설정
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ProductView(
+                                              productName: productName,
+                                              price: formattedPrice,
+                                              imageUrl: imageUrl,
+                                            ),
                                           ),
+                                        );
+                                      },
+                                      child: Text(
+                                        productName,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
                                         ),
-                                      );
-                                    },
-                                    child: Text(
-                                      productName,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
                                       ),
                                     ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ProductView(
-                                            productName: productName,
-                                            price: formattedPrice,
-                                            imageUrl: imageUrl,
+                                    GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ProductView(
+                                              productName: productName,
+                                              price: formattedPrice,
+                                              imageUrl: imageUrl,
+                                            ),
                                           ),
+                                        );
+                                      },
+                                      child: Text(
+                                        '$formattedPrice 원',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 10,
                                         ),
-                                      );
-                                    },
-                                    child: Text(
-                                      '$formattedPrice 원',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 10,
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ],
                         ),
+
                       ),
                     );
                   },
