@@ -1,10 +1,29 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import '../firebase_options.dart';
 import '../main.dart';
 import 'adminAd.dart';
 import 'adminBoard.dart';
 import 'adminInquiry.dart';
 import 'adminUser.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Project',
+      home: AdminDomainPage(),
+    );
+  }
+}
 
 class AdminDomainPage extends StatefulWidget {
   @override
@@ -17,7 +36,7 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('관리자 페이지'),
-        backgroundColor: Color(0xff328772),
+        backgroundColor: Color(0xFF4E598C),
         actions: [
           IconButton(
             icon: const Icon(Icons.home),
@@ -47,7 +66,7 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
                 },
                 child: Text('광고 관리'),
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xff328772),
+                  primary: Color(0xFF4E598C),
                 ),
               ),
               ElevatedButton(
@@ -59,7 +78,7 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
                 },
                 child: Text('게시판 관리'),
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xff328772),
+                  primary: Color(0xFF4E598C),
                 ),
               ),
               ElevatedButton(
@@ -71,7 +90,7 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
                 },
                 child: Text('회원 관리'),
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xff328772),
+                  primary: Color(0xFF4E598C),
                 ),
               ),
               ElevatedButton(
@@ -83,7 +102,7 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
                 },
                 child: Text('문의 관리'),
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xff328772),
+                  primary: Color(0xFF4E598C),
                 ),
               ),
             ],

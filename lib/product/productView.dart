@@ -285,7 +285,7 @@ class _ProductViewState extends State<ProductView>
             }
           },
         ),
-        backgroundColor: Color(0xff328772),
+        backgroundColor: Color(0xFF4E598C),
       ),
       body: Container(
         padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -351,7 +351,7 @@ class _ProductViewState extends State<ProductView>
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xfff48752),
+                  primary: Color(0xFFFCAF58),
                 ),
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16.0),

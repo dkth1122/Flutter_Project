@@ -12,7 +12,7 @@ class _AdminBoardState extends State<AdminBoard> {
     return Scaffold(
       appBar: AppBar(
         title: Text('게시판 관리'),
-        backgroundColor: Color(0xff328772),
+        backgroundColor: Color(0xFF4E598C),
       ),
       body: Center(
       ),
