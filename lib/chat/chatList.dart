@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:project_flutter/payment/paymentTest.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
@@ -32,7 +33,18 @@ class _ChatListState extends State<ChatList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("채팅 목록"),
+        title: Row(
+          children: [
+            Text("채팅 목록"),
+            IconButton(onPressed: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                  builder: (context) => Payment())
+              );
+            }, icon: Icon(Icons.move_down))
+          ],
+        ),
         backgroundColor: Color(0xFFFCAF58),
       ),
       body: Center(
@@ -155,7 +167,6 @@ class _ChatListState extends State<ChatList> {
                             lastMessageText = "이미지를 보냈습니다.";
                             lastMessages[roomName] = lastMessageText;
                           } else {
-                            lastMessageText = "메시지가 없습니다."; // 예를 들어, 이미지 또는 텍스트가 없을 때
                             lastMessages[roomName] = lastMessageText;
                           }
                         }
