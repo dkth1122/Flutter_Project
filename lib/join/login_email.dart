@@ -167,20 +167,31 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         Provider.of<UserModel>(context, listen: false).login(id);
 
-        if (id == 'admin') {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AdminDomainPage(),
-            ),
+        final banDocs = await _fs
+            .collection('ban')
+            .where('uId', isEqualTo: id)
+            .get();
+
+        if (banDocs.docs.isNotEmpty) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('정지된 계정입니다. 고객센터에게 문의해주세요.')),
           );
         } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HomePage(),
-            ),
-          );
+          if (id == 'admin') {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => AdminDomainPage(),
+              ),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(),
+              ),
+            );
+          }
         }
 
         _userId.clear();
