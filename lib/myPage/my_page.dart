@@ -311,7 +311,7 @@ class _MyPageState extends State<MyPage> {
                     children: <Widget>[
                       Text(
                         '판매 정보',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        // style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 10),
                       Text(
@@ -331,6 +331,7 @@ class _MyPageState extends State<MyPage> {
                 ),
 
               // 나의 서비스 섹션
+              if(!isExpert)
               Container(
                 padding: EdgeInsets.all(16.0),
                 child: Column(
@@ -338,13 +339,13 @@ class _MyPageState extends State<MyPage> {
                   children: <Widget>[
                     Text(
                       '나의 서비스',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      // style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     ListTile(
                       leading: Icon(Icons.monetization_on), // 아이콘 추가
                       title: Text(
                         '수익 관리',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        // style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       onTap:(){
                         Navigator.of(context).push(MaterialPageRoute(builder: (context) => Revenue()));
@@ -354,7 +355,7 @@ class _MyPageState extends State<MyPage> {
                       leading: Icon(Icons.ad_units), // 아이콘 추가
                       title: Text(
                         '광고 관리',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        // style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       onTap:(){
                         Navigator.of(context).push(MaterialPageRoute(builder: (context) => AdManagement()));
@@ -365,7 +366,7 @@ class _MyPageState extends State<MyPage> {
                       leading: Icon(Icons.add), // 아이콘 추가
                       title: Text(
                         '광고 신청',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        // style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       onTap:(){
                         Navigator.of(context).push(MaterialPageRoute(builder: (context) => AdRequest()));
@@ -375,7 +376,7 @@ class _MyPageState extends State<MyPage> {
                       leading: Icon(Icons.beach_access), // 아이콘 추가
                       title: Text(
                         '휴가 설정',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        // style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       onTap:(){
                         Navigator.of(context).push(MaterialPageRoute(builder: (context) => Vacation()));
@@ -385,7 +386,7 @@ class _MyPageState extends State<MyPage> {
                         leading: Icon(Icons.star), // 아이콘 추가
                         title: Text(
                           '나의 전문가 등급',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          // style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         onTap:() {
                           Navigator.of(context).push(MaterialPageRoute(builder: (
@@ -396,7 +397,7 @@ class _MyPageState extends State<MyPage> {
                       leading: Icon(Icons.portrait), // 아이콘 추가
                       title: Text(
                         '나의 포트폴리오',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        // style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       onTap:(){
                         Navigator.of(context).push(MaterialPageRoute(builder: (context) => Portfolio()));
@@ -406,7 +407,7 @@ class _MyPageState extends State<MyPage> {
                       leading: Icon(Icons.message), // 아이콘 추가
                       title: Text(
                         '메시지 응답 관리',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        // style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       onTap:(){
                         Navigator.of(context).push(MaterialPageRoute(builder: (context) => MessageResponse()));
