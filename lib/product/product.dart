@@ -55,6 +55,9 @@ class _ProductState extends State<Product> {
 
   @override
   Widget build(BuildContext context) {
+
+    List<Map<String, dynamic>> sortedProductList = [];
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("상품페이지"),
@@ -165,10 +168,38 @@ class _ProductState extends State<Product> {
 
                 final productList = snapshot.data!.docs;
 
-                final filteredProductList = productList.where((document) {
+                List<QueryDocumentSnapshot> sortedProductList = List.from(productList);
+
+                sortedProductList = sortedProductList.where((document) {
                   final category = document['category'] as String;
                   return selectedCategory == '전체' || category == selectedCategory;
                 }).toList();
+
+                if (selectedSort == '조회수 높은 순') {
+                  sortedProductList.sort((a, b) {
+                    final aCnt = a['cnt'] as int;
+                    final bCnt = b['cnt'] as int;
+                    return bCnt.compareTo(aCnt);
+                  });
+                } else if (selectedSort == '최신 등록 순') {
+                  sortedProductList.sort((a, b) {
+                    final aTime = a['sendTime'] as Timestamp;
+                    final bTime = b['sendTime'] as Timestamp;
+                    return bTime.compareTo(aTime);
+                  });
+                }else if (selectedSort == '가격 높은 순') {
+                  sortedProductList.sort((a, b) {
+                    final aPrice = a['price'] as int;
+                    final bPrice = b['price'] as int;
+                    return bPrice.compareTo(aPrice);
+                  });
+                }else if (selectedSort == '가격 낮은 순') {
+                  sortedProductList.sort((a, b) {
+                    final aPrice = a['price'] as int;
+                    final bPrice = b['price'] as int;
+                    return aPrice.compareTo(bPrice);
+                  });
+                }
 
                 return GridView.builder(
                   shrinkWrap: true,
@@ -178,9 +209,9 @@ class _ProductState extends State<Product> {
                     crossAxisSpacing: 8,
                     mainAxisSpacing: 8,
                   ),
-                  itemCount: filteredProductList.length, // 수정된 부분: 선택된 카테고리에 속하는 상품의 개수로 설정
+                  itemCount: sortedProductList.length, // 수정된 부분: 선택된 카테고리에 속하는 상품의 개수로 설정
                   itemBuilder: (context, index) {
-                    final document = filteredProductList[index];
+                    final document = sortedProductList[index];
                     final productName = document['pName'] as String;
                     final price = document['price'] as int;
                     final imageUrl = document['iUrl'] as String;
