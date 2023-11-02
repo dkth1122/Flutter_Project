@@ -1,4 +1,5 @@
-  import 'dart:io';
+  import 'dart:async';
+import 'dart:io';
   import 'package:firebase_storage/firebase_storage.dart';
   import 'package:flutter/material.dart';
   import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,6 +44,11 @@
 
     File? _image; // 이미지 파일을 저장할 변수
 
+    final someStream = Stream<int>.fromIterable([1, 2, 3, 4, 5]);
+
+
+    StreamSubscription? _streamSubscription; // StreamSubscription 변수 선언
+
     @override
     void initState() {
       super.initState();
@@ -54,6 +60,21 @@
         user1 = "없음";
         print("로그인 안됨");
       }
+      // Stream을 구독하고 구독 객체를 _streamSubscription에 할당
+      _streamSubscription = someStream.listen((data) {
+        // 예제: data가 5보다 크면 로그를 출력
+        if (data > 5) {
+          print('Received data greater than 5: $data');
+        }
+        // 처리 로직
+      });
+    }
+
+    @override
+    void dispose() {
+      // _streamSubscription을 취소하여 메모리 누수 방지
+      _streamSubscription?.cancel();
+      super.dispose();
     }
 
     @override

@@ -70,7 +70,6 @@ class _ChatListState extends State<ChatList> {
                 (!data.containsKey('user1') && !data.containsKey('user2'))) {
               return Container();
             }
-
             final user1Value = data['user1'] as String?;
             final user2Value = data['user2'] as String?;
             String chatTitle = '';
@@ -81,15 +80,25 @@ class _ChatListState extends State<ChatList> {
                 chatTitle = '$user1Value 님과의 채팅' ?? "No User";
               }
 
-              String roomName1 = '$user1' + '_' + '$user2Value';
-              String roomName2 = '$user2Value' + '_' + '$user1';
 
+              String roomName1 = '$user1' + '_' + '${data['user1'] as String?}';
+              String roomName2 = '${data['user1'] as String?}' + '_' + '$user1';
+
+              String roomName3 = '${data['user2'] as String?}' + '_' + '$user1';
+              String roomName4 = '$user1' + '_' + '${data['user2'] as String?}';
+
+
+
+              print('$roomName1');
+              print('$roomName2');
+              print('$roomName3');
+              print('$roomName4');
 
               // 이 부분에서 서브컬렉션의 필드 값을 가져올 수 있음
               return StreamBuilder<QuerySnapshot>(
                 stream: FirebaseFirestore.instance
                     .collection('chat')
-                    .where('roomId', whereIn: [roomName1, roomName2])
+                    .where('roomId', whereIn: [roomName1, roomName2, roomName3, roomName4])
                     .snapshots(),
                 builder: (BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -119,13 +128,16 @@ class _ChatListState extends State<ChatList> {
 
                           String lastMessageText =
                           lastMessageData['text'] as String;
+
                           var lastMessageImageUrl =
                           lastMessageData['imageUrl'];
+
+                          print("내용 ====> $lastMessageText");
 
                           // 이제 lastMessageText 또는 lastMessageImageUrl을 사용할 수 있습니다.
                           if (lastMessageText != null) {
                             lastMessages[roomName] = lastMessageText;
-                            setState(() {}); // 상태 업데이트
+                            print("맵 ===> $lastMessages");
                           } else if (lastMessageImageUrl != null) {
                             // 이미지 처리
                           } else {
