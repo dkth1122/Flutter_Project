@@ -157,30 +157,40 @@ class _LoginPageState extends State<LoginPage> {
         .get();
 
     if (userDocs.docs.isNotEmpty) {
-      Provider.of<UserModel>(context, listen: false).login(id);
+      final userDoc = userDocs.docs.first;
+      final delYn = userDoc['delYn'];
 
-      if (id == 'admin') {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AdminDomainPage(),
-          ),
+      if (delYn == 'Y') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('탈퇴한 사용자입니다.')),
         );
       } else {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HomePage(),
-          ),
-        );
-      }
+        Provider.of<UserModel>(context, listen: false).login(id);
 
-      _userId.clear();
-      _pw.clear();
+        if (id == 'admin') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AdminDomainPage(),
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(),
+            ),
+          );
+        }
+
+        _userId.clear();
+        _pw.clear();
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('아이디나 패스워드를 다시 확인해주세요.')),
       );
     }
   }
+
 }

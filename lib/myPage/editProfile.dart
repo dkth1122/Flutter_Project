@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_flutter/myPage/alertControl.dart';
 import 'package:provider/provider.dart';
 import '../join/userModel.dart';
+import 'deleteAccount.dart';
 
 class EditProfile extends StatefulWidget {
   final Map<String, dynamic> data;
@@ -317,7 +318,12 @@ class _EditProfileState extends State<EditProfile> {
                   ListTile(
                     title: Text('회원탈퇴'),
                     onTap: () {
-                      // 첫 번째 아이템이 클릭됐을 때 수행할 작업
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DeleteAccount(data : widget.data), // 로그인 화면으로 이동하도록 변경
+                        ),
+                      );
                     },
                   ),
                 ],

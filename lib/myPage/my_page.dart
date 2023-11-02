@@ -28,8 +28,6 @@ class _MyPageState extends State<MyPage> {
 
   Color appBarColor = Color(0xFF4E598C);
 
-  MyExpert _myExpert = MyExpert();
-
   @override
   void initState() {
     super.initState();
