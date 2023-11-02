@@ -13,6 +13,7 @@ import 'package:project_flutter/test2.dart';
 import 'package:provider/provider.dart';
 import 'admin/adminDomain.dart';
 import 'category/categoryProduct.dart';
+import 'chat/ChatProvider.dart';
 import 'chat/chat.dart';
 import 'expert/my_expert.dart';
 import 'firebase_options.dart';
@@ -25,10 +26,13 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   runApp(
-      ChangeNotifierProvider(
-        create: (context) => UserModel(),
-        child: MyApp(),
-      )
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => UserModel()),
+        ChangeNotifierProvider(create: (context) => ChatProvider()),
+      ],
+      child: MyApp(),
+    ),
   );
 }
 

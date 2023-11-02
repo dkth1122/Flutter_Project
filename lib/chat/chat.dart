@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import '../join/userModel.dart';
+import 'ChatProvider.dart';
 
 class ChatApp extends StatelessWidget {
   final String roomId;
@@ -30,7 +31,9 @@ class ChatScreen extends StatefulWidget {
 
 class ChatScreenState extends State<ChatScreen> {
   final String roomId;
-  ChatScreenState({required this.roomId});
+  final ChatProvider chatProvider; // ChatProvider
+  ChatScreenState({required this.roomId}) : chatProvider = ChatProvider(); // ChatProvider 초기화
+
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _messageController = TextEditingController();
@@ -154,6 +157,8 @@ class ChatScreenState extends State<ChatScreen> {
         final storageRef = FirebaseStorage.instance.ref().child('chat_images/${Uuid().v4()}.png');
         final uploadTask = storageRef.putFile(_image!);
 
+
+
         uploadTask.then((TaskSnapshot taskSnapshot) {
           return taskSnapshot.ref.getDownloadURL().then((downloadUrl) {
             // 이미지 URL에 .png 확장자를 추가
@@ -168,6 +173,7 @@ class ChatScreenState extends State<ChatScreen> {
               'imageUrl': downloadUrl, // 확장자가 추가된 이미지 URL 저장
               'sendTime': FieldValue.serverTimestamp(),
               'user': user1,
+              'roomId' : roomId,
             }).then((_) {
               setState(() {
                 _image = null;
@@ -191,6 +197,7 @@ class ChatScreenState extends State<ChatScreen> {
           'text': text,
           'sendTime': FieldValue.serverTimestamp(),
           'user': user1,
+          'roomId': roomId
         }).then((_) {
           _messageController.clear();
         }).catchError((error) {
@@ -256,12 +263,14 @@ class ChatMessages extends StatelessWidget {
                     sendTime: (messageTimestamp as Timestamp).toDate(),
                     isCurrentUser: messageMap['user'] == user1 ? true : false,
                     imageUrl: messageImg,
+                      roomId:roomId
                   );
                 }else{
                   messageWidget = ChatMessage(
                   text: messageText,
                   sendTime: (messageTimestamp as Timestamp).toDate(),
                   isCurrentUser: messageMap['user'] == user1 ? true : false,
+                    roomId : roomId
                 );
 
                 }
@@ -290,12 +299,14 @@ class ChatMessage extends StatelessWidget {
   final String? imageUrl;
   final DateTime sendTime;
   final bool isCurrentUser;
+  final String? roomId;
 
   ChatMessage({
     this.text,
     this.imageUrl,
     required this.sendTime,
     required this.isCurrentUser,
+    this.roomId
   });
 
   @override
