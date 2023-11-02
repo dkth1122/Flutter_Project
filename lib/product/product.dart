@@ -79,206 +79,203 @@ class _ProductState extends State<Product> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10),
-            child: Container(
-              child: Row(
-                children: List.generate(categories.length, (index) {
-                  return Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          if (selectedCategoryIndex == index) {
-                            selectedCategory = '전체'; // 카테고리 선택 해제
-                            selectedCategoryIndex = -1; // 선택된 카테고리 인덱스 초기화
-                          } else {
-                            selectedCategory = categories[index]; // 선택한 카테고리로 업데이트
-                            selectedCategoryIndex = index; // 선택한 카테고리 인덱스로 업데이트
-                          }
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        primary: selectedCategoryIndex == index ? Color(0xFFFCAF58) : Color(0xFF4E598C),
-                        minimumSize: Size(double.infinity, 90),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              child: Container(
+                child: Row(
+                  children: List.generate(categories.length, (index) {
+                    return Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            if (selectedCategoryIndex == index) {
+                              selectedCategory = '전체'; // 카테고리 선택 해제
+                              selectedCategoryIndex = -1; // 선택된 카테고리 인덱스 초기화
+                            } else {
+                              selectedCategory = categories[index]; // 선택한 카테고리로 업데이트
+                              selectedCategoryIndex = index; // 선택한 카테고리 인덱스로 업데이트
+                            }
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          primary: selectedCategoryIndex == index ? Color(0xFFFCAF58) : Color(0xFF4E598C),
+                          minimumSize: Size(double.infinity, 90),
+                        ),
+                        child: Text(categories[index]),
                       ),
-                      child: Text(categories[index]),
-                    ),
-                  );
-                }),
+                    );
+                  }),
+                ),
               ),
             ),
-
-          ),
-          Container(
-            height: 100, // 광고 영역의 높이를 150으로 고정
-            color: Colors.black, // 광고 영역의 배경색 설정
-            alignment: Alignment.center, // 광고 내용을 가운데로 정렬
-            child: Text(
-              '여기에 광고를 한다면 매출이 얼마나 오를까 \n 02-000-0000',
-              style: TextStyle(fontSize: 18, color: Colors.white),
-              textAlign: TextAlign.center,
+            Container(
+              height: 100, // 광고 영역의 높이를 150으로 고정
+              color: Colors.black, // 광고 영역의 배경색 설정
+              alignment: Alignment.center, // 광고 내용을 가운데로 정렬
+              child: Text(
+                '여기에 광고를 한다면 매출이 얼마나 오를까\n02-000-0000',
+                style: TextStyle(fontSize: 18, color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Icon(Icons.filter_alt_sharp), // 아이콘 추가
-                DropdownButton<String>(
-                  value: selectedSort,
-                  items: sortOptions.map((String option) {
-                    return DropdownMenuItem<String>(
-                      value: option,
-                      child: Text(option),
-                    );
-                  }).toList(),
-                  onChanged: (String? value) {
-                    setState(() {
-                      selectedSort = value!;
-                    });
-                  },
-                ),
-              ],
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Icon(Icons.filter_alt_sharp), // 아이콘 추가
+                  DropdownButton<String>(
+                    value: selectedSort,
+                    items: sortOptions.map((String option) {
+                      return DropdownMenuItem<String>(
+                        value: option,
+                        child: Text(option),
+                      );
+                    }).toList(),
+                    onChanged: (String? value) {
+                      setState(() {
+                        selectedSort = value!;
+                      });
+                    },
+                  ),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(10),
-              child: StreamBuilder<QuerySnapshot>(
-                stream: productStream!,
-                builder: (context, snapshot) {
-                  if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
-                  }
+            StreamBuilder<QuerySnapshot>(
+              stream: productStream!,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Error: ${snapshot.error}');
+                }
 
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Center(
-                      child: Text('상품이 없습니다.'),
-                    );
-                  }
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return const Center(
+                    child: Text('상품이 없습니다.'),
+                  );
+                }
 
-                  final productList = snapshot.data!.docs;
+                final productList = snapshot.data!.docs;
 
-                  final filteredProductList = productList.where((document) {
-                    final category = document['category'] as String;
-                    return selectedCategory == '전체' || category == selectedCategory;
-                  }).toList();
+                final filteredProductList = productList.where((document) {
+                  final category = document['category'] as String;
+                  return selectedCategory == '전체' || category == selectedCategory;
+                }).toList();
 
-                  return GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      crossAxisSpacing: 8,
-                      mainAxisSpacing: 8,
-                    ),
-                    itemCount: filteredProductList.length, // 수정된 부분: 선택된 카테고리에 속하는 상품의 개수로 설정
-                    itemBuilder: (context, index) {
-                      final document = filteredProductList[index];
-                      final productName = document['pName'] as String;
-                      final price = document['price'] as int;
-                      final imageUrl = document['iUrl'] as String;
+                return GridView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 3,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                  ),
+                  itemCount: filteredProductList.length, // 수정된 부분: 선택된 카테고리에 속하는 상품의 개수로 설정
+                  itemBuilder: (context, index) {
+                    final document = filteredProductList[index];
+                    final productName = document['pName'] as String;
+                    final price = document['price'] as int;
+                    final imageUrl = document['iUrl'] as String;
 
-                      final formattedPrice = NumberFormat("#,###").format(price);
+                    final formattedPrice = NumberFormat("#,###").format(price);
 
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ProductView(
-                                productName: productName,
-                                price: price.toString(),
-                                imageUrl: imageUrl,
-                              ),
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ProductView(
+                              productName: productName,
+                              price: price.toString(),
+                              imageUrl: imageUrl,
                             ),
-                          );
-                        },
-                        child: Container(
-                          width: 150,
-                          height: 100,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey, width: 1.0),
                           ),
-                          child: Stack(
-                            children: [
-                              Image.network(
+                        );
+                      },
+                      child: Container(
+                        width: 150,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey, width: 1.0),
+                        ),
+                        child: Stack(
+                          children: [
+                            Image.network(
                                 imageUrl,
                                 width: double.infinity,
                                 height: double.infinity,
                                 fit: BoxFit.cover
-                              ),
-                              Positioned(
-                                bottom: 0, // 박스의 아래에 위치하도록 수정
-                                left: 0,
-                                right: 0,
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => ProductView(
-                                              productName: productName,
-                                              price: formattedPrice,
-                                              imageUrl: imageUrl,
-                                            ),
+                            ),
+                            Positioned(
+                              bottom: 0, // 박스의 아래에 위치하도록 수정
+                              left: 0,
+                              right: 0,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ProductView(
+                                            productName: productName,
+                                            price: formattedPrice,
+                                            imageUrl: imageUrl,
                                           ),
-                                        );
-                                      },
-                                      child: Text(
-                                        productName,
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
                                         ),
+                                      );
+                                    },
+                                    child: Text(
+                                      productName,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
                                       ),
                                     ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => ProductView(
-                                              productName: productName,
-                                              price: formattedPrice,
-                                              imageUrl: imageUrl,
-                                            ),
+                                  ),
+                                  GestureDetector(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ProductView(
+                                            productName: productName,
+                                            price: formattedPrice,
+                                            imageUrl: imageUrl,
                                           ),
-                                        );
-                                      },
-                                      child: Text(
-                                        '$formattedPrice 원',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
                                         ),
+                                      );
+                                    },
+                                    child: Text(
+                                      '$formattedPrice 원',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      );
-
-                    },
-                  );
-                },
-              ),
+                      ),
+                    );
+                  },
+                );
+              },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       bottomNavigationBar: BottomAppBar(
         height: 60,
