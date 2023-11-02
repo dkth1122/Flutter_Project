@@ -7,23 +7,12 @@ import 'package:project_flutter/expert/revenue.dart';
 import 'package:project_flutter/expert/vacation.dart';
 import 'package:provider/provider.dart';
 
-//세션 관리
-//import 'package:project_flutter/join/userModel.dart';
-//import 'package:provider/provider.dart';
-
 import '../firebase_options.dart';
 import '../join/userModel.dart';
 import 'myPortfolio.dart';
 import 'adManagement.dart';
 import 'adRequest.dart';
 import 'messageResponse.dart';
-
-// void main() {
-//   runApp(MaterialApp(
-//     home: MyExpert(),
-//     // 이 외에 필요한 MaterialApp 설정들을 여기에 추가할 수 있습니다.
-//   ));
-// }
 
 class MyExpert extends StatefulWidget {
 
