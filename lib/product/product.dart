@@ -220,7 +220,7 @@ class _ProductState extends State<Product> {
                               right: 0,
                               child: Container(
                                 padding: EdgeInsets.all(8), // 내용과 상하 좌우 간격 조절
-                                color: Colors.black.withOpacity(0.5), // 검정색 배경 색상 및 불투명도 설정
+                                color: Colors.black.withOpacity(0.2), // 검정색 배경 색상 및 불투명도 설정
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
