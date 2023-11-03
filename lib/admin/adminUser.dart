@@ -92,7 +92,7 @@ class _AdminUserState extends State<AdminUser> {
                             Text(' ($nick)', style: TextStyle(color: Colors.grey)),
                           ],
                         ),
-                        subtitle: Text(userId),
+                        subtitle: Text(uId),
                         trailing: IconButton(
                           icon: Icon(Icons.remove_red_eye),
                           onPressed: () {
