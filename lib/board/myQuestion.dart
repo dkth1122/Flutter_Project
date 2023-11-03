@@ -70,8 +70,8 @@ class _MyQuestionState extends State<MyQuestion> {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
             return ListTile(
-              title: Text('${data['title']}'),
-              subtitle: Text('작성일 : ${data['timestamp'].toDate().toString()}'),
+              title: Text('작성일 : ${data['timestamp'].toDate().toString()}'),
+              subtitle: Text('${data['title']}'),
               onTap: (){
                 Navigator.push(
                     context,

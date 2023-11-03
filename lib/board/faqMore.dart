@@ -56,7 +56,7 @@ class _FaqMoreState extends State<FaqMore> {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
             return ListTile(
-              title: Text('${index + 1}. ${data['title']}'),
+              title: Text('${data['title']}'),
               onTap: (){
                 Navigator.push(
                     context,

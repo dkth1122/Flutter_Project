@@ -4,11 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:project_flutter/board/noticeView.dart';
 import 'package:project_flutter/board/myQuestion.dart';
 import 'package:project_flutter/customer/question.dart';
+import 'package:provider/provider.dart';
 
 import '../board/faqMore.dart';
 import '../board/faqView.dart';
 import '../board/noticeMore.dart';
 import '../firebase_options.dart';
+import '../join/userModel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,8 +29,19 @@ class UserCustomer extends StatefulWidget {
 class _UserCustomerState extends State<UserCustomer> {
   final Stream<QuerySnapshot> noticeStream = FirebaseFirestore.instance.collection("notice").limit(3).snapshots();
   final Stream<QuerySnapshot> faqStream = FirebaseFirestore.instance.collection("faq").limit(5).snapshots();
+  String sessionId = "";
   @override
   Widget build(BuildContext context) {
+
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+
+    if (um.isLogin) {
+      sessionId = um.userId!;
+    } else {
+      sessionId = "";
+    }
+
+
     return Scaffold(
       appBar: AppBar(title: Text("고객센터"),),
       body: SingleChildScrollView(
@@ -79,27 +92,33 @@ class _UserCustomerState extends State<UserCustomer> {
               ),
               SizedBox(height: 20,),
               _faq(),
-              ElevatedButton(
-                onPressed: (){
-                  Navigator.push(
+              Visibility(
+                visible: sessionId != "",
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => Question(),
-                      )
-                  );
-                },
-                child: Text("1:1 문의하기")
+                      ),
+                    );
+                  },
+                  child: Text("1:1 문의하기"),
+                ),
               ),
-              ElevatedButton(
-                onPressed: (){
-                  Navigator.push(
+              Visibility(
+                visible: sessionId != "", // 세션 ID가 있을 때만 버튼을 보이도록 설정
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => MyQuestion(),
-                      )
-                  );
-                },
-                child: Text("내 문의 보기")
+                      ),
+                    );
+                  },
+                  child: Text("내 문의 보기"),
+                ),
               ),
             ],
           ),
