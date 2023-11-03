@@ -107,7 +107,6 @@ class _HomePageState extends State<HomePage> {
       print(sessionId);
     } else {
       sessionId = "";
-      print("상품페이지 로그인 안됨");
       print(sessionId);
     }
 

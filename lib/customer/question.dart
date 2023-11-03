@@ -36,7 +36,6 @@ class _QuestionState extends State<Question> {
       print(sessionId);
     } else {
       sessionId = "";
-      print("상품페이지 로그인 안됨");
       print(sessionId);
     }
     if (_title.text.isNotEmpty && _content.text.isNotEmpty) {
