@@ -19,6 +19,17 @@ class _CustomerLikeListState extends State<CustomerLikeList> {
   List<Map<String, dynamic>> likeData = [];
   List<int> productPrices = [];
   List<String> productUrls = []; // 이미지 URL을 저장하는 목록
+  String selectedFilter = "전체";
+  List<String> optionsButton1 = [
+    '전체',
+    'UX기획',
+    '웹',
+    '커머스',
+    '모바일',
+    '프로그램',
+    '트렌드',
+    '데이터',
+    '기타',];
 
 
   @override
@@ -26,14 +37,38 @@ class _CustomerLikeListState extends State<CustomerLikeList> {
     super.initState();
     userModel = Provider.of<UserModel>(context, listen: false);
     LikeData();
+  }
+  void _showFilterOptions(BuildContext context, List<String> options) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return ListView(
+          children: options.map((option) {
+            return ListTile(
+              title: Text(option),
+              onTap: () {
+                setState(() {
+                  selectedFilter = option; // 선택한 필터 값을 저장
+                });
 
+                Navigator.pop(context);
+                LikeData(); // 필터를 선택한 후 데이터 다시 불러오기
+              },
+            );
+          }).toList(),
+        );
+      },
+    );
   }
 
   Future<void> LikeData() async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection("like")
-        .where("user", isEqualTo: userModel.userId)
-        .get();
+    Query query = FirebaseFirestore.instance.collection("like").where("user", isEqualTo: userModel.userId);
+
+    if (selectedFilter != "전체") {
+      // 선택한 필터에 따라 필터링
+      query = query.where("category", isEqualTo: selectedFilter);
+    }
+    QuerySnapshot querySnapshot = await query.get();
 
     if (querySnapshot.docs.isNotEmpty) {
       List<Map<String, dynamic>> data = querySnapshot.docs.map((doc) {
@@ -76,6 +111,7 @@ class _CustomerLikeListState extends State<CustomerLikeList> {
     return {'price': 0, 'iUrl': ''};
   }
 
+
   Color appBarColor = Color(0xFF4E598C);
   @override
   Widget build(BuildContext context) {
@@ -108,7 +144,7 @@ class _CustomerLikeListState extends State<CustomerLikeList> {
                   style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
                 ),
                 onPressed: () {
-
+                  _showFilterOptions(context, optionsButton1);
                 },
               ),
             ],

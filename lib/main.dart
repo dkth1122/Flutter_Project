@@ -40,6 +40,29 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        primaryColor: Color(0xFF4E598C),
+        hintColor: Color(0xFFFCAF58),
+        fontFamily: 'Pretendard',
+        textTheme: TextTheme(
+          bodyLarge: TextStyle(color: Colors.black, fontSize: 16),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          labelStyle: TextStyle(
+            color: Colors.black, // 레이블 텍스트의 색상
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          // 여기에 필요한 다른 스타일을 추가할 수 있습니다.
+        ),
+      ),
+
       title: 'Flutter Project',
       home: HomePage(),
     );
