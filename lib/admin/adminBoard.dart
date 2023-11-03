@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:project_flutter/board/faq.dart';
 import 'package:project_flutter/board/notice.dart';
 
+import '../board/questionAnswer.dart';
+
 class AdminBoard extends StatefulWidget {
 
   @override
@@ -35,6 +37,15 @@ class _AdminBoardState extends State<AdminBoard> {
               );
             },
             child: Text('FAQ 등록하기'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => QuestionAnswer()),
+              );
+            },
+            child: Text('1:1문의 답변하기'),
           ),
         ],
       )

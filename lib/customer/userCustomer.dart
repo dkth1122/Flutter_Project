@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/board/noticeView.dart';
+import 'package:project_flutter/board/myQuestion.dart';
 import 'package:project_flutter/customer/question.dart';
 
 import '../board/faqMore.dart';
@@ -85,10 +86,20 @@ class _UserCustomerState extends State<UserCustomer> {
                       builder: (context) => Question(),
                     )
                 );
-
               },
               child: Text("1:1 문의하기")
-            )
+            ),
+            ElevatedButton(
+              onPressed: (){
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MyQuestion(),
+                    )
+                );
+              },
+              child: Text("내 문의 보기")
+            ),
           ],
         ),
       ),
