@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:project_flutter/expert/my_expert.dart';
 import 'package:project_flutter/myPage/editProfile.dart';
 import 'package:project_flutter/myPage/purchaseManagement.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +46,6 @@ class _MyPageState extends State<MyPage> {
         if (snap.hasData) {
           data = snap.data!.docs[0].data() as Map<String, dynamic>;
           isExpert = data['status'] == 'E';
-          // 이 부분에서 isExpert 값을 설정합니다.
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -92,6 +90,7 @@ class _MyPageState extends State<MyPage> {
       },
     );
   }
+
   void _toggleExpertStatus() {
     String newStatus = isExpert ? 'C' : 'E';
 
@@ -191,51 +190,7 @@ class _MyPageState extends State<MyPage> {
                 color: Colors.grey,
                 thickness: 5.0,
               ),
-              if(isExpert)
-              Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  children: [
-                    Text("내 프로젝트", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                    Container(
-                      child: Column(
-                        children: [
-                          Text("요구사항을 작성하시고, 딱 맞는 전문가와의 거래를 진행하세요"),
-                          ElevatedButton(
-                            onPressed: () {},
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.white),
-                              side: MaterialStateProperty.all(
-                                BorderSide(
-                                  color: Color(0xff424242),
-                                  width: 0.5,
-                                ),
-                              ),
-                            ),
-                            child: Text(
-                              "프로젝트 의뢰하기",
-                              style: TextStyle(color: Color(0xff424242)),
-                            ),
-                          ),
-
-
-                        ],
-                      ),
-                      margin: EdgeInsets.all(20.0),
-                      width: double.infinity,
-                      height: 150,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.grey,
-                          width: 1.0,
-                        ),
-                        borderRadius: BorderRadius.circular(4.0),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if(!isExpert)
+              if(!isExpert)  // 클라이언트의 경우 컨텐츠 표시
                 Container(
                   padding: EdgeInsets.all(16.0),
                   child: Column(

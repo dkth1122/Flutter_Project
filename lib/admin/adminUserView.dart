@@ -1,9 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 class AdminUserView {
   final String userId;
-  final String uId;
   final String name;
   final String nick;
   final String email;
@@ -16,7 +16,6 @@ class AdminUserView {
 
   AdminUserView(
       this.userId,
-      this.uId,
       this.name,
       this.nick,
       this.email,
@@ -26,6 +25,95 @@ class AdminUserView {
       this.delYn,
       this.status,
       );
+}
+
+class AdminUser extends StatefulWidget {
+  @override
+  State<AdminUser> createState() => _AdminUserState();
+}
+
+class _AdminUserState extends State<AdminUser> {
+  late Stream<QuerySnapshot> userListStream;
+
+  @override
+  void initState() {
+    super.initState();
+    Firebase.initializeApp().then((value) {
+      setState(() {
+        userListStream = FirebaseFirestore.instance.collection('userList').snapshots();
+      });
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('회원 관리'),
+        backgroundColor: Color(0xFF4E598C),
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: userListStream,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text('데이터를 불러오는 중에 오류가 발생했습니다.'));
+          } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(child: Text('회원이 없습니다.'));
+          } else {
+            return ListView(
+              children: snapshot.data!.docs.map((DocumentSnapshot document) {
+                Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                String userId = document.id;
+                String name = data['name'] ?? '이름 없음';
+                String nick = data['nick'] ?? '';
+                String email = data['email'];
+                String birth = data['birth'];
+                Timestamp timestamp = data['cdatetime'];
+                String cdatetime = timestamp.toDate().toString();
+                String banYn = data['banYn'];
+                String delYn = data['delYn'];
+                String status = data['status'];
+
+                return ListTile(
+                  title: Row(
+                    children: <Widget>[
+                      Text(name, style: TextStyle(color: Colors.black)),
+                      Text(' ($nick)', style: TextStyle(color: Colors.grey)),
+                    ],
+                  ),
+                  subtitle: Text(userId),
+                  trailing: IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: () {
+                      AdminUserView user = AdminUserView(
+                        userId,
+                        name,
+                        nick,
+                        email,
+                        birth,
+                        cdatetime,
+                        banYn,
+                        delYn,
+                        status,
+                      );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AdminUserViewPage(user: user),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }).toList(),
+            );
+          }
+        },
+      ),
+    );
+  }
 }
 
 class AdminUserViewPage extends StatelessWidget {
@@ -45,97 +133,12 @@ class AdminUserViewPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Text('회원 번호 : ${user.userId}'),
-            Text('아이디 : ${user.uId}'),
-            Text('이름 : ${user.name} (${user.nick})'),
+            Text('이름 : ${user.name}'),
+            Text('닉네임 : ${user.nick}'),
             Text('이메일 : ${user.email}'),
             Text('생일 : ${user.birth}'),
             Text('가입일 : ${user.cdatetime}'),
-            ElevatedButton(
-              child: Text(user.banYn == 'N' ? '정지' : '해제'),
-              onPressed: () {
-                if (user.banYn == 'N') {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      String bReason = '';
-                      return AlertDialog(
-                        title: Text('정지 사유 입력'),
-                        content: TextField(
-                          onChanged: (value) {
-                            bReason = value;
-                          },
-                        ),
-                        actions: <Widget>[
-                          TextButton(
-                            child: Text('확인'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              String updatedBanYn = 'Y';
-                              Timestamp currentTime = Timestamp.now();
-
-                              FirebaseFirestore.instance
-                                  .collection('userList')
-                                  .doc(user.userId)
-                                  .update({'banYn': updatedBanYn});
-
-                              FirebaseFirestore.instance.collection('ban').add({
-                                'uId': user.uId,
-                                'bdate': currentTime,
-                                'bReason': bReason,
-                              });
-
-                              Navigator.of(context).pop();
-                            },
-
-                          ),
-                          TextButton(
-                            child: Text('취소'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                } else {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: Text('밴이 해제되었습니다.'),
-                        actions: <Widget>[
-                          TextButton(
-                            child: Text('확인'),
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              String updatedBanYn = 'N';
-
-                              FirebaseFirestore.instance
-                                  .collection('userList')
-                                  .doc(user.userId)
-                                  .update({'banYn': updatedBanYn});
-
-                              FirebaseFirestore.instance
-                                  .collection('ban')
-                                  .where('uId', isEqualTo: user.uId)
-                                  .get()
-                                  .then((snapshot) {
-                                for (DocumentSnapshot doc in snapshot.docs) {
-                                  doc.reference.delete();
-                                }
-                              });
-
-                              Navigator.of(context).pop();
-                            },
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                }
-              },
-            ),
+            Text('밴여부: ${user.banYn}'),
             Text('삭제여부: ${user.delYn}'),
           ],
         ),

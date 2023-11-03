@@ -159,15 +159,10 @@ class _LoginPageState extends State<LoginPage> {
     if (userDocs.docs.isNotEmpty) {
       final userDoc = userDocs.docs.first;
       final delYn = userDoc['delYn'];
-      final banYn = userDoc['banYn'];
 
       if (delYn == 'Y') {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('탈퇴한 사용자입니다.')),
-        );
-      }else if (banYn == 'Y') {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('정지된 사용자입니다. 관리자에게 문의 해주세요')),
         );
       } else {
         Provider.of<UserModel>(context, listen: false).login(id);
