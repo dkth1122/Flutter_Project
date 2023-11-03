@@ -32,75 +32,77 @@ class _UserCustomerState extends State<UserCustomer> {
     return Scaffold(
       appBar: AppBar(title: Text("고객센터"),),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: 20,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SizedBox(width: 10,),
-                Text("공지사항", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                SizedBox(width: 10,),
-                TextButton(
-                  onPressed: (){
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => NoticeMore(),
-                        )
-                    );
-                  },
-                  child: Text("더보기")
-                )
-              ],
-            ),
-            SizedBox(height: 20,),
-            _notice(),
-            SizedBox(height: 20,),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                SizedBox(width: 10,),
-                Text("FAQ", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                SizedBox(width: 10,),
-                TextButton(
+        child: Container(
+          padding: EdgeInsets.all(10),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 10,),
+                  Text("공지사항", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                  SizedBox(width: 10,),
+                  TextButton(
                     onPressed: (){
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FaqMore(),
+                            builder: (context) => NoticeMore(),
                           )
                       );
                     },
                     child: Text("더보기")
-                )
-              ],
-            ),
-            SizedBox(height: 20,),
-            _faq(),
-            ElevatedButton(
-              onPressed: (){
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Question(),
-                    )
-                );
-              },
-              child: Text("1:1 문의하기")
-            ),
-            ElevatedButton(
-              onPressed: (){
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MyQuestion(),
-                    )
-                );
-              },
-              child: Text("내 문의 보기")
-            ),
-          ],
+                  )
+                ],
+              ),
+              SizedBox(height: 20,),
+              _notice(),
+              SizedBox(height: 20,),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 10,),
+                  Text("FAQ", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                  SizedBox(width: 10,),
+                  TextButton(
+                      onPressed: (){
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FaqMore(),
+                            )
+                        );
+                      },
+                      child: Text("더보기")
+                  )
+                ],
+              ),
+              SizedBox(height: 20,),
+              _faq(),
+              ElevatedButton(
+                onPressed: (){
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Question(),
+                      )
+                  );
+                },
+                child: Text("1:1 문의하기")
+              ),
+              ElevatedButton(
+                onPressed: (){
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => MyQuestion(),
+                      )
+                  );
+                },
+                child: Text("내 문의 보기")
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -124,7 +126,7 @@ class _UserCustomerState extends State<UserCustomer> {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
             return ListTile(
-              title: Text('${index + 1}. ${data['title']}'),
+              title: Text('${data['title']}'),
               onTap: (){
                 Navigator.push(
                     context,
@@ -158,7 +160,7 @@ class _UserCustomerState extends State<UserCustomer> {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
             return ListTile(
-              title: Text('${index + 1}. ${data['title']}'),
+              title: Text('${data['title']}'),
               onTap: (){
                 Navigator.push(
                     context,

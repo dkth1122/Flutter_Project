@@ -17,10 +17,20 @@ class _NoticeMoreState extends State<NoticeMore> {
     return Scaffold(
       appBar: AppBar(title: Text("공지사항"),),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _notice()
-          ],
+        child: Container(
+          padding: EdgeInsets.all(10),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(width: 10,),
+                  Text("공지사항", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                ],
+              ),
+              _notice()
+            ],
+          ),
         ),
       ),
     );
@@ -44,7 +54,7 @@ class _NoticeMoreState extends State<NoticeMore> {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
             return ListTile(
-              title: Text('${index + 1}. ${data['title']}'),
+              title: Text('${data['title']}'),
               onTap: (){
                 Navigator.push(
                     context,

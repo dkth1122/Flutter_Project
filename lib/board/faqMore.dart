@@ -18,10 +18,21 @@ class _FaqMoreState extends State<FaqMore> {
     return Scaffold(
       appBar: AppBar(title: Text("FAQ"),),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _faq()
-          ],
+        child: SingleChildScrollView(
+          child: Container(
+            padding: EdgeInsets.all(10),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Text("FAQ", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                  ],
+                ),
+                SizedBox(height: 10,),
+                _faq()
+              ],
+            ),
+          ),
         ),
       ),
     );

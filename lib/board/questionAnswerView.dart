@@ -34,35 +34,51 @@ class _QuestionAnswerViewState extends State<QuestionAnswerView> {
     Map<String, dynamic> data = widget.document.data() as Map<String, dynamic>;
     return Scaffold(
       appBar: AppBar(title: Text("${data['user']}문의 답변하기"),),
-      body: Column(
-        children: [
-          Text('작성일 : ${data['timestamp'].toDate().toString()}'),
-          Text(
-            '제목 : ${data['title']}',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+      body: Container(
+        padding: EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '제목 : ${data['title']}',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text('작성일 : ${data['timestamp'].toDate().toString()}'),
+              ],
             ),
-          ),
-          Text( '내용 : ${data['content']}',
-            style: TextStyle(
-              fontSize: 18,
+            SizedBox(height: 10,),
+            Row(
+              children: [
+                Text( '내용 : ${data['content']}',
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+              ],
             ),
-          ),
-          TextField(
-            controller: _comment,
-            decoration: InputDecoration(
-              labelText: "댓글 입력",
-              border: OutlineInputBorder(),
+            SizedBox(height: 10,),
+            TextField(
+              controller: _comment,
+              decoration: InputDecoration(
+                labelText: "답변 입력",
+                border: OutlineInputBorder(),
+              ),
             ),
-          ),
+            SizedBox(height: 10,),
 
-          ElevatedButton(
-              onPressed: _addComment,
-              child: Text("댓글달기")
-          ),
-          Expanded(child: _listComments())
-        ],
+            ElevatedButton(
+                onPressed: _addComment,
+                child: Text("답변ㄹㅇ달기")
+            ),
+            SizedBox(height: 10,),
+            Expanded(child: _listComments())
+          ],
+        ),
       ),
     );
   }

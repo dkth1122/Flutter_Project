@@ -41,7 +41,7 @@ class _QuestionAnswerState extends State<QuestionAnswer> {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
             return ListTile(
-              title: Text('${index + 1}. ${data['title']}'),
+              title: Text('${data['title']}'),
               subtitle: Text("작성자 : ${data['user']}"),
               onTap: (){
                 Navigator.push(

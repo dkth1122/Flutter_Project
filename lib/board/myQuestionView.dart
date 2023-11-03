@@ -15,31 +15,39 @@ class _MyQuestionViewState extends State<MyQuestionView> {
     Map<String, dynamic> data = widget.document.data() as Map<String, dynamic>;
     return Scaffold(
       appBar: AppBar(title: Text("내 질문 보기"),),
-      body: Column(
-        children: [
-          Text('작성일 : ${data['timestamp'].toDate().toString()}'),
-          Text(
-            '제목 : ${data['title']}',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+      body: Container(
+        padding: EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '제목 : ${data['title']}',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text('작성일 : ${data['timestamp'].toDate().toString()}'),
+              ],
             ),
-          ),
-          Text( '내용 : ${data['content']}',
-            style: TextStyle(
-              fontSize: 18,
+            SizedBox(height: 10,),
+            Row(
+              children: [
+                Text( '내용 : ${data['content']}',
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
+                ),
+              ],
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text( '운영자 답변', style: TextStyle(fontSize: 18,),
-              ),
-            ],
-          ),
-          Expanded(child: _listComments())
+            SizedBox(height: 50,),
+            SizedBox(height: 10,),
+            Expanded(child: _listComments())
 
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -63,9 +71,25 @@ class _MyQuestionViewState extends State<MyQuestionView> {
             if (commentData['comments'] == null || commentData['timestamp'] == null) {
               return Container();
             }
-            return ListTile(
-              title: Text(commentData['comments']),
-              subtitle: Text('작성일: ${commentData['timestamp'].toDate().toString()}'),
+            return Column(
+              children:[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text( '운영자 답변', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                    Text('작성일: ${commentData['timestamp'].toDate().toString()}'),
+                  ],
+                ),
+                SizedBox(height: 10,),
+                Row(
+                  children: [
+                    Text(
+                      commentData['comments'],
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ],
+                ),
+              ]
             );
           },
         );

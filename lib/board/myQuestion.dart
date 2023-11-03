@@ -39,10 +39,13 @@ class _MyQuestionState extends State<MyQuestion> {
     }
     return Scaffold(
       appBar: AppBar(title: Text("내 문의"),),
-      body: ListView(
-        children: [
-          _myQuestion()
-        ],
+      body: Container(
+        padding: EdgeInsets.all(10),
+        child: ListView(
+          children: [
+            _myQuestion()
+          ],
+        ),
       ),
     );
   }
@@ -67,7 +70,7 @@ class _MyQuestionState extends State<MyQuestion> {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
             return ListTile(
-              title: Text('${index + 1}. ${data['title']}'),
+              title: Text('${data['title']}'),
               subtitle: Text('작성일 : ${data['timestamp'].toDate().toString()}'),
               onTap: (){
                 Navigator.push(

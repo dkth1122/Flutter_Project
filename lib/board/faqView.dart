@@ -16,23 +16,28 @@ class _FaqViewState extends State<FaqView> {
     Map<String, dynamic> data = widget.document.data() as Map<String, dynamic>;
     return Scaffold(
       appBar: AppBar(title: Text("FAQ View"),),
-      body: ListView(
-        children: [
-          Text(
-            '제목 : ${data['title']}',
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+      body: Container(
+        padding: EdgeInsets.all(10),
+        child: ListView(
+          children: [
+            Text(
+              '${data['title']}',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          Text('작성일 : ${data['timestamp'].toDate().toString()}'),
-          Text( '내용 : ${data['content']}',
-            style: TextStyle(
-              fontSize: 18,
+            SizedBox(height: 10,),
+            Text('작성일 : ${data['timestamp'].toDate().toString()}'),
+            SizedBox(height: 10,),
+            Text( '내용 : ${data['content']}',
+              style: TextStyle(
+                fontSize: 18,
+              ),
             ),
-          ),
 
-        ],
+          ],
+        ),
       ),
     );
   }

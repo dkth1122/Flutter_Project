@@ -95,24 +95,15 @@ class _HomePageState extends State<HomePage> {
 
   String sessionId = "";
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-
+  Widget build(BuildContext context) {
 
     UserModel um = Provider.of<UserModel>(context, listen: false);
 
     if (um.isLogin) {
       sessionId = um.userId!;
-      print(sessionId);
     } else {
       sessionId = "";
-      print(sessionId);
     }
-
-  }
-  @override
-  Widget build(BuildContext context) {
 
     final userModel = Provider.of<UserModel>(context, listen: false);
     bool isAdmin = userModel.userId == 'admin';

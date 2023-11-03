@@ -42,32 +42,50 @@ class _NoticeState extends State<Notice> {
     }
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("공지사항 등록"),),
-      body: Column(
-        children: [
-          TextField(
-            controller: _title,
-            decoration: InputDecoration(labelText: "제목"),
-          ),
-          SizedBox(height: 10),
-          TextField(
-            controller: _content,
-            decoration: InputDecoration(labelText: "내용"),
-          ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: _addNotice,
-            child: Text("게시물 추가"),
-          ),
-          SizedBox(height: 20),
-          _listNotice()
-        ],
+      body: Container(
+        padding: EdgeInsets.all(10),
+        child: Center(
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Text("제목", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                ],
+              ),
+              SizedBox(height: 10,),
+              TextField(
+                controller: _title,
+              ),
+              SizedBox(height: 10,),
+              Row(
+                children: [
+                  Text("내용", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                ],
+              ),
+              SizedBox(height: 10,),
+              TextFormField(
+                controller: _content,
+                style: TextStyle(fontSize: 20),
+                maxLines: 10,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(), // 테두리 스타일 지정
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _addNotice,
+                child: Text("게시물 추가"),
+              ),
+              SizedBox(height: 20),
+              _listNotice()
+            ],
 
+          ),
+        ),
       ),
     );
   }
@@ -87,7 +105,7 @@ class _NoticeState extends State<Notice> {
               Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
               return ListTile(
-                title: Text('${index + 1}. ${data['title']}'),
+                title: Text('${data['title']}'),
                 onTap: (){
                   Navigator.push(
                       context,
