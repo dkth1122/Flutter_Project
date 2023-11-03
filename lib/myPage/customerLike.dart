@@ -10,6 +10,8 @@ class CustomerLikeList extends StatefulWidget {
 class _CustomerLikeListState extends State<CustomerLikeList> {
   @override
   Widget build(BuildContext context) {
-    return Text("의뢰인찜목록");
+    return MaterialApp(
+
+    );
   }
 }
