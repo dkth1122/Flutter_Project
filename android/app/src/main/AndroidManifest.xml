@@ -4,6 +4,8 @@
         android:name="${applicationName}"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
+        <!--   알림 받기    -->
+        <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver" android:exported="false" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -16,8 +18,7 @@
                  the Android process has started. This theme is visible to the user
                  while the Flutter UI initializes. After that, this theme continues
                  to determine the Window background behind the Flutter UI. -->
-            <!--   알림 받기    -->
-            <receiver android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver" android:exported="false" />
+
             <!--   Notification    -->
             <meta-data
                 android:name="com.google.firebase.messaging.default_notification_channel_id"
