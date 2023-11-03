@@ -23,15 +23,15 @@ class MyPage extends StatefulWidget {
 
 class _MyPageState extends State<MyPage> {
   late Map<String, dynamic> data;
-  late bool isExpert;
+  bool isExpert = true;
 
   Color appBarColor = Color(0xFF4E598C);
 
   @override
   void initState() {
     super.initState();
-    isExpert = false;
   }
+
 
   Widget _userInfo() {
     UserModel userModel = Provider.of<UserModel>(context);

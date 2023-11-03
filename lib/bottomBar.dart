@@ -183,11 +183,16 @@ class _BottomBarState extends State<BottomBar> {
   Widget _hiddenIcon(){
     return Expanded(
       child: IconButton(
-          onPressed: (){
-            Navigator.push(
-                context, MaterialPageRoute(builder: (context) => CustomerLikeList())
-            );
-          },
+        onPressed: () async {
+          final userModel = Provider.of<UserModel>(context, listen: false);
+          if (!userModel.isLogin) {
+            // 사용자가 로그인하지 않은 경우에만 LoginPage로 이동
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
+          } else {
+            // 사용자가 로그인한 경우에만 MyPage로 이동
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => CustomerLikeList()));
+          }
+        },
           icon: Icon(Icons.favorite),
       ),
     );
