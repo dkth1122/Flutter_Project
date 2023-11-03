@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_flutter/expert/addPortfolio.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:project_flutter/expert/portfolioDetail.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
@@ -20,9 +21,10 @@ class Portfolio extends StatefulWidget {
 }
 
 class _PortfolioState extends State<Portfolio> {
-  final CollectionReference portfolioCollection = FirebaseFirestore.instance.collection('expert');
+  final CollectionReference expertCollection = FirebaseFirestore.instance.collection('expert');
   late List<PortfolioItem> portfolioItems = [];
   String user = "";
+  late PortfolioItem item;
 
   @override
   void initState() {
@@ -41,23 +43,35 @@ class _PortfolioState extends State<Portfolio> {
 
   Future<void> fetchPortfolioItems() async {
     try {
-      QuerySnapshot portfolioSnapshot = await portfolioCollection.get();
-      List<PortfolioItem> items = portfolioSnapshot.docs.map((DocumentSnapshot document) {
-        Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-        return PortfolioItem(
-          document.id, // 문서 ID를 사용하여 각 포트폴리오 항목을 고유하게 식별
-          data['title'],
-          data['description'],
-          data['thumbnailUrl'],
-        );
-      }).toList();
-      setState(() {
-        portfolioItems = items;
-      });
+      QuerySnapshot expertSnapshot = await expertCollection.get();
+
+      for (QueryDocumentSnapshot expertDoc in expertSnapshot.docs) {
+        QuerySnapshot portfolioSnapshot = await expertDoc.reference.collection('portfolio').get();
+
+        for (QueryDocumentSnapshot portfolioDoc in portfolioSnapshot.docs) {
+          Map<String, dynamic> data = portfolioDoc.data() as Map<String, dynamic>;
+
+          // 필수 필드의 존재 여부를 확인하고 처리
+          if (data['title'] != null && data['description'] != null && data['thumbnailUrl'] != null) {
+            item = PortfolioItem(
+              portfolioDoc.id,
+              data['title'],
+              data['description'],
+              data['thumbnailUrl'],
+            );
+            setState(() {
+              portfolioItems.add(item);
+            });
+          } else {
+            print('포트폴리오 항목 데이터가 올바르지 않습니다.');
+          }
+        }
+      }
     } catch (e) {
       print('포트폴리오 항목 가져오기 오류: $e');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +104,12 @@ class _PortfolioState extends State<Portfolio> {
               ),
               subtitle: Text(item.description),
               onTap: () {
-                _showPortfolioDetailDialog(context, item);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PortfolioDetailPage(portfolioItem : item, user: user),
+                  ),
+                );
               },
             ),
           );
@@ -99,42 +118,6 @@ class _PortfolioState extends State<Portfolio> {
     );
   }
 
-  void _showPortfolioDetailDialog(BuildContext context, PortfolioItem item) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: SizedBox(
-            width: double.maxFinite,
-            child: ListView(
-              children: [
-                // 상세 정보를 표시하는 내용 추가
-                Text('포트폴리오 ID: ${item.id}'),
-                SizedBox(height: 20),
-                Row(
-                  children: [
-                    Text('아이디'),
-                    IconButton(
-                      onPressed: () {
-                        // 즐겨찾기 버튼을 눌렀을 때의 동작 추가
-                      },
-                      icon: Icon(Icons.favorite),
-                    )
-                  ],
-                ),
-                SizedBox(height: 10),
-                Text('카테고리: IT 프로그래밍 > 홈페이지'),
-                SizedBox(height: 10),
-                Text(
-                  '포트폴리오 제목: ${item.title}',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-                ),
-                // 나머지 포트폴리오 항목 상세 정보를 여기에 추가
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
+
+
 }
