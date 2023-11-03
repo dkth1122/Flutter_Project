@@ -58,8 +58,10 @@ class _HomePageState extends State<HomePage> {
   final CarouselController _controller = CarouselController();
   // 1초에 한번씩 로딩되는 문제를 해결하기 위해 밖으로 뺏음
   // 현재는 가격 낮은 순으로 정렬했지만 cnt가 추가되면 조회수 높은 순으로 할 예정
-  final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").orderBy("cnt", descending: true).limit(3).snapshots();
-  final Stream<QuerySnapshot> productStream2 = FirebaseFirestore.instance.collection("product").snapshots();
+  final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").orderBy("cnt", descending: true).limit(4).snapshots();
+  final Stream<QuerySnapshot> productStream2 = FirebaseFirestore.instance.collection("product")
+      .where("likeCnt", isGreaterThanOrEqualTo: 1)
+      .snapshots();
   FocusNode myFocusNode = FocusNode();
 
   List<String> imageBanner = ['assets/banner1.webp','assets/banner2.webp','assets/banner3.webp','assets/banner4.webp','assets/banner5.webp'];
@@ -67,6 +69,26 @@ class _HomePageState extends State<HomePage> {
   List<String> imagePaths2 = ['assets/category_program.png','assets/category_trend.png','assets/category_data.png','assets/category_rest.png',];
   List<String> categories = ["UX기획", "웹", "커머스", "모바일"];
   List<String> categories2 = ["프로그램", "트렌드", "데이터", "기타"];
+
+  String sessionId = "";
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+
+    if (um.isLogin) {
+      sessionId = um.userId!;
+      print(sessionId);
+    } else {
+      sessionId = "";
+      print("상품페이지 로그인 안됨");
+      print(sessionId);
+    }
+
+  }
   @override
   Widget build(BuildContext context) {
 
@@ -169,7 +191,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     // 인기 서비스
                     Container(
-                        height: 250,
+                        height: 270,
                         child: _heartProduct()
                     ),
                     SizedBox(height: 20,),
@@ -379,6 +401,7 @@ class _HomePageState extends State<HomePage> {
 
         int initialPage = snap.data!.docs.length ~/ 2;
 
+
         return PageView(
           scrollDirection: Axis.horizontal,
           pageSnapping: false,
@@ -399,27 +422,119 @@ class _HomePageState extends State<HomePage> {
                 );
               },
               child: Container(
-                child: Card(
-                  child: Column(
-                    children: [
-                      SizedBox(height: 10),
-                      Image.network(
-                        data['iUrl'],
-                        width: 300,
-                        height: 150,
-                        fit: BoxFit.cover,
-                      ),
-                      ListTile(
-                        title: Text(
-                          data['pDetail'].length > 15
-                              ? '${data['pDetail'].substring(0, 15)}...'
-                              : data['pDetail'],
+                  child: Card(
+                    child: Column(
+                      children: [
+                        SizedBox(height: 10),
+                        Stack(
+                          alignment: Alignment.topRight,
+                          children: [
+                            Image.network(
+                              data['iUrl'],
+                              width: 300,
+                              height: 150,
+                              fit: BoxFit.cover,
+                            ),
+                            IconButton(
+                              onPressed: () async {
+                                if (sessionId.isNotEmpty) {
+                                  final QuerySnapshot result = await FirebaseFirestore.instance
+                                      .collection('like')
+                                      .where('user', isEqualTo: sessionId)
+                                      .where('pName', isEqualTo: data['pName'])
+                                      .get();
+
+                                  if (result.docs.isNotEmpty) {
+                                    // 찾은 데이터가 있는 경우 삭제
+                                    final documentId = result.docs.first.id;
+                                    FirebaseFirestore.instance.collection('like').doc(documentId).delete();
+
+                                    // "product" 컬렉션의 "likeCnt" 업데이트
+                                    final productQuery = await FirebaseFirestore.instance
+                                        .collection('product')
+                                        .where('pName', isEqualTo: data['pName'])
+                                        .get();
+
+                                    if (productQuery.docs.isNotEmpty) {
+                                      final productDocId = productQuery.docs.first.id;
+                                      final currentLikeCount = productQuery.docs.first['likeCnt'] ?? 0;
+
+                                      // "likeCnt" 업데이트
+                                      FirebaseFirestore.instance.collection('product').doc(productDocId).update({
+                                        'likeCnt': currentLikeCount - 1, // 좋아요를 취소했으므로 감소
+                                      });
+                                    }
+                                  } else {
+                                    // 찾은 데이터가 없는 경우, 좋아요 버튼을 누를 때 Firestore에 데이터 추가
+                                    FirebaseFirestore.instance.collection('like').add({
+                                      'user': sessionId,
+                                      'pName': data['pName'],
+                                    });
+
+                                    // "product" 컬렉션의 "likeCnt" 업데이트
+                                    final productQuery = await FirebaseFirestore.instance
+                                        .collection('product')
+                                        .where('pName', isEqualTo: data['pName'])
+                                        .get();
+
+                                    if (productQuery.docs.isNotEmpty) {
+                                      final productDocId = productQuery.docs.first.id;
+                                      final currentLikeCount = productQuery.docs.first['likeCnt'] ?? 0;
+
+                                      // "likeCnt" 업데이트
+                                      FirebaseFirestore.instance.collection('product').doc(productDocId).update({
+                                        'likeCnt': currentLikeCount + 1, // 좋아요를 추가했으므로 증가
+                                      });
+                                    }
+                                  }
+                                }
+                              },
+                              icon: sessionId.isNotEmpty
+                                  ? StreamBuilder<QuerySnapshot>(
+                                stream: FirebaseFirestore.instance
+                                    .collection('like')
+                                    .where('user', isEqualTo: sessionId)
+                                    .where('pName', isEqualTo: data['pName'])
+                                    .snapshots(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    if (snapshot.data!.docs.isNotEmpty) {
+                                      return Icon(
+                                        Icons.favorite,
+                                        color: Colors.red,
+                                        size: 30,
+                                      );
+                                    }
+                                  }
+                                  return Icon(
+                                    Icons.favorite_border,
+                                    color: Colors.red,
+                                    size: 30,
+                                  );
+                                },
+                              )
+                                  : Container(), // 하트 아이콘
+                            ),
+                          ],
                         ),
-                        subtitle: Text("가격 : ${data['price']}"),
-                      ),
-                    ],
-                  ),
-                ),
+                        ListTile(
+                          title: Text(
+                            data['pDetail'].length > 15
+                                ? '${data['pDetail'].substring(0, 15)}...'
+                                : data['pDetail'],
+                          ),
+                          subtitle: Text("가격 : ${data['price']}"),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text("좋아요 : ${data['likeCnt']}개"),
+                            SizedBox(width: 10,)
+                          ],
+                        )
+                      ],
+                    ),
+                  )
               ),
             );
           }).toList(),
