@@ -157,11 +157,6 @@ class ServiceListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    // if (productPrices.isEmpty || productUrls.isEmpty) {
-    //   // 데이터가 아직 로드되지 않았거나 비어 있는 경우 대체 콘텐츠 표시
-    //   return Center(child: CircularProgressIndicator()); // 또는 다른 대체 콘텐츠를 표시
-    // }
     return ListView.builder(
       itemCount: productPrices.length,
       itemBuilder: (context, index) {
@@ -171,7 +166,8 @@ class ServiceListView extends StatelessWidget {
 
 
         return ListTile(
-          leading:Image.network(iUrl),
+          leading:Image.network(
+              iUrl, width: 100,),
           title: Text(pName),
           subtitle:Text(' $price 원'),
           onTap: () {
