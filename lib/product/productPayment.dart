@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project_flutter/join/userModel.dart';
+import 'package:project_flutter/product/payment.dart';
 import 'package:provider/provider.dart';
 
 import '../join/login_email.dart';
@@ -29,6 +30,7 @@ class _ProductPaymentState extends State<ProductPayment> {
   double discountPercentage = 0.0;
   int discountedPrice = 0;
   bool agreedToTerms = false;
+  int totalPrice = 0;
 
   @override
   void initState() {
@@ -146,7 +148,7 @@ class _ProductPaymentState extends State<ProductPayment> {
                         } else {
                           final selectedCouponData = coupons.firstWhere((coupon) => coupon['cName'] == value);
                           discountPercentage = (int.parse(widget.price) / 100) * (selectedCouponData['discount']).toDouble();
-                          calculateDiscountedPrice();
+                          totalPrice = calculateDiscountedPrice();
                         }
                       });
                     },
@@ -249,6 +251,20 @@ class _ProductPaymentState extends State<ProductPayment> {
                 );
               } else {
                 // 결제 처리를 위한 함수 호출 또는 네비게이션 추가
+                setState(() {
+                  totalPrice = calculateDiscountedPrice();
+                });
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => Payment(
+                      user: user, // 사용자 정보
+                      //어느게 총 가격인지 몰라서 임시로 넣음
+                      price: totalPrice,
+                      productName: widget.productName, // 상품명
+                    ),
+                  ),
+                );
               }
             },
             child: Text(
@@ -266,8 +282,9 @@ class _ProductPaymentState extends State<ProductPayment> {
     );
   }
 
-  void calculateDiscountedPrice() { // 할인된 가격 결제시 넘길 금액
+  int calculateDiscountedPrice() { // 할인된 가격 결제시 넘길 금액
     discountedPrice = int.parse(widget.price) - discountPercentage.toInt();
     print(discountedPrice);
+    return discountedPrice;
   }
 }

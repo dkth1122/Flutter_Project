@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:project_flutter/payment/paymentTest.dart';
+import 'package:project_flutter/product/payment.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
@@ -36,13 +36,6 @@ class _ChatListState extends State<ChatList> {
         title: Row(
           children: [
             Text("채팅 목록"),
-            IconButton(onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                  builder: (context) => Payment())
-              );
-            }, icon: Icon(Icons.move_down))
           ],
         ),
         backgroundColor: Color(0xFFFCAF58),

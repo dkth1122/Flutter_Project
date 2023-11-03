@@ -4,6 +4,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:project_flutter/expert/myPortfolio.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
@@ -50,7 +51,6 @@ class _AddPortfolioState extends State<AddPortfolio> {
   @override
   void initState() {
     super.initState();
-    // 여기에서 필요한 초기 설정을 수행하세요.
     UserModel um = Provider.of<UserModel>(context, listen: false);
     if (um.isLogin) {
       user = um.userId!;
@@ -184,7 +184,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
 
   // 썸네일 이미지 업로드
   Future<String> uploadThumbnailImage(File imageFile, String userId) async {
-    String fileName = 'thumbnails/$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    String fileName = 'portfolio/thumbnail/$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
     Reference ref = FirebaseStorage.instance.ref().child(fileName);
     await ref.putFile(imageFile);
     String downloadURL = await ref.getDownloadURL();
@@ -193,7 +193,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
 
 // 서브 이미지 업로드
   Future<String> uploadSubImage(File imageFile, String userId) async {
-    String fileName = 'sub_images/$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
+    String fileName = 'portfolio/subImg/$userId/${DateTime.now().millisecondsSinceEpoch}.jpg';
     Reference ref = FirebaseStorage.instance.ref().child(fileName);
     await ref.putFile(imageFile);
     String downloadURL = await ref.getDownloadURL();
@@ -299,11 +299,15 @@ class _AddPortfolioState extends State<AddPortfolio> {
                     height: 300,
                     fit: BoxFit.cover,
                   ),
-                  ElevatedButton(
+                  ElevatedButton.icon(
                     onPressed: () {
-                      _selectThumbnailImage(context);
+                      setState(() {
+                        thumbImagePath = null;
+                        isThumbnailSelected = false;
+                      });
                     },
-                    child: Text('이미지 변경'),
+                    icon: Icon(Icons.clear), // "x" 아이콘 추가
+                    label: Text('선택 취소'),
                   ),
                 ],
               )
@@ -322,19 +326,37 @@ class _AddPortfolioState extends State<AddPortfolio> {
                 },
                 child: Text('이미지 선택'),
               ),
-              SizedBox(height: 12.0),
-              if (imagePaths.isNotEmpty)
-                Column(
-                  children: imagePaths.map((path) {
-                    return Image.file(
-                      File(path),
-                      width: 100,
-                      height: 100,
-                      fit: BoxFit.cover,
-                    );
-                  }).toList(),
-                ),
 
+              Column(
+                children: [
+                  if (imagePaths.isNotEmpty) ...imagePaths.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final imagePath = entry.value;
+                    return Row(
+                      children: [
+                        Image.file(
+                          File(imagePath),
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              // 해당 인덱스의 이미지를 삭제
+                              imagePaths.removeAt(index);
+                              if (imagePaths.isEmpty) {
+                                isImageSelected = false;
+                              }
+                            });
+                          },
+                          icon: Icon(Icons.clear), // "x" 아이콘 추가
+                        ),
+                      ],
+                    );
+                  }),
+                ],
+              ),
               SizedBox(height: 12.0),
               ListTile(
                 title: Text(
@@ -439,9 +461,19 @@ class _AddPortfolioState extends State<AddPortfolio> {
                     setState(() {
                       portfolioItems.add(portfolioItem);
                     });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('포트폴리오가 등록되었습니다.'),
+                      ),
+                    );
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => Portfolio()));
                   } else {
                     // 사용자가 로그인하지 않은 경우의 처리
-                    print("로그인하세용 등록 취소");
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('로그인이 필요한 서비스입니다.'),
+                      ),
+                    );
                   }
                 },
                 child: Text('포트폴리오 등록'),
