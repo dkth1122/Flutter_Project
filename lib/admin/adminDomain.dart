@@ -105,18 +105,6 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
                   primary: Color(0xFF4E598C),
                 ),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AdminInquiry()),
-                  );
-                },
-                child: Text('문의 관리'),
-                style: ElevatedButton.styleFrom(
-                  primary: Color(0xFF4E598C),
-                ),
-              ),
             ],
           ),
         ],

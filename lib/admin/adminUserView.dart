@@ -68,7 +68,7 @@ class AdminUserViewPage extends StatelessWidget {
                           title: Text('정지 사유 입력'),
                           content: TextField(
                             onChanged: (value) {
-                              bReason = value;
+                              bReason = value.trim();
                             },
                           ),
                           actions: <Widget>[
@@ -76,23 +76,42 @@ class AdminUserViewPage extends StatelessWidget {
                               child: Text('확인'),
                               onPressed: () {
                                 Navigator.of(context).pop();
-                                String updatedBanYn = 'Y';
-                                Timestamp currentTime = Timestamp.now();
+                                if (bReason.isEmpty) {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('정지 사유 입력'),
+                                        content: Text('정지 사유를 입력하세요.'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            child: Text('확인'),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                } else {
+                                  String updatedBanYn = 'Y';
+                                  Timestamp currentTime = Timestamp.now();
 
-                                FirebaseFirestore.instance
-                                    .collection('userList')
-                                    .doc(user.userId)
-                                    .update({'banYn': updatedBanYn});
+                                  FirebaseFirestore.instance
+                                      .collection('userList')
+                                      .doc(user.userId)
+                                      .update({'banYn': updatedBanYn});
 
-                                FirebaseFirestore.instance.collection('ban').add({
-                                  'uId': user.uId,
-                                  'bdate': currentTime,
-                                  'bReason': bReason,
-                                });
+                                  FirebaseFirestore.instance.collection('ban').add({
+                                    'uId': user.uId,
+                                    'bdate': currentTime,
+                                    'bReason': bReason,
+                                  });
 
-                                Navigator.of(context).pop();
+                                  Navigator.of(context).pop();
+                                }
                               },
-
                             ),
                             TextButton(
                               child: Text('취소'),
@@ -192,7 +211,7 @@ class AdminUserViewPage extends StatelessWidget {
 
               ElevatedButton(
                 onPressed: () {
-                  String addCName = ''; // 쿠폰 이름을 저장할 변수
+                  String addCName = ''; // 초기화
                   int addDiscount = 10; // 기본 할인율을 10으로 설정
 
                   showDialog(
@@ -207,7 +226,9 @@ class AdminUserViewPage extends StatelessWidget {
                               children: [
                                 TextField(
                                   onChanged: (value) {
-                                    addCName = value; // 쿠폰 이름을 입력 받음
+                                    setState(() {
+                                      addCName = value.trim(); // 트림 적용
+                                    });
                                   },
                                   decoration: InputDecoration(labelText: '쿠폰 이름'),
                                 ),
@@ -222,7 +243,7 @@ class AdminUserViewPage extends StatelessWidget {
                                   onChanged: (int? value) {
                                     if (value != null) {
                                       setState(() {
-                                        addDiscount = value; // 할인율을 선택하고 다이얼로그 내용을 다시 그림
+                                        addDiscount = value;
                                       });
                                     }
                                   },
@@ -233,20 +254,40 @@ class AdminUserViewPage extends StatelessWidget {
                               TextButton(
                                 child: Text('추가'),
                                 onPressed: () {
-                                  // 여기서 Firestore에 새로운 쿠폰을 추가하는 로직을 구현
-                                  FirebaseFirestore.instance.collection('coupon').add({
-                                    'cName': addCName,
-                                    'discount': addDiscount,
-                                    'userId': user.uId,
-                                  });
-                                  Navigator.of(context).pop();
-                                  Navigator.of(context).pop();
+                                  if (addCName == null || addCName.isEmpty) {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title: Text('쿠폰 이름 입력'),
+                                          content: Text('쿠폰 이름을 입력하세요.'),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: Text('확인'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  } else {
+                                    // Firestore에 새로운 쿠폰 추가 로직
+                                    FirebaseFirestore.instance.collection('coupon').add({
+                                      'cName': addCName,
+                                      'discount': addDiscount,
+                                      'userId': user.uId,
+                                    });
+                                    Navigator.of(context).pop();
+                                    Navigator.of(context).pop();
+                                  }
                                 },
                               ),
                               TextButton(
                                 child: Text('취소'),
                                 onPressed: () {
-                                  Navigator.of(context).pop(); // 다이얼로그 닫기
+                                  Navigator.of(context).pop();
                                 },
                               ),
                             ],
@@ -261,7 +302,7 @@ class AdminUserViewPage extends StatelessWidget {
                 ),
                 child: Text('쿠폰 추가'),
               ),
-              Divider(color :Colors.black),
+              Divider(color :Colors.grey),
               Text(
                 '문의 정보',
                 style: TextStyle(
