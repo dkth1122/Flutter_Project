@@ -16,7 +16,7 @@ class _FaqMoreState extends State<FaqMore> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("FAQ"),),
+      appBar: AppBar(title: Text("FAQ"),backgroundColor: Color(0xFFFF8C42),),
       body: SingleChildScrollView(
         child: SingleChildScrollView(
           child: Container(

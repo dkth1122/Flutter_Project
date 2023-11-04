@@ -15,7 +15,7 @@ class _FaqViewState extends State<FaqView> {
   Widget build(BuildContext context) {
     Map<String, dynamic> data = widget.document.data() as Map<String, dynamic>;
     return Scaffold(
-      appBar: AppBar(title: Text("FAQ View"),),
+      appBar: AppBar(title: Text("FAQ View"),backgroundColor: Color(0xFFFF8C42),),
       body: Container(
         padding: EdgeInsets.all(10),
         child: ListView(

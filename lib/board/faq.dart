@@ -47,44 +47,49 @@ class _FaqState extends State<Faq> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("FAQ 등록"),),
+      appBar: AppBar(title: Text("FAQ 등록"),backgroundColor: Color(0xFFFF8C42),),
       body: Container(
         padding: EdgeInsets.all(10),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Text("제목", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-              ],
-            ),
-            SizedBox(height: 10,),
-            TextField(
-              controller: _title,
-            ),
-            SizedBox(height: 10,),
-            Row(
-              children: [
-                Text("내용", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-              ],
-            ),
-            SizedBox(height: 10,),
-            TextFormField(
-              controller: _content,
-              style: TextStyle(fontSize: 20),
-              maxLines: 10,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(), // 테두리 스타일 지정
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Text("제목", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                ],
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _addFaq,
-              child: Text("게시물 추가"),
-            ),
-            SizedBox(height: 20),
-            _listFaq()
-          ],
+              SizedBox(height: 10,),
+              TextField(
+                controller: _title,
+              ),
+              SizedBox(height: 10,),
+              Row(
+                children: [
+                  Text("내용", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+                ],
+              ),
+              SizedBox(height: 10,),
+              TextFormField(
+                controller: _content,
+                style: TextStyle(fontSize: 20),
+                maxLines: 10,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(), // 테두리 스타일 지정
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _addFaq,
+                child: Text("게시물 추가"),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFFF8C42)), // 원하는 색상으로 변경
+                ),
+              ),
+              SizedBox(height: 20),
+              _listFaq()
+            ],
 
+          ),
         ),
       ),
     );
@@ -97,26 +102,26 @@ class _FaqState extends State<Faq> {
           return Center(child: CircularProgressIndicator());
         }
 
-        return Expanded(
-          child: ListView.builder(
-            itemCount: snap.data!.docs.length,
-            itemBuilder: (context, index) {
-              DocumentSnapshot doc = snap.data!.docs[index];
-              Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        return ListView.builder(
+          physics: NeverScrollableScrollPhysics(), // 스크롤 금지
+          shrinkWrap: true,
+          itemCount: snap.data!.docs.length,
+          itemBuilder: (context, index) {
+            DocumentSnapshot doc = snap.data!.docs[index];
+            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-              return ListTile(
-                title: Text('${data['title']}'),
-                onTap: (){
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => FaqView(document: doc),
-                      )
-                  );
-                },
-              );
-            },
-          ),
+            return ListTile(
+              title: Text('${data['title']}'),
+              onTap: (){
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => FaqView(document: doc),
+                    )
+                );
+              },
+            );
+          },
         );
       },
     );

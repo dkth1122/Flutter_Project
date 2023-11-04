@@ -27,7 +27,6 @@ class CategoryProduct extends StatefulWidget {
 
 class _CategoryProductState extends State<CategoryProduct> {
   int _current = 0;
-  int _current2 = 0;
   final CarouselController _controller = CarouselController();
 
   List<String> imageBanner = ['assets/banner1.webp','assets/banner2.webp','assets/banner3.webp','assets/banner4.webp','assets/banner5.webp'];
@@ -35,7 +34,7 @@ class _CategoryProductState extends State<CategoryProduct> {
   Widget build(BuildContext context) {
     String sendText = widget.sendText;
     return Scaffold(
-      appBar: AppBar(title: Text("카테고리 상품"),),
+      appBar: AppBar(title: Text("카테고리 상품"),backgroundColor: Color(0xFFFCAF58),),
       body: Column(
         children: [
           SizedBox(height: 10,),

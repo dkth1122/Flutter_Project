@@ -14,7 +14,7 @@ class _QuestionAnswerState extends State<QuestionAnswer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("1:1 문의 답변하기"),),
+      appBar: AppBar(title: Text("1:1 문의 답변하기"),backgroundColor: Color(0xFFFF8C42),),
       body: ListView(
         children: [
           _questionAnswer()

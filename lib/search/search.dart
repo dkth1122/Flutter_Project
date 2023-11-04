@@ -109,7 +109,7 @@ class _SearchState extends State<Search> {
       print("로그인 안됨");
     }
     return Scaffold(
-      appBar: AppBar(title: Text("검색"),),
+      appBar: AppBar(title: Text("검색"),backgroundColor: Color(0xFFFCAF58),),
       body: Container(
         padding: EdgeInsets.all(10),
         child: ListView(
@@ -188,6 +188,7 @@ class _SearchState extends State<Search> {
               child: Text("검색"),
               style: ButtonStyle(
                 minimumSize: MaterialStateProperty.all(Size(50, 35)),
+                backgroundColor:MaterialStateProperty.all<Color>(Color(0xFFFCAF58)),
               ),
             ),
             if (um.isLogin)

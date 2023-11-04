@@ -33,51 +33,66 @@ class _QuestionAnswerViewState extends State<QuestionAnswerView> {
   Widget build(BuildContext context) {
     Map<String, dynamic> data = widget.document.data() as Map<String, dynamic>;
     return Scaffold(
-      appBar: AppBar(title: Text("${data['user']}문의 답변하기"),),
+      appBar: AppBar(title: Text("${data['user']}문의 답변하기"),backgroundColor: Color(0xFFFF8C42),),
       body: Container(
         padding: EdgeInsets.all(10),
-        child: Column(
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '제목 : ${data['title']}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+        child: Container(
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    '제목 : ${data['title']}',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                Text('작성일 : ${data['timestamp'].toDate().toString()}'),
-              ],
-            ),
-            SizedBox(height: 10,),
-            Row(
-              children: [
-                Text( '내용 : ${data['content']}',
-                  style: TextStyle(
-                    fontSize: 18,
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 10,),
-            TextField(
-              controller: _comment,
-              decoration: InputDecoration(
-                labelText: "답변 입력",
-                border: OutlineInputBorder(),
+                  Text('작성일 : ${data['timestamp'].toDate().toString()}'),
+                ],
               ),
-            ),
-            SizedBox(height: 10,),
+              SizedBox(height: 10,),
+              Row(
+                children: [
+                  Text( '내용 : ${data['content']}',
+                    style: TextStyle(
+                      fontSize: 18,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 50,),
+              Row(
+                children: [
+                  Text("답변 작성",
+                    style: TextStyle(
+                    fontSize: 18,),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10,),
+              TextFormField(
+                controller: _comment,
+                style: TextStyle(fontSize: 20),
+                maxLines: 10,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              SizedBox(height: 10,),
 
-            ElevatedButton(
-                onPressed: _addComment,
-                child: Text("답변ㄹㅇ달기")
-            ),
-            SizedBox(height: 10,),
-            Expanded(child: _listComments())
-          ],
+              ElevatedButton(
+                  onPressed: _addComment,
+                  child: Text("답변달기"),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFFF8C42)), // 원하는 색상으로 변경
+                ),
+              ),
+              SizedBox(height: 10,),
+              Expanded(child: _listComments())
+            ],
+          ),
         ),
       ),
     );

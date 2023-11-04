@@ -18,7 +18,8 @@ class _AdminBoardState extends State<AdminBoard> {
         title: Text('게시판 관리'),
         backgroundColor: Color(0xFF4E598C),
       ),
-      body: Column(
+      body: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           ElevatedButton(
             onPressed: () {
@@ -27,6 +28,9 @@ class _AdminBoardState extends State<AdminBoard> {
                 MaterialPageRoute(builder: (context) => Notice()),
               );
             },
+            style: ElevatedButton.styleFrom(
+              primary: Color(0xFF4E598C),
+            ),
             child: Text('공지사항 등록하기'),
           ),
           ElevatedButton(
@@ -36,6 +40,9 @@ class _AdminBoardState extends State<AdminBoard> {
                 MaterialPageRoute(builder: (context) => Faq()),
               );
             },
+            style: ElevatedButton.styleFrom(
+              primary: Color(0xFF4E598C),
+            ),
             child: Text('FAQ 등록하기'),
           ),
           ElevatedButton(
@@ -45,6 +52,9 @@ class _AdminBoardState extends State<AdminBoard> {
                 MaterialPageRoute(builder: (context) => QuestionAnswer()),
               );
             },
+            style: ElevatedButton.styleFrom(
+              primary: Color(0xFF4E598C),
+            ),
             child: Text('1:1문의 답변하기'),
           ),
         ],

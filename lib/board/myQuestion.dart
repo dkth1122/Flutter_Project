@@ -38,7 +38,7 @@ class _MyQuestionState extends State<MyQuestion> {
       sessionId = "";
     }
     return Scaffold(
-      appBar: AppBar(title: Text("내 문의"),),
+      appBar: AppBar(title: Text("내 문의"),backgroundColor: Color(0xFFFF8C42),),
       body: Container(
         padding: EdgeInsets.all(10),
         child: ListView(

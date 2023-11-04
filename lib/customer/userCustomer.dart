@@ -43,7 +43,7 @@ class _UserCustomerState extends State<UserCustomer> {
 
 
     return Scaffold(
-      appBar: AppBar(title: Text("고객센터"),),
+      appBar: AppBar(title: Text("고객센터"),backgroundColor: Color(0xFFFF8C42),),
       body: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.all(10),
@@ -103,6 +103,9 @@ class _UserCustomerState extends State<UserCustomer> {
                       ),
                     );
                   },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFFF8C42)), // 원하는 색상으로 변경
+                  ),
                   child: Text("1:1 문의하기"),
                 ),
               ),
@@ -117,6 +120,9 @@ class _UserCustomerState extends State<UserCustomer> {
                       ),
                     );
                   },
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFFF8C42)), // 원하는 색상으로 변경
+                  ),
                   child: Text("내 문의 보기"),
                 ),
               ),

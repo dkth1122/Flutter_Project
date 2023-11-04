@@ -15,7 +15,7 @@ class _NoticeMoreState extends State<NoticeMore> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("공지사항"),),
+      appBar: AppBar(title: Text("공지사항"),backgroundColor: Color(0xFFFF8C42),),
       body: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.all(10),

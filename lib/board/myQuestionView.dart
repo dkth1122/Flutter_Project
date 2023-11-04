@@ -14,7 +14,7 @@ class _MyQuestionViewState extends State<MyQuestionView> {
   Widget build(BuildContext context) {
     Map<String, dynamic> data = widget.document.data() as Map<String, dynamic>;
     return Scaffold(
-      appBar: AppBar(title: Text("내 질문 보기"),),
+      appBar: AppBar(title: Text("내 질문 보기"),backgroundColor: Color(0xFFFF8C42),),
       body: Container(
         padding: EdgeInsets.all(10),
         child: Column(

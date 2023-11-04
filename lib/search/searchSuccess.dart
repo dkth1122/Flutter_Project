@@ -27,7 +27,7 @@ class _SearchSuccessState extends State<SearchSuccess> {
   Widget build(BuildContext context) {
     String searchText = widget.searchText;
     return Scaffold(
-      appBar: AppBar(title: Text("검색성공"),),
+      appBar: AppBar(title: Text("검색성공"),backgroundColor: Color(0xFFFCAF58),),
       body: SingleChildScrollView(
         child: Column(
           children: [
