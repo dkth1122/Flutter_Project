@@ -177,8 +177,54 @@ class _HomeScreenState extends State<HomeScreen> {
               TextField(
                 controller: _price,
                 decoration: InputDecoration(labelText: "가격"),
+                keyboardType: TextInputType.number,
+                onChanged: (value) {
+                  RegExp numeric = RegExp(r'^[0-9]*$');
+                  if (!numeric.hasMatch(value)) {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('숫자 입력'),
+                          content: Text('숫자만 입력할 수 있습니다.'),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text('확인'),
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                    _price.clear();
+                  } else {
+                    int price = int.parse(value);
+                    if (price <= 1 || price > 100000000) {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text('금액 설정'),
+                            content: Text('가격은 1원 이상, 100,000,000원 미만으로 입력해주세요.'),
+                            actions: <Widget>[
+                              TextButton(
+                                child: Text('확인'),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                      _price.clear();
+                    }
+                  }
+                },
               ),
-              SizedBox(height: 20),
+            SizedBox(height: 20),
               Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
