@@ -72,7 +72,7 @@ class _FaqState extends State<Faq> {
               TextFormField(
                 controller: _content,
                 style: TextStyle(fontSize: 20),
-                maxLines: 10,
+                maxLines: 15,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(), // 테두리 스타일 지정
                 ),

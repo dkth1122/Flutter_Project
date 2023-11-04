@@ -79,7 +79,7 @@ class _NoticeState extends State<Notice> {
                 TextFormField(
                   controller: _content,
                   style: TextStyle(fontSize: 20),
-                  maxLines: 10,
+                  maxLines: 15,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                   ),
