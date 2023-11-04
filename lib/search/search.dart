@@ -111,6 +111,7 @@ class _SearchState extends State<Search> {
     return Scaffold(
       appBar: AppBar(title: Text("검색"),),
       body: Container(
+        padding: EdgeInsets.all(10),
         child: ListView(
           children: [
             SizedBox(height: 10,),
@@ -118,9 +119,40 @@ class _SearchState extends State<Search> {
               controller: _latelySearch,
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.fromLTRB(10, 5, 5, 5),
-
                 hintText: "검색어를 입력하세요",
-                suffixIcon: Icon(Icons.search),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () {
+                    if (_latelySearch.text.isNotEmpty) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SearchSuccess(searchText: _latelySearch.text),
+                        ),
+                      );
+                      _addSearch();
+                    } else {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text("경고"),
+                            content: Text("검색어를 입력하세요."),
+                            actions: <Widget>[
+                              TextButton(
+                                child: Text("확인"),
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+
               ),
             ),
             ElevatedButton(
@@ -134,7 +166,23 @@ class _SearchState extends State<Search> {
                   );
                   _addSearch();
                 } else {
-                  // 빈 값일 때 처리할 내용 추가 (예: 경고 또는 아무 작업 없음)
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text("경고"),
+                        content: Text("검색어를 입력하세요."),
+                        actions: <Widget>[
+                          TextButton(
+                            child: Text("확인"),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                          ),
+                        ],
+                      );
+                    },
+                  );
                 }
               },
               child: Text("검색"),

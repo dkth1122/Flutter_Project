@@ -13,7 +13,6 @@ void main() async {
   runApp(SearchSuccess(searchText: '',));
 }
 
-
 class SearchSuccess extends StatefulWidget {
   final String searchText;
 
@@ -33,7 +32,7 @@ class _SearchSuccessState extends State<SearchSuccess> {
         child: Column(
           children: [
             SizedBox(height: 20,),
-            Text("검색어 : $searchText", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+            Text("검색어: $searchText", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
             SizedBox(height: 20,),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -79,6 +78,11 @@ class _SearchSuccessState extends State<SearchSuccess> {
           return pDetail.contains(widget.searchText) || pName.contains(widget.searchText);
         }).toList();
 
+        if (filteredDocs.isEmpty) {
+          // 상품 리스트가 없을 때 '상품 리스트 없음'을 출력합니다.
+          return Text('상품 리스트 없음');
+        }
+
         return ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
@@ -117,7 +121,7 @@ class _SearchSuccessState extends State<SearchSuccess> {
                       ? '${data['pDetail'].substring(0, 15)}...'
                       : data['pDetail'],
                 ),
-                trailing: Text('${(data['price'])}원'),
+                trailing: Text('${formattedPrice}원'),
               ),
             );
           },
@@ -125,6 +129,7 @@ class _SearchSuccessState extends State<SearchSuccess> {
       },
     );
   }
+
   Widget searchListPortFolio() {
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collectionGroup("portfolio").snapshots(),
@@ -142,8 +147,8 @@ class _SearchSuccessState extends State<SearchSuccess> {
         }).toList();
 
         if (filteredDocs.isEmpty) {
-          // 포트폴리오 데이터가 없을 때 "포트폴리오 리스트"를 숨깁니다.
-          return SizedBox.shrink();
+          // 포트폴리오 리스트가 없을 때 '상품 리스트 없음'을 출력합니다.
+          return Text('포트폴리오 리스트 없음');
         }
 
         return ListView.builder(
@@ -155,6 +160,7 @@ class _SearchSuccessState extends State<SearchSuccess> {
 
             return InkWell(
               onTap: () {
+                // 포트폴리오를 눌렀을 때 실행할 동작을 여기에 추가할 수 있습니다.
               },
               child: ListTile(
                 leading: Image.network(
@@ -176,5 +182,4 @@ class _SearchSuccessState extends State<SearchSuccess> {
       },
     );
   }
-
 }
