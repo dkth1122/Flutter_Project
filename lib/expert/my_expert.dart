@@ -91,26 +91,6 @@ class _MyExpertState extends State<MyExpert> {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.ad_units), // 아이콘 추가
-                  title: Text(
-                    '광고 관리',
-                  ),
-                  onTap: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) => AdManagement()));
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.add), // 아이콘 추가
-                  title: Text(
-                    '광고 신청',
-                  ),
-                  onTap: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) => AdRequest()));
-                  },
-                ),
-                ListTile(
                   leading: Icon(Icons.beach_access), // 아이콘 추가
                   title: Text(
                     '휴가 설정',
