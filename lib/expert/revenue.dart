@@ -1,7 +1,6 @@
-import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
@@ -12,34 +11,25 @@ class Revenue extends StatefulWidget {
 }
 
 class _RevenueState extends State<Revenue> {
-  // 월 목록
   List<String> months = [
     '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'
   ];
 
-  // 수익 데이터 (초기값은 0)
   List<double> earnings = List.generate(12, (index) => 0.0);
-
+  double availableEarnings = 0.0;
   double completedWithdrawals = 500.0;
 
   List<int> prices = [];
   List<String> productNames = [];
   List<DateTime> timestamps = [];
 
-  // 출금 가능 수익금
-  double availableEarnings = 0.0;
-
-  // Firestore 인스턴스 생성
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  // 사용자 정보 및 데이터 리스트
   String user = "";
 
   @override
   void initState() {
     super.initState();
 
-    // 사용자 정보 가져오기
     UserModel um = Provider.of<UserModel>(context, listen: false);
     if (um.isLogin) {
       user = um.userId!;
@@ -49,32 +39,39 @@ class _RevenueState extends State<Revenue> {
       print("로그인 안됨");
     }
 
-    // 데이터 가져오기
     fetchData();
   }
 
   Future<void> fetchData() async {
-    // Firestore 컬렉션 초기화
     final orderCollection = _firestore.collection('orders');
-
-    // 사용자와 관련된 주문 데이터 가져오기
     final orderQuery = await orderCollection.where('seller', isEqualTo: user).get();
     final orderDocs = orderQuery.docs;
 
     for (QueryDocumentSnapshot orderDoc in orderDocs) {
       int price = orderDoc['price'] as int;
-      String productName = orderDoc['productName'] as String;
       Timestamp timestamp = orderDoc['timestamp'] as Timestamp;
       DateTime timestampDateTime = timestamp.toDate();
 
       prices.add(price);
-      productNames.add(productName);
       timestamps.add(timestampDateTime);
     }
 
-    // 출금 가능 수익금를 업데이트
     availableEarnings = prices.reduce((a, b) => a + b).toDouble();
-    setState(() {});
+    updateEarningsData();
+  }
+
+  void updateEarningsData() {
+    List<double> updatedEarnings = List.generate(12, (index) => 0.0);
+
+    for (int i = 0; i < prices.length; i++) {
+      DateTime timestamp = timestamps[i];
+      int month = timestamp.month;
+      updatedEarnings[month - 1] += prices[i].toDouble();
+    }
+
+    setState(() {
+      earnings = updatedEarnings;
+    });
   }
 
   @override
@@ -198,20 +195,18 @@ class _RevenueState extends State<Revenue> {
                       show: false,
                     ),
                     minY: 0,
-                    maxY: earnings.reduce((a, b) => a > b ? a : b), // 최대 수익값 설정
+                    maxY: earnings.reduce((a, b) => a > b ? a : b),
                     barGroups: List.generate(
                       months.length,
                           (index) => BarChartGroupData(
                         x: index,
                         barRods: [
                           BarChartRodData(
-                            y: prices[index].toDouble(), // 수익 데이터
+                            y: earnings[index],
                             width: 16,
                             colors: [Colors.amber],
-                            belowBarData: BarAreaData(show: false),
                           ),
                         ],
-                        showingTooltipIndicators: [0],
                       ),
                     ),
                   ),
