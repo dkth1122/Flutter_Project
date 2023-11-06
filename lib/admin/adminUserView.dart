@@ -166,7 +166,7 @@ class AdminUserViewPage extends StatelessWidget {
               ),
               Divider(color :Colors.grey),
               Text(
-                '고객 정보',
+                '쿠폰 정보',
                 style: TextStyle(
                   fontSize: 30,
                 ),

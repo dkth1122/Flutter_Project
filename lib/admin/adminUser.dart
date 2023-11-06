@@ -51,7 +51,7 @@ class _AdminUserState extends State<AdminUser> {
                       userListStream = FirebaseFirestore.instance.collection('userList')
                           .where('userId', isGreaterThanOrEqualTo: searchKeyword)
                           .where('userId', isLessThan: searchKeyword + 'z')
-                          .where('name', isNotEqualTo: '관리자계정')
+                          .where('userId', isNotEqualTo: 'admin')
                           .orderBy('userId')
                           .snapshots();
                     });
