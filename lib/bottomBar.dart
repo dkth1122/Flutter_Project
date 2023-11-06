@@ -244,7 +244,7 @@ class _BottomBarState extends State<BottomBar> {
                 // 'E'인 경우 MyExpert로 이동
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert()));
               } else {
-                // 다른 경우에는 어떤 페이지로 이동할지 정의하세요
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
               }
             }
           },
