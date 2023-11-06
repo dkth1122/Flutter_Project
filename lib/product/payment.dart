@@ -10,11 +10,13 @@ class Payment extends StatelessWidget {
   final String user;
   final int price;
   final String productName;
+  final String seller; // 판매자 정보 추가
 
   Payment({
     required this.user,
     required this.price,
     required this.productName,
+    required this.seller, // 판매자 정보를 추가
   });
 
 
@@ -66,7 +68,9 @@ class Payment extends StatelessWidget {
               paymentResult: result,
               user: user,        // 넘겨줄 user 데이터
               price: price,      // 넘겨줄 price 데이터
-              productName: productName,  // 넘겨줄 productName 데이터
+              productName: productName,
+              seller: seller,// 넘겨줄 productName 데이터
+
             ),
           ),
         );

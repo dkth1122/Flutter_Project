@@ -1,5 +1,10 @@
+import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:provider/provider.dart';
+
+import '../join/userModel.dart';
 
 class Revenue extends StatefulWidget {
   @override
@@ -7,25 +12,101 @@ class Revenue extends StatefulWidget {
 }
 
 class _RevenueState extends State<Revenue> {
-  List<String> months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  List<double> earnings = [1000, 1500, 1200, 2200, 1800, 2100, 2300, 1000, 1500, 1200, 2200, 1800];
+  // 월 목록
+  List<String> months = [
+    '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'
+  ];
+
+  // 수익 데이터 (초기값은 0)
+  List<double> earnings = List.generate(12, (index) => 0.0);
+
+  // 출금 가능 수익금, 예상 수익금, 출금 완료 수익금
   double availableEarnings = 1000.0;
   double expectedEarnings = 2000.0;
   double completedWithdrawals = 500.0;
+
+  // Firestore 인스턴스 생성
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  // 사용자 정보 및 데이터 리스트
+  String user = "";
+
+  @override
+  void initState() {
+    super.initState();
+
+    // 사용자 정보 가져오기
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+    if (um.isLogin) {
+      user = um.userId!;
+      print(user);
+    } else {
+      user = "없음";
+      print("로그인 안됨");
+    }
+
+    // 데이터 가져오기
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    // Firestore 컬렉션 초기화
+    final productCollection = _firestore.collection('products');
+    final orderCollection = _firestore.collection('orders');
+
+    // 사용자와 관련된 상품 데이터 가져오기
+    final productQuery = await productCollection.where('user', isEqualTo: user).get();
+    final productDocs = productQuery.docs;
+
+    // 상품 이름 리스트 생성
+    final productNames = productDocs.map((doc) => doc['pName'] as String).toList();
+
+    // 주문 데이터 가져오기
+    final orderQuery = await orderCollection.where('productName', whereIn: productNames).get();
+    final orderDocs = orderQuery.docs;
+
+    // 주문 데이터 처리 및 그래프 업데이트
+    updateGraphData(orderDocs);
+  }
+
+  void updateGraphData(List<QueryDocumentSnapshot> orderDocs) {
+    // 그래프 데이터 초기화
+    for (int i = 0; i < months.length; i++) {
+      earnings[i] = 0.0;
+    }
+
+    // 주문 데이터에서 월별 수익 합산
+    for (final orderDoc in orderDocs) {
+      final orderInfo = json.decode(orderDoc['user']) as Map<String, dynamic>;
+      final price = orderInfo['price'] as int;
+      final timestamp = orderDoc['timestamp'] as Timestamp;
+      final timestampDateTime = timestamp.toDate();
+
+      // 월별 수익 업데이트
+      for (int i = 0; i < months.length; i++) {
+        if (timestampDateTime.month == (i + 1)) {
+          earnings[i] += price.toDouble();
+        }
+      }
+    }
+
+    // 그래프 데이터 업데이트
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.white, // 배경색
-          elevation: 0, // 그림자 효과 제거
-          title: Text(
-            '수익관리',
-            style: TextStyle(
-              color: Colors.black, // 타이틀 색상
-              fontSize: 24.0, // 타이틀 폰트 크기
-            ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          '수익관리',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24.0,
           ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -35,8 +116,8 @@ class _RevenueState extends State<Revenue> {
             Container(
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Colors.grey[300]!, // Container의 외곽 보더 색상
-                  width: 1.0,              // Container의 외곽 보더 두께
+                  color: Colors.grey[300]!,
+                  width: 1.0,
                 ),
                 borderRadius: BorderRadius.circular(8.0),
               ),
@@ -53,7 +134,7 @@ class _RevenueState extends State<Revenue> {
                           // 출금 신청 로직을 추가
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.amber, // 버튼 색상 설정
+                          primary: Colors.amber,
                         ),
                         child: Text('출금 신청'),
                       ),
@@ -63,20 +144,20 @@ class _RevenueState extends State<Revenue> {
                           // 출금 취소 로직을 추가
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.grey, // 버튼 색상 설정
+                          primary: Colors.grey,
                         ),
                         child: Text('출금 취소'),
                       ),
                     ],
                   ),
                   Divider(
-                    color: Colors.grey[300]!, // 구분선의 색상
-                    thickness: 1.0,            // 구분선의 두께
+                    color: Colors.grey[300]!,
+                    thickness: 1.0,
                   ),
                   _buildStatRow("예상 수익금", expectedEarnings),
                   Divider(
-                    color: Colors.grey[300]!, // 구분선의 색상
-                    thickness: 1.0,            // 구분선의 두께
+                    color: Colors.grey[300]!,
+                    thickness: 1.0,
                   ),
                   _buildStatRow("출금 완료 수익금", completedWithdrawals),
                 ],
@@ -89,8 +170,8 @@ class _RevenueState extends State<Revenue> {
                 width: 500,
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Colors.grey[300]!, // Container의 외곽 보더 색상
-                    width: 1.0,              // Container의 외곽 보더 두께
+                    color: Colors.grey[300]!,
+                    width: 1.0,
                   ),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -100,7 +181,6 @@ class _RevenueState extends State<Revenue> {
                     titlesData: FlTitlesData(
                       leftTitles: SideTitles(
                         showTitles: true,
-                        //Y축에 담을 정보 내용
                         getTextStyles: (context, value) => TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
@@ -140,8 +220,7 @@ class _RevenueState extends State<Revenue> {
                       show: false,
                     ),
                     minY: 0,
-                    //추후 1~12월 거래액 중 최대값을 maxY에 넣기
-                    maxY: 2500,
+                    maxY: earnings.reduce((a, b) => a > b ? a : b), // 최대 수익값 설정
                     barGroups: List.generate(
                       months.length,
                           (index) => BarChartGroupData(

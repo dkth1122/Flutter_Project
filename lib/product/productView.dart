@@ -31,6 +31,7 @@ class _ProductViewState extends State<ProductView>
   bool _isFavorite = false;
   late Stream<QuerySnapshot>? productStream;
   String chatUser = "";
+  String seller = "";
 
   @override
   void initState() {
@@ -84,6 +85,7 @@ class _ProductViewState extends State<ProductView>
         .then((QuerySnapshot snapshot) {
       snapshot.docs.forEach((document) {
         final currentCount = document['cnt'] as int;
+        seller = document['user'] as String;
         document.reference.update({'cnt': currentCount + 1});
       });
 
@@ -361,6 +363,7 @@ class _ProductViewState extends State<ProductView>
                                     productName: widget.productName,
                                     price: widget.price,
                                     imageUrl : widget.imageUrl,
+                                    seller: seller,
                                   ),
                                 ),
                               );
