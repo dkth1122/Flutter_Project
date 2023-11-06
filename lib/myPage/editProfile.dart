@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:project_flutter/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_flutter/myPage/alertControl.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 import '../join/userModel.dart';
 import 'deleteAccount.dart';
 
@@ -22,7 +26,7 @@ class _EditProfileState extends State<EditProfile> {
 
 
   final ImagePicker _imagePicker = ImagePicker();
-  XFile? _image;
+  File? _image;
 
   Padding buildTextField(String labelText, String hintText, String value) {
     return Padding(
@@ -130,29 +134,57 @@ class _EditProfileState extends State<EditProfile> {
           });
           _email.clear();
         }
-        // 업데이트 성공 시 사용자에게 성공 메시지 표시
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('업데이트 완료'),
-              content: Text('이메일이 성공적으로 업데이트되었습니다.'),
-              actions: [
-                TextButton(
-                  child: Text('확인'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    FocusScope.of(context).unfocus();
-                    setState(() {
-                      labelText = _email.text;
-                    });
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
+        final storageRef = FirebaseStorage.instance.ref().child('profile_images/${Uuid().v4()}.png');
+        final uploadTask = storageRef.putFile(_image!);
+
+
+        uploadTask.then((TaskSnapshot snapshot) {
+          // 이미지 업로드가 성공하면, 다운로드 URL을 얻어옵니다.
+          snapshot.ref.getDownloadURL().then((downloadURL) async {
+            // Firestore에 사용자 데이터 업데이트
+            CollectionReference users = FirebaseFirestore.instance.collection("userList");
+            QuerySnapshot snap = await users.where('userId', isEqualTo: widget.data['userId']).get();
+
+            for (QueryDocumentSnapshot doc in snap.docs) {
+              await users.doc(doc.id).update({
+                'email': _email.text,
+                'profileImageUrl': downloadURL, // 이미지 다운로드 URL을 저장
+              });
+
+              setState(() {
+                Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
+                if (data != null) {
+                  labelText = data['email'] ?? '';
+                  labelText = _email.text;
+                }
+              });
+              _email.clear();
+            }
+
+            // 업데이트 성공 시 사용자에게 성공 메시지 표시
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('업데이트 완료'),
+                  content: Text('이메일 및 프로필 이미지가 성공적으로 업데이트되었습니다.'),
+                  actions: [
+                    TextButton(
+                      child: Text('확인'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        FocusScope.of(context).unfocus();
+                        setState(() {
+                          labelText = _email.text;
+                        });
+                      },
+                    ),
+                  ],
+                );
+              },
             );
-          },
-        );
+          });
+        });
       } catch (e) {
         // 업데이트 실패 시 사용자에게 실패 메시지 표시
         showDialog(
@@ -160,7 +192,7 @@ class _EditProfileState extends State<EditProfile> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('업데이트 실패'),
-              content: Text('이메일 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.'),
+              content: Text('이메일 및 프로필 이미지 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.'),
               actions: [
                 TextButton(
                   child: Text('확인'),
@@ -461,40 +493,29 @@ class _EditProfileState extends State<EditProfile> {
       child: Column(
         children: [
           Text(
-            'Choose Profile photo',
+            '프로필사진을 선택하세요',
             style: TextStyle(
               fontSize: 20,
             ),
           ),
           SizedBox(height: 20,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              TextButton.icon(
-                icon: Icon(Icons.camera, size: 40),
-                onPressed: () async{
-                  XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
-                  if (image != null) {
-                    setState(() {
-                      _image = image;
-                    });
-                  }
-                },
-                label: Text('Camera', style: TextStyle(fontSize: 20)),
-              ),
-              TextButton.icon(
-                icon: Icon(Icons.photo_library, size: 40),
-                onPressed: () async{
-                  XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
-                  if (image != null) {
-                    setState(() {
-                      _image = image;
-                    });
-                  }
-                },
-                label: Text('Gallery', style: TextStyle(fontSize: 20)),
-              ),
-            ],
+          TextButton.icon(
+            icon: Icon(Icons.photo_library, size: 40),
+            onPressed: () async{
+              final pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                final imageFile = File(pickedFile.path);
+                setState(() {
+                  _image = imageFile;
+                });
+              } else {
+                // 이미지 선택이 취소되면 이미지 변수 초기화
+                setState(() {
+                  _image = null;
+                });
+              }
+            },
+            label: Text('Gallery', style: TextStyle(fontSize: 20)),
           ),
         ],
       ),
