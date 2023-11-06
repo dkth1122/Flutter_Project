@@ -6,12 +6,14 @@ class PaymentCompletePage extends StatelessWidget {
   final String user;
   final int price;
   final String productName;
+  final String seller;
 
   PaymentCompletePage({
     required this.paymentResult,
     required this.user,
     required this.price,
     required this.productName,
+    required this.seller
   });
 
   @override
@@ -42,6 +44,7 @@ class PaymentCompletePage extends StatelessWidget {
                     'price': price,
                     'orderNo' : paymentResult['merchant_uid'],
                     'status':  paymentResult['imp_success'],
+                    'seller': seller,
                     'timestamp': FieldValue.serverTimestamp(),
                   });
                   // 메인 페이지로 이동

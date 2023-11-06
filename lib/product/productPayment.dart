@@ -12,11 +12,13 @@ class ProductPayment extends StatefulWidget {
   final String productName;
   final String price;
   final String imageUrl;
+  final String seller; // 사용자 정보 추가
 
   const ProductPayment({
     required this.productName,
     required this.price,
-    required this.imageUrl
+    required this.imageUrl,
+    required this.seller
   });
 
   @override
@@ -56,6 +58,7 @@ class _ProductPaymentState extends State<ProductPayment> {
       user = "없음";
       print("로그인 안됨");
     }
+
   }
 
   @override
@@ -250,10 +253,12 @@ class _ProductPaymentState extends State<ProductPayment> {
                   },
                 );
               } else {
+
                 // 결제 처리를 위한 함수 호출 또는 네비게이션 추가
                 setState(() {
                   totalPrice = calculateDiscountedPrice();
                 });
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -262,6 +267,7 @@ class _ProductPaymentState extends State<ProductPayment> {
                       //어느게 총 가격인지 몰라서 임시로 넣음
                       price: totalPrice,
                       productName: widget.productName, // 상품명
+                      seller: widget.seller,
                     ),
                   ),
                 );
