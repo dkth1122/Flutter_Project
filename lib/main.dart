@@ -42,7 +42,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(
         primaryColor: Color(0xFF4E598C),
-        hintColor: Color(0xFFFCAF58),
+        hintColor: Color(0xff424242),
         fontFamily: 'Pretendard',
         textTheme: TextTheme(
           bodyLarge: TextStyle(color: Colors.black, fontSize: 16),
