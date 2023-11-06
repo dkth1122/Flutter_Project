@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:project_flutter/expert/ratings.dart';
 import 'package:project_flutter/expert/revenue.dart';
-import 'package:project_flutter/expert/vacation.dart';
 
 import '../myPage/customerLike.dart';
-import 'adManagement.dart';
-import 'adRequest.dart';
 import 'messageResponse.dart';
 
 class MyExpert extends StatefulWidget {
@@ -88,16 +85,6 @@ class _MyExpertState extends State<MyExpert> {
                   onTap: () {
                     Navigator.of(context)
                         .push(MaterialPageRoute(builder: (context) => Revenue()));
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.beach_access), // 아이콘 추가
-                  title: Text(
-                    '휴가 설정',
-                  ),
-                  onTap: () {
-                    Navigator.of(context)
-                        .push(MaterialPageRoute(builder: (context) => Vacation()));
                   },
                 ),
                 ListTile(
