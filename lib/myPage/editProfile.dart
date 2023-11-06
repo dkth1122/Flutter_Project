@@ -76,6 +76,8 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
+
+
   Future<void> updateUserData() async {
     String emailText = _email.text;
 
@@ -158,6 +160,7 @@ class _EditProfileState extends State<EditProfile> {
                   labelText = _email.text;
                 }
               });
+              _image = null;
               _email.clear();
             }
 
@@ -207,6 +210,23 @@ class _EditProfileState extends State<EditProfile> {
       }
     }
   }
+
+  Future<String?> getUserProfileImageUrl() async {
+    try {
+      CollectionReference users = FirebaseFirestore.instance.collection("userList");
+      QuerySnapshot snap = await users.where('userId', isEqualTo: widget.data['userId']).get();
+
+      for (QueryDocumentSnapshot doc in snap.docs) {
+        return doc['profileImageUrl'] as String?;
+      }
+    } catch (e) {
+      // 여기서 오류 처리를 수행합니다. 예를 들어, 기본 이미지 URL을 반환할 수 있습니다.
+      return null;
+    }
+  }
+
+
+
 
   //이메일 중복검사
   Future<bool> isEmailAlreadyRegistered(String email) async {
@@ -333,6 +353,28 @@ class _EditProfileState extends State<EditProfile> {
   }
   @override
   Widget build(BuildContext context) {
+
+    FutureBuilder<String?>(
+      future: getUserProfileImageUrl(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator(); // 이미지 URL을 가져오는 동안 로딩 인디케이터를 표시할 수 있습니다.
+        } else if (snapshot.hasError || snapshot.data == null) {
+          // 오류가 발생하거나 이미지 URL이 사용 불가능한 경우를 처리합니다.
+          return CircleAvatar(
+            radius: 70,
+            backgroundImage: AssetImage('assets/profile.png'),
+          );
+        } else {
+          return CircleAvatar(
+            radius: 70,
+            backgroundImage: NetworkImage(snapshot.data!),
+          );
+        }
+      },
+    );
+
+
     return MaterialApp(
       theme: ThemeData(
         primaryColor: Color(0xFF4E598C),
@@ -406,7 +448,7 @@ class _EditProfileState extends State<EditProfile> {
                     padding: const EdgeInsets.all(10.0),
                     child: CircleAvatar(
                       radius: 70,
-                      backgroundImage: AssetImage('assets/profile.png'),
+                      // backgroundImage: NetworkImage(imageUrl!),
                     ),
                   ),
                   Padding(
