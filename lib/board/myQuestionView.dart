@@ -44,6 +44,13 @@ class _MyQuestionViewState extends State<MyQuestionView> {
             ),
             SizedBox(height: 50,),
             SizedBox(height: 10,),
+
+            Row(
+              children: [
+                Text( '운영자 답변', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              ],
+            ),
+            SizedBox(height: 10,),
             Expanded(child: _listComments())
 
           ],
@@ -76,19 +83,15 @@ class _MyQuestionViewState extends State<MyQuestionView> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text( '운영자 답변', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-                    Text('작성일: ${commentData['timestamp'].toDate().toString()}'),
-                  ],
-                ),
-                SizedBox(height: 10,),
-                Row(
-                  children: [
                     Text(
                       commentData['comments'],
                       style: TextStyle(fontSize: 18),
                     ),
+
+                    Text('작성일: ${commentData['timestamp'].toDate().toString()}'),
                   ],
                 ),
+                SizedBox(height: 20,),
               ]
             );
           },

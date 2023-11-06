@@ -190,7 +190,7 @@ class _SearchSuccessState extends State<SearchSuccess> {
             .where((document) {
           Map<String, dynamic> data = document.data() as Map<String, dynamic>;
           String title = data['title'];
-          String description = data['description'];
+          String description = data['portfolioDescription'];
           return title.contains(widget.searchText) || description.contains(widget.searchText);
         }).toList();
 
@@ -230,7 +230,7 @@ class _SearchSuccessState extends State<SearchSuccess> {
                             ClipRRect(
                               borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
                               child: Image.network(
-                                data['iUrl'],
+                                data['thumbnailUrl'],
                                 width: 130,
                                 height: 100,
                                 fit: BoxFit.cover,
@@ -248,9 +248,9 @@ class _SearchSuccessState extends State<SearchSuccess> {
                                 Container(
                                   width: 110,
                                   child: Text(
-                                    data['description'].length > 20
-                                        ? '${data['description'].substring(0, 20)}...'
-                                        : data['description'],
+                                    data['portfolioDescription'].length > 20
+                                        ? '${data['portfolioDescription'].substring(0, 20)}...'
+                                        : data['portfolioDescription'],
                                   ),
                                 ),
                               ],
@@ -261,7 +261,7 @@ class _SearchSuccessState extends State<SearchSuccess> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Text(
-                              '가격: ${data['description'].toString()}',
+                              '카테고리: ${data['category']}',
                               style: TextStyle(fontSize: 12),
                             ),
                           ],
