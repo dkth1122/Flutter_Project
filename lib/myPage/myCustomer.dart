@@ -105,7 +105,7 @@ class _MyCustomerState extends State<MyCustomer> {
                   backgroundImage: NetworkImage(profileImageUrl),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(20.0),
+                  padding: const EdgeInsets.all(10.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -116,13 +116,15 @@ class _MyCustomerState extends State<MyCustomer> {
               ],
             ),
           ),
-          Container(
-            margin: EdgeInsets.fromLTRB(10, 0, 10, 5),
-            width: double.infinity,
-            height: 100,
-            decoration: BoxDecoration(
-              color: Colors.grey[300],
-              borderRadius: BorderRadius.circular(20.0),
+          Expanded(
+            child: Container(
+              margin: EdgeInsets.fromLTRB(10, 0, 10, 5),
+              width: double.infinity,
+              height: MediaQuery.of(context).size.height - kToolbarHeight - 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(20.0),
+              ),
             ),
           ),
           Divider(
