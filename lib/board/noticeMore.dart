@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../join/userModel.dart';
+import 'notice.dart';
 import 'noticeView.dart';
 
 class NoticeMore extends StatefulWidget {
@@ -11,9 +14,18 @@ class NoticeMore extends StatefulWidget {
 }
 
 class _NoticeMoreState extends State<NoticeMore> {
-  final Stream<QuerySnapshot> noticeStream = FirebaseFirestore.instance.collection("notice").snapshots();
+  String sessionId = "";
+  final Stream<QuerySnapshot> noticeStream = FirebaseFirestore.instance.collection("notice").orderBy("timestamp", descending: true).snapshots();
   @override
   Widget build(BuildContext context) {
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+
+    if (um.isLogin) {
+      sessionId = um.userId!;
+    } else {
+      sessionId = "";
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text("공지사항"),backgroundColor: Color(0xFFFF8C42),),
       body: SingleChildScrollView(
@@ -28,7 +40,23 @@ class _NoticeMoreState extends State<NoticeMore> {
                   Text("공지사항", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
                 ],
               ),
-              _notice()
+              _notice(),
+              SizedBox(height: 10,),
+              Visibility(
+                visible: sessionId == "admin",
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Notice()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Color(0xFFFF8C42),
+                  ),
+                  child: Text('공지사항 등록하기'),
+                ),
+              ),
             ],
           ),
         ),

@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../join/userModel.dart';
+import 'faq.dart';
 import 'faqView.dart';
 import 'noticeView.dart';
 
@@ -12,9 +15,18 @@ class FaqMore extends StatefulWidget {
 }
 
 class _FaqMoreState extends State<FaqMore> {
-  final Stream<QuerySnapshot> faqStream = FirebaseFirestore.instance.collection("faq").snapshots();
+  String sessionId = "";
+  final Stream<QuerySnapshot> faqStream = FirebaseFirestore.instance.collection("faq").orderBy("timestamp", descending: true).snapshots();
   @override
   Widget build(BuildContext context) {
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+
+    if (um.isLogin) {
+      sessionId = um.userId!;
+    } else {
+      sessionId = "";
+    }
+
     return Scaffold(
       appBar: AppBar(title: Text("FAQ"),backgroundColor: Color(0xFFFF8C42),),
       body: SingleChildScrollView(
@@ -29,7 +41,23 @@ class _FaqMoreState extends State<FaqMore> {
                   ],
                 ),
                 SizedBox(height: 10,),
-                _faq()
+                _faq(),
+                SizedBox(height: 10,),
+                Visibility(
+                  visible: sessionId == "admin",
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Faq()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Color(0xFFFF8C42),
+                    ),
+                    child: Text('FAQ 등록하기'),
+                  ),
+                ),
               ],
             ),
           ),

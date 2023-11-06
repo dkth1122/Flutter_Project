@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import '../firebase_options.dart';
+import 'noticeMore.dart';
 import 'noticeView.dart';
 
 void main() async {
@@ -44,6 +45,10 @@ class _NoticeState extends State<Notice> {
 
       _title.clear();
       _content.clear();
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => NoticeMore()), // FaqMore 페이지로 이동
+      );
     } else {
       print("제목 또는 내용을 입력해주세요.");
     }
