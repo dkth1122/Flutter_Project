@@ -12,12 +12,48 @@ import 'messageResponse.dart';
 import 'myPortfolio.dart';
 
 class MyExpert extends StatefulWidget {
+  final String userId;
+
+  const MyExpert({required this.userId, Key? key}) : super(key: key);
   @override
-  State<MyExpert> createState() => _MyExpertState();
+  State<MyExpert> createState() => _MyExpertState(userId: userId);
 }
 
 class _MyExpertState extends State<MyExpert> {
+  late final String userId;
   late Map<String, dynamic> data;
+  String profileImageUrl = '';
+
+  _MyExpertState({required this.userId});
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserProfileImageUrl(); // 프로필 이미지 URL을 로드
+  }
+
+  void loadUserProfileImageUrl() async {
+    String? imageUrl = await getUserProfileImageUrl(userId);
+    setState(() {
+      profileImageUrl = imageUrl ?? 'assets/profile.png';
+    });
+  }
+
+  Future<String?> getUserProfileImageUrl(String userId) async {
+    try {
+      UserModel userModel = Provider.of<UserModel>(context);
+      CollectionReference users = FirebaseFirestore.instance.collection("userList");
+      QuerySnapshot snap = await users.where('userId', isEqualTo: userModel.userId).get();
+
+      for (QueryDocumentSnapshot doc in snap.docs) {
+        return doc['profileImageUrl'] as String?;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -69,9 +105,14 @@ class _MyExpertState extends State<MyExpert> {
               child: Row(
                 children: [
                   CircleAvatar(
-                    radius: 50,
-                    backgroundImage: AssetImage('assets/profile.png'),
+                    radius: 70,
+                    backgroundImage: profileImageUrl.isNotEmpty
+                        ? NetworkImage(profileImageUrl)
+                        : Image.asset('assets/profile.png').image,
+
                   ),
+
+
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(

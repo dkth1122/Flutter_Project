@@ -238,7 +238,7 @@ class _BottomBarState extends State<BottomBar> {
               if (status == 'C') {
                 print("의뢰인");
                 // 'C'인 경우 MyCustomer로 이동
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyCustomer()));
+                // Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyCustomer()));
               } else if (status == 'E') {
                 print("전문가");
                 // 'E'인 경우 MyExpert로 이동
