@@ -48,7 +48,8 @@ class PaymentCompletePage extends StatelessWidget {
                     'status':  paymentResult['imp_success'],
                     'seller': seller,
                     'timestamp': FieldValue.serverTimestamp(),
-                    'cName' : selectedCouponName
+                    'cName' : selectedCouponName,
+                    'withdraw' : 'N'
                   });
                   FirebaseFirestore.instance
                       .collection('coupon')
