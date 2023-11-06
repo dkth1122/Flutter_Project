@@ -154,10 +154,7 @@ class _CircularDialogState extends State<CircularDialog> {
             ),
             InkWell(
               onTap: (){
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => pageChange[pageIndex]),
-                );
+
               },
               child: Text(text)
             ),
@@ -253,6 +250,7 @@ class _BottomBarState extends State<BottomBar> {
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert()));
               } else {
                 // 다른 경우에는 어떤 페이지로 이동할지 정의하세요
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert()));
               }
             }
           },
