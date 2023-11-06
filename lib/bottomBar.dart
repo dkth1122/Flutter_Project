@@ -25,9 +25,9 @@ class _CircularDialogState extends State<CircularDialog> {
   double _dialogHeight = 0.0;
 
   List<Offset> calculateIconOffsets() {
-    final double centerX = 300 / 2 - 15; // 컨테이너 가로 길이의 절반
+    final double centerX = 300 / 2 - 25; // 컨테이너 가로 길이의 절반
     final double centerY = 300 / 2 - 25; // 컨테이너 세로 길이의 절반
-    final double radius = 110.0; // 반지름
+    final double radius = 100.0; // 반지름
 
     final List<Offset> iconOffsets = [];
 
@@ -85,7 +85,7 @@ class _CircularDialogState extends State<CircularDialog> {
               });
             },
             child: Transform.translate(
-              offset: Offset(0, _dialogHeight * (1.2 - value)), // 아래에서 위로 슬라이딩
+              offset: Offset(0, _dialogHeight * (1 - value)), // 아래에서 위로 슬라이딩
               child: Transform.scale(
                 scale: dialogScale,
                 child: Transform.rotate(
@@ -152,7 +152,15 @@ class _CircularDialogState extends State<CircularDialog> {
                 icon,
               ),
             ),
-            Text(text),
+            InkWell(
+              onTap: (){
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pageChange[pageIndex]),
+                );
+              },
+              child: Text(text)
+            ),
           ],
         ),
       ),

@@ -617,10 +617,10 @@ class _HomePageState extends State<HomePage> {
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
                                 Container(
-                                  width: 150,
+                                  width: 110,
                                   child: Text(
-                                    data['pDetail'].length > 30
-                                        ? '${data['pDetail'].substring(0, 30)}...'
+                                    data['pDetail'].length > 20
+                                        ? '${data['pDetail'].substring(0, 20)}...'
                                         : data['pDetail'],
                                   ),
                                 ),
