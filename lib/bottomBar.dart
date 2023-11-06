@@ -25,16 +25,16 @@ class _CircularDialogState extends State<CircularDialog> {
   double _dialogHeight = 0.0;
 
   List<Offset> calculateIconOffsets() {
-    final double centerX = 300 / 2 - 25; // 컨테이너 가로 길이의 절반
-    final double centerY = 300 / 2 - 25; // 컨테이너 세로 길이의 절반
+    final double centerX = 300 / 2; // 컨테이너 가로 길이의 절반
+    final double centerY = 300 / 2; // 컨테이너 세로 길이의 절반
     final double radius = 100.0; // 반지름
 
     final List<Offset> iconOffsets = [];
 
     for (int i = 0; i < 8; i++) {
       final double angle = i * (pi / 4); // 45도 간격으로 아이콘 배치
-      final double x = centerX + radius * cos(angle) - 10; // 20은 아이콘의 크기 반값
-      final double y = centerY + radius * sin(angle) - 10;
+      final double x = centerX + radius * cos(angle) - 25; // 20은 아이콘의 크기 반값
+      final double y = centerY + radius * sin(angle) - 30;
       iconOffsets.add(Offset(x, y));
     }
 
