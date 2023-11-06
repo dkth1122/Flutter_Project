@@ -12,7 +12,6 @@ import 'package:provider/provider.dart';
 import 'expert/my_expert.dart';
 import 'join/userModel.dart';
 import 'myPage/myCustomer.dart';
-import 'myPage/my_page.dart';
 
 
 void main() {

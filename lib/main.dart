@@ -2,22 +2,14 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:project_flutter/chat/chatList.dart';
-import 'package:project_flutter/myPage/my_page.dart';
-import 'package:project_flutter/product/product.dart';
 import 'package:project_flutter/product/productView.dart';
 import 'package:project_flutter/search/search.dart';
 import 'package:project_flutter/bottomBar.dart';
-import 'package:project_flutter/test.dart';
-import 'package:project_flutter/test2.dart';
 import 'package:provider/provider.dart';
 import 'admin/adminDomain.dart';
 import 'category/categoryProduct.dart';
 import 'chat/ChatProvider.dart';
-import 'chat/chat.dart';
-import 'expert/my_expert.dart';
 import 'firebase_options.dart';
-import 'join/login_email.dart';
 import 'join/userModel.dart';
 
 void main() async {

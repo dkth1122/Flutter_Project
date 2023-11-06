@@ -3,16 +3,10 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:project_flutter/bottomBar.dart';
 import 'package:project_flutter/product/productAdd.dart';
 import 'package:project_flutter/product/productView.dart';
-import 'package:project_flutter/join/userModel.dart';
-import 'package:project_flutter/test2.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-
-import '../chat/chatList.dart';
-import '../join/login_email.dart';
-import '../myPage/my_page.dart';
 
 class Product extends StatefulWidget {
   @override
@@ -318,50 +312,7 @@ class _ProductState extends State<Product> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        height: 60,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Product())
-                  );
-                },
-                icon: Icon(Icons.add_circle_outline)
-            ),
-            IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => ChatList())
-                  );
-                },
-                icon: Icon(Icons.chat_outlined)
-            ),
-            IconButton(
-              onPressed: () async {
-                final userModel = Provider.of<UserModel>(context, listen: false);
-                if (userModel.isLogin) {
-                  // 사용자가 로그인한 경우에만 MyPage로 이동
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyPage()));
-                } else {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
-                }
-              },
-              icon: Icon(Icons.person),
-            ),
-            IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Test2())
-                  );
-                },
-                icon: Icon(Icons.telegram_sharp)
-            ),
-          ],
-        ),
-      ),
+      bottomNavigationBar: BottomBar(),
     );
   }
 
