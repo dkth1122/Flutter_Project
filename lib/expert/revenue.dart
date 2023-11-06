@@ -20,10 +20,14 @@ class _RevenueState extends State<Revenue> {
   // 수익 데이터 (초기값은 0)
   List<double> earnings = List.generate(12, (index) => 0.0);
 
-  // 출금 가능 수익금, 예상 수익금, 출금 완료 수익금
-  double availableEarnings = 1000.0;
-  double expectedEarnings = 2000.0;
   double completedWithdrawals = 500.0;
+
+  List<int> prices = [];
+  List<String> productNames = [];
+  List<DateTime> timestamps = [];
+
+  // 출금 가능 수익금
+  double availableEarnings = 0.0;
 
   // Firestore 인스턴스 생성
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -51,46 +55,25 @@ class _RevenueState extends State<Revenue> {
 
   Future<void> fetchData() async {
     // Firestore 컬렉션 초기화
-    final productCollection = _firestore.collection('products');
     final orderCollection = _firestore.collection('orders');
 
-    // 사용자와 관련된 상품 데이터 가져오기
-    final productQuery = await productCollection.where('user', isEqualTo: user).get();
-    final productDocs = productQuery.docs;
-
-    // 상품 이름 리스트 생성
-    final productNames = productDocs.map((doc) => doc['pName'] as String).toList();
-
-    // 주문 데이터 가져오기
-    final orderQuery = await orderCollection.where('productName', whereIn: productNames).get();
+    // 사용자와 관련된 주문 데이터 가져오기
+    final orderQuery = await orderCollection.where('seller', isEqualTo: user).get();
     final orderDocs = orderQuery.docs;
 
-    // 주문 데이터 처리 및 그래프 업데이트
-    updateGraphData(orderDocs);
-  }
+    for (QueryDocumentSnapshot orderDoc in orderDocs) {
+      int price = orderDoc['price'] as int;
+      String productName = orderDoc['productName'] as String;
+      Timestamp timestamp = orderDoc['timestamp'] as Timestamp;
+      DateTime timestampDateTime = timestamp.toDate();
 
-  void updateGraphData(List<QueryDocumentSnapshot> orderDocs) {
-    // 그래프 데이터 초기화
-    for (int i = 0; i < months.length; i++) {
-      earnings[i] = 0.0;
+      prices.add(price);
+      productNames.add(productName);
+      timestamps.add(timestampDateTime);
     }
 
-    // 주문 데이터에서 월별 수익 합산
-    for (final orderDoc in orderDocs) {
-      final orderInfo = json.decode(orderDoc['user']) as Map<String, dynamic>;
-      final price = orderInfo['price'] as int;
-      final timestamp = orderDoc['timestamp'] as Timestamp;
-      final timestampDateTime = timestamp.toDate();
-
-      // 월별 수익 업데이트
-      for (int i = 0; i < months.length; i++) {
-        if (timestampDateTime.month == (i + 1)) {
-          earnings[i] += price.toDouble();
-        }
-      }
-    }
-
-    // 그래프 데이터 업데이트
+    // 출금 가능 수익금를 업데이트
+    availableEarnings = prices.reduce((a, b) => a + b).toDouble();
     setState(() {});
   }
 
@@ -150,11 +133,6 @@ class _RevenueState extends State<Revenue> {
                       ),
                     ],
                   ),
-                  Divider(
-                    color: Colors.grey[300]!,
-                    thickness: 1.0,
-                  ),
-                  _buildStatRow("예상 수익금", expectedEarnings),
                   Divider(
                     color: Colors.grey[300]!,
                     thickness: 1.0,
@@ -227,11 +205,13 @@ class _RevenueState extends State<Revenue> {
                         x: index,
                         barRods: [
                           BarChartRodData(
-                            y: earnings[index],
+                            y: prices[index].toDouble(), // 수익 데이터
                             width: 16,
                             colors: [Colors.amber],
+                            belowBarData: BarAreaData(show: false),
                           ),
                         ],
+                        showingTooltipIndicators: [0],
                       ),
                     ),
                   ),
