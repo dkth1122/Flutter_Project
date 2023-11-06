@@ -1,9 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PaymentCompletePage extends StatelessWidget {
   final Map<String, String> paymentResult;
+  final String user;
+  final int price;
+  final String productName;
 
-  PaymentCompletePage({required this.paymentResult});
+  PaymentCompletePage({
+    required this.paymentResult,
+    required this.user,
+    required this.price,
+    required this.productName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +28,32 @@ class PaymentCompletePage extends StatelessWidget {
             SizedBox(height: 20),
             Text('결제 상태: ${paymentResult['imp_success']}'),
             Text('주문번호: ${paymentResult['merchant_uid']}'),
-            Text('결제금액: ${paymentResult['amount']}'),
-            // 기타 필요한 결제 결과 정보를 추가하세요
+            Text('결제금액: $price'),
+            ElevatedButton(
+              onPressed: () async {
+
+                String successStatus = paymentResult['imp_success'] ?? 'false';
+                if (successStatus == 'true') {
+                  // 결제가 성공한 경우
+                  // Firestore 데이터베이스에 주문 내역 추가
+                  await FirebaseFirestore.instance.collection('orders').add({
+                    'user': user,
+                    'productName': productName,
+                    'price': price,
+                    'orderNo' : paymentResult['merchant_uid'],
+                    'status':  paymentResult['imp_success'],
+                    'timestamp': FieldValue.serverTimestamp(),
+                  });
+                  // 메인 페이지로 이동
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                } else {
+                  // 결제가 실패한 경우
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                }
+
+              },
+              child: Text('확인'),
+            ),
           ],
         ),
       ),

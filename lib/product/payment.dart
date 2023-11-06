@@ -60,10 +60,15 @@ class Payment extends StatelessWidget {
         print(price);
         print(productName);
         Navigator.push(
-            context,
-            MaterialPageRoute(
-            builder: (context) => PaymentCompletePage(paymentResult: result)
-            )
+          context,
+          MaterialPageRoute(
+            builder: (context) => PaymentCompletePage(
+              paymentResult: result,
+              user: user,        // 넘겨줄 user 데이터
+              price: price,      // 넘겨줄 price 데이터
+              productName: productName,  // 넘겨줄 productName 데이터
+            ),
+          ),
         );
       },
     );
