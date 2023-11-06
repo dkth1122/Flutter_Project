@@ -41,8 +41,10 @@ class _SearchSuccessState extends State<SearchSuccess> {
                 Text("상품 리스트", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
               ],
             ),
-            SizedBox(height: 20,),
-            searchListProduct(),
+            Container(
+              padding: EdgeInsets.all(10),
+              child: searchListProduct()
+            ),
             SizedBox(height: 20,),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -108,20 +110,66 @@ class _SearchSuccessState extends State<SearchSuccess> {
                   ),
                 );
               },
-              child: ListTile(
-                leading: Image.network(
-                  data['iUrl'],
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
-                title: Text(data['pName']),
-                subtitle: Text(
-                  data['pDetail'].length > 15
-                      ? '${data['pDetail'].substring(0, 15)}...'
-                      : data['pDetail'],
-                ),
-                trailing: Text('${formattedPrice}원'),
+              child: Column(
+                children: [
+                  SizedBox(height: 10,),
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 0.6,
+                            color: Color.fromRGBO(182, 182, 182, 0.6)
+                        )
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
+                              child: Image.network(
+                                data['iUrl'],
+                                width: 130,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            SizedBox(width: 10,),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  data['pName'],
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                Container(
+                                  width: 110,
+                                  child: Text(
+                                    data['pDetail'].length > 20
+                                        ? '${data['pDetail'].substring(0, 20)}...'
+                                        : data['pDetail'],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              '가격: ${data['price'].toString()}',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ],
               ),
             );
           },
@@ -158,25 +206,91 @@ class _SearchSuccessState extends State<SearchSuccess> {
           itemBuilder: (context, index) {
             Map<String, dynamic> data = filteredDocs[index].data() as Map<String, dynamic>;
 
+
             return InkWell(
               onTap: () {
-                // 포트폴리오를 눌렀을 때 실행할 동작을 여기에 추가할 수 있습니다.
               },
-              child: ListTile(
-                leading: Image.network(
-                  data['thumbnailUrl'],
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
-                title: Text(data['title']),
-                subtitle: Text(
-                  data['description'].length > 15
-                      ? '${data['description'].substring(0, 15)}...'
-                      : data['description'],
-                ),
+              child: Column(
+                children: [
+                  SizedBox(height: 10,),
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 0.6,
+                            color: Color.fromRGBO(182, 182, 182, 0.6)
+                        )
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
+                              child: Image.network(
+                                data['iUrl'],
+                                width: 130,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            SizedBox(width: 10,),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  data['title'],
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                Container(
+                                  width: 110,
+                                  child: Text(
+                                    data['description'].length > 20
+                                        ? '${data['description'].substring(0, 20)}...'
+                                        : data['description'],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              '가격: ${data['description'].toString()}',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ],
               ),
             );
+            // return InkWell(
+            //   onTap: () {
+            //     // 포트폴리오를 눌렀을 때 실행할 동작을 여기에 추가할 수 있습니다.
+            //   },
+            //   child: ListTile(
+            //     leading: Image.network(
+            //       data['thumbnailUrl'],
+            //       width: 100,
+            //       height: 100,
+            //       fit: BoxFit.cover,
+            //     ),
+            //     title: Text(data['title']),
+            //     subtitle: Text(
+            //       data['description'].length > 15
+            //           ? '${data['description'].substring(0, 15)}...'
+            //           : data['description'],
+            //     ),
+            //   ),
+            // );
           },
         );
       },
