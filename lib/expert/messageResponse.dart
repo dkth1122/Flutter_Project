@@ -36,7 +36,7 @@ class _MessageResponsenState extends State<MessageResponse> {
 
   // Firestore에서 설정 정보 가져오기
   Future<void> getSettingsFromFirestore() async {
-    final userSettingsRef = FirebaseFirestore.instance.collection('messageResponsen').doc(user);
+    final userSettingsRef = FirebaseFirestore.instance.collection('messageResponse').doc(user);
 
     final doc = await userSettingsRef.get();
     if (doc.exists) {
@@ -89,7 +89,7 @@ class _MessageResponsenState extends State<MessageResponse> {
 
   // Firestore에 설정 정보 저장
   Future<void> saveSettingsToFirestore() async {
-    final userSettingsRef = FirebaseFirestore.instance.collection('messageResponsen').doc(user);
+    final userSettingsRef = FirebaseFirestore.instance.collection('messageResponse').doc(user);
 
     await userSettingsRef.set({
       'isResponseEnabled': isResponseEnabled,
