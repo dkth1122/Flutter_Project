@@ -17,9 +17,11 @@ class _RevenueState extends State<Revenue> {
 
   List<double> earnings = List.generate(12, (index) => 0.0);
   double availableEarnings = 0.0;
-  double completedWithdrawals = 500.0;
+  double completedWithdrawals = 0.0;
 
   List<int> prices = [];
+  List<int> prices2 = [];
+  List<int> prices3 = [];
   List<String> productNames = [];
   List<DateTime> timestamps = [];
 
@@ -40,6 +42,8 @@ class _RevenueState extends State<Revenue> {
     }
 
     fetchData();
+    fetchPrices();
+    fetchcompletedWithdraw();
   }
 
   Future<void> fetchData() async {
@@ -56,9 +60,44 @@ class _RevenueState extends State<Revenue> {
       timestamps.add(timestampDateTime);
     }
 
-    availableEarnings = prices.reduce((a, b) => a + b).toDouble();
     updateEarningsData();
   }
+
+  //출금 가능 내역 따로
+  Future<void> fetchPrices() async {
+
+    prices2 = []; // 기존 prices2를 초기화
+    final orderCollection = _firestore.collection('orders');
+    final orderQuery = await orderCollection.where('seller', isEqualTo: user).where('withdraw', isEqualTo : 'N').get();
+    final orderDocs = orderQuery.docs;
+
+    for (QueryDocumentSnapshot orderDoc in orderDocs) {
+      int price2 = orderDoc['price'] as int;
+      prices2.add(price2);
+    }
+
+    // prices2 리스트에는 'withdraw' 필드가 'N'인 주문의 가격만 저장
+    availableEarnings = prices2.reduce((a, b) => a + b).toDouble();
+  }
+
+  //출금 완료 내역 따로
+  Future<void> fetchcompletedWithdraw() async {
+
+    prices3 = []; // 기존 prices3를 초기화
+    final orderCollection = _firestore.collection('orders');
+    final orderQuery = await orderCollection.where('seller', isEqualTo: user).where('withdraw', isEqualTo : 'Y').get();
+    final orderDocs = orderQuery.docs;
+
+    for (QueryDocumentSnapshot orderDoc in orderDocs) {
+      int price3 = orderDoc['price'] as int;
+      prices3.add(price3);
+    }
+
+    // prices3 리스트에는 'withdraw' 필드가 'Y'인 주문의 가격만 저장
+    completedWithdrawals = prices3.reduce((a, b) => a + b).toDouble();
+  }
+
+
 
   void updateEarningsData() {
     List<double> updatedEarnings = List.generate(12, (index) => 0.0);
@@ -78,7 +117,7 @@ class _RevenueState extends State<Revenue> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Color(0xFFFCAF58),
         elevation: 0,
         title: Text(
           '수익관리',
@@ -110,13 +149,60 @@ class _RevenueState extends State<Revenue> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
-                        onPressed: () {
-                          // 출금 신청 로직을 추가
+                        child: Text('출금 신청'),
+                        onPressed: () async {
+                          if (availableEarnings == 0.0) {
+                            // 출금 가능 수익이 0인 경우 스낵바 표시
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('출금 가능한 수익이 없습니다.'),
+                                duration: Duration(seconds: 3), // 스낵바 표시 시간
+                              ),
+                            );
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text('출금 신청 확인'),
+                                  content: Text('출금을 신청하시겠습니까?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(); // 다이얼로그 닫기
+                                      },
+                                      child: Text('취소'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        // 출금 신청 로직 추가
+                                        QuerySnapshot orderQuery = await _firestore
+                                            .collection('orders')
+                                            .where('seller', isEqualTo: user)
+                                            .get();
+
+                                        for (QueryDocumentSnapshot orderDoc in orderQuery.docs) {
+                                          await _firestore.collection('orders').doc(orderDoc.id).update({
+                                            'withdraw': 'Y',
+                                          });
+                                        }
+
+                                        // 다이얼로그 닫기
+                                        Navigator.of(context).pop();
+
+                                        // 출금 신청 후 다른 작업 수행
+                                      },
+                                      child: Text('출금 신청'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           primary: Colors.amber,
                         ),
-                        child: Text('출금 신청'),
                       ),
                       SizedBox(width: 10),
                       ElevatedButton(
@@ -173,7 +259,7 @@ class _RevenueState extends State<Revenue> {
                         getTextStyles: (context, value) => TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                          fontSize: 10,
                         ),
                         getTitles: (value) {
                           int index = value.toInt();
@@ -231,7 +317,7 @@ class _RevenueState extends State<Revenue> {
           ),
         ),
         Text(
-          '\$${value.toStringAsFixed(2)}',
+          '${value.toInt()} 원',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
