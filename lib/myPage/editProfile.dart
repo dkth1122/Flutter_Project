@@ -448,7 +448,7 @@ class _EditProfileState extends State<EditProfile> {
                     padding: const EdgeInsets.all(10.0),
                     child: CircleAvatar(
                       radius: 70,
-                      backgroundImage: NetworkImage(snapshot.data!),
+                      // backgroundImage: NetworkImage(snapshot.data!),
                     ),
                   ),
                   Padding(

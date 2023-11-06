@@ -221,13 +221,37 @@ class _MyCustomerState extends State<MyCustomer> {
                 ],
               ),
               ElevatedButton(
-                onPressed: (){
+                onPressed: () {
+                  UserModel userModel = Provider.of<UserModel>(context, listen: false);
+                  userModel.updateStatus('E');
+
+                  CollectionReference users = FirebaseFirestore.instance.collection('userList');
+                  users
+                      .where('userId', isEqualTo: userModel.userId)
+                      .limit(1)
+                      .get()
+                      .then((QuerySnapshot querySnapshot) {
+                    if (querySnapshot.docs.isNotEmpty) {
+                      // userId와 userModel.userId가 일치하는 문서가 존재하면 해당 문서를 업데이트합니다.
+                      DocumentReference docRef = querySnapshot.docs.first.reference;
+                      // 업데이트할 데이터
+                      Map<String, dynamic> dataToUpdate = {
+                        'status': 'E',
+                      };
+                      docRef.update(dataToUpdate).then((_) {
+                        print("문서 업데이트 성공");
+                        // 업데이트 성공 후, 원하는 작업을 수행할 수 있습니다.
+                      }).catchError((error) {
+                        print("문서 업데이트 오류: $error");
+                        // 업데이트 오류 처리
+                      });
+                    }
+                  });
                   Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
+                      context,
+                      MaterialPageRoute(
                       builder: (context) => MyExpert(),
-                    ),
-                  );
+                  ),);
                 },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Colors.white),

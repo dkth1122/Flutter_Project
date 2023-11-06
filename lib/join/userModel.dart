@@ -49,4 +49,9 @@ class UserModel with ChangeNotifier {
       await _storage.delete(key: 'status'); // userId와 status를 모두 삭제
     }
   }
+
+  void updateStatus(String newStatus) {
+    _status = newStatus;
+    notifyListeners(); // 상태가 업데이트되었음을 알립니다.
+  }
 }
