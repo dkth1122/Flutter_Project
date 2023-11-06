@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/chat/chatList.dart';
 import 'package:project_flutter/customer/userCustomer.dart';
@@ -22,6 +21,8 @@ class _CircularDialogState extends State<CircularDialog> {
   double rotation = 0.0;
   Offset initialPosition = Offset(0, 0);
   Offset currentPosition = Offset(0, 0);
+  double dialogScale = 0.0; // 다이얼로그 크기의 초기 값
+  double _dialogHeight = 0.0;
 
   List<Offset> calculateIconOffsets() {
     final double centerX = 300 / 2 - 15; // 컨테이너 가로 길이의 절반
@@ -57,59 +58,75 @@ class _CircularDialogState extends State<CircularDialog> {
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      alignment: Alignment.bottomCenter,
-      child: GestureDetector(
-        onPanStart: (details) {
-          setState(() {
-            initialPosition = details.localPosition;
-          });
-        },
-        onPanUpdate: (details) {
-          setState(() {
-            // Calculate the rotation angle based on the drag direction
-            double angle = (details.localPosition - initialPosition).direction;
-            rotation = angle;
-            currentPosition = details.localPosition;
-          });
-        },
-        onPanEnd: (details) {
-          setState(() {
-          });
-        },
-        child: Transform.rotate(
-          angle: rotation,
-          child: Container(
-            width: 300,
-            height: 300,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-            ),
-            child: Stack(
-              alignment: Alignment.center,
-              children: <Widget>[
-                InkWell(
-                  onTap: (){
-                    Navigator.pop(context);
-                  },
-                  child: Image.asset(
-                    'assets/logo.png',
-                    width: 70,
-                    height: 70,
+      alignment: Alignment.bottomCenter, // 중앙 정렬
+      child: TweenAnimationBuilder<double>(
+        duration: Duration(milliseconds: 300),
+        tween: Tween<double>(begin: 0.0, end: 1.0),
+        builder: (BuildContext context, double value, Widget? child) {
+          dialogScale = value; // 크기 업데이트
+          _dialogHeight = 200.0; // 원하는 높이로 설정
+
+          return GestureDetector(
+            onPanStart: (details) {
+              setState(() {
+                initialPosition = details.localPosition;
+              });
+            },
+            onPanUpdate: (details) {
+              setState(() {
+                // Calculate the rotation angle based on the drag direction
+                double angle = (details.localPosition - initialPosition).direction;
+                rotation = angle;
+                currentPosition = details.localPosition;
+              });
+            },
+            onPanEnd: (details) {
+              setState(() {
+              });
+            },
+            child: Transform.translate(
+              offset: Offset(0, _dialogHeight * (1.2 - value)), // 아래에서 위로 슬라이딩
+              child: Transform.scale(
+                scale: dialogScale,
+                child: Transform.rotate(
+                  angle: -45 * (pi / 180) + (45 * (pi / 180) * value), // -45도에서 0도로 바뀌도록 애니메이션 적용
+                  child: Container(
+                    width: 300,
+                    height: 300,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
+                    ),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: <Widget>[
+                        InkWell(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Image.asset(
+                            'assets/logo.png',
+                            width: 70,
+                            height: 70,
+                          ),
+                        ),
+                        for (int i = 0; i < iconOffsets.length; i++)
+                          buildAddButton(
+                            iconOffsets[i],
+                            iconData[i],
+                            iconRotations[i],
+                            addButtonTexts[i],
+                            i,
+                          ),
+                      ],
+                    ),
                   ),
                 ),
-                for (int i = 0; i < iconOffsets.length; i++)
-                  buildAddButton(
-                      iconOffsets[i],
-                      iconData[i],
-                      iconRotations[i],
-                      addButtonTexts[i],
-                      i
-                  ),
-              ],
+              ),
             ),
-          ),
-        ),
+
+          );
+        },
       ),
     );
   }
@@ -139,7 +156,6 @@ class _CircularDialogState extends State<CircularDialog> {
       ),
     );
   }
-
 }
 
 void main() {

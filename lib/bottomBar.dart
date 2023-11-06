@@ -60,7 +60,7 @@ class _CircularDialogState extends State<CircularDialog> {
       elevation: 0,
       alignment: Alignment.bottomCenter, // 중앙 정렬
       child: TweenAnimationBuilder<double>(
-        duration: Duration(milliseconds: 300),
+        duration: Duration(milliseconds: 500),
         tween: Tween<double>(begin: 0.0, end: 1.0),
         builder: (BuildContext context, double value, Widget? child) {
           dialogScale = value; // 크기 업데이트
@@ -89,36 +89,39 @@ class _CircularDialogState extends State<CircularDialog> {
               child: Transform.scale(
                 scale: dialogScale,
                 child: Transform.rotate(
-                  angle: rotation,
-                  child: Container(
-                    width: 300,
-                    height: 300,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: <Widget>[
-                        InkWell(
-                          onTap: () {
-                            Navigator.pop(context);
-                          },
-                          child: Image.asset(
-                            'assets/logo.png',
-                            width: 70,
-                            height: 70,
+                  angle: -360 * (pi / 180) + (360 * (pi / 180) * value),
+                  child: Transform.rotate(
+                    angle: rotation,
+                    child: Container(
+                      width: 300,
+                      height: 300,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: <Widget>[
+                          InkWell(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Image.asset(
+                              'assets/logo.png',
+                              width: 70,
+                              height: 70,
+                            ),
                           ),
-                        ),
-                        for (int i = 0; i < iconOffsets.length; i++)
-                          buildAddButton(
-                            iconOffsets[i],
-                            iconData[i],
-                            iconRotations[i],
-                            addButtonTexts[i],
-                            i,
-                          ),
-                      ],
+                          for (int i = 0; i < iconOffsets.length; i++)
+                            buildAddButton(
+                              iconOffsets[i],
+                              iconData[i],
+                              iconRotations[i],
+                              addButtonTexts[i],
+                              i,
+                            ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
