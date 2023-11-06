@@ -7,13 +7,15 @@ class PaymentCompletePage extends StatelessWidget {
   final int price;
   final String productName;
   final String seller;
+  final String selectedCouponName;
 
   PaymentCompletePage({
     required this.paymentResult,
     required this.user,
     required this.price,
     required this.productName,
-    required this.seller
+    required this.seller,
+    required this.selectedCouponName
   });
 
   @override
@@ -46,9 +48,20 @@ class PaymentCompletePage extends StatelessWidget {
                     'status':  paymentResult['imp_success'],
                     'seller': seller,
                     'timestamp': FieldValue.serverTimestamp(),
+                    'cName' : selectedCouponName
                   });
-                  // 메인 페이지로 이동
-                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  FirebaseFirestore.instance
+                      .collection('coupon')
+                      .where('cName', isEqualTo: selectedCouponName)
+                      .where('userId', isEqualTo: user)
+                      .get()
+                      .then((snapshot) {
+                    for (DocumentSnapshot doc in snapshot.docs) {
+                      doc.reference.delete();
+                    }
+                    // 메인 페이지로 이동
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  });
                 } else {
                   // 결제가 실패한 경우
                   Navigator.of(context).popUntil((route) => route.isFirst);

@@ -29,6 +29,7 @@ class _ProductPaymentState extends State<ProductPayment> {
 
   late Stream<QuerySnapshot>? productStream;
   String selectedCoupon = '--------------------';
+  String selectedCouponName = '사용하지 않음';
   double discountPercentage = 0.0;
   int discountedPrice = 0;
   bool agreedToTerms = false;
@@ -148,8 +149,10 @@ class _ProductPaymentState extends State<ProductPayment> {
                         selectedCoupon = value!;
                         if (value == '--------------------') {
                           discountPercentage = 0.0;
+                          selectedCouponName = '사용하지 않음';
                         } else {
                           final selectedCouponData = coupons.firstWhere((coupon) => coupon['cName'] == value);
+                          selectedCouponName = value;
                           discountPercentage = (int.parse(widget.price) / 100) * (selectedCouponData['discount']).toDouble();
                           totalPrice = calculateDiscountedPrice();
                         }
@@ -268,6 +271,7 @@ class _ProductPaymentState extends State<ProductPayment> {
                       price: totalPrice,
                       productName: widget.productName, // 상품명
                       seller: widget.seller,
+                      selectedCouponName: selectedCouponName,
                     ),
                   ),
                 );
