@@ -111,11 +111,14 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       //appbar를 안하고 body를 한 이유는 스크롤 하면서 appbar를 사라지게 하기 위함
       body: NestedScrollView(
+
         headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
           return <Widget>[
             SliverAppBar(
               floating: false, // Appbar가 스크롤될 때 고정되지 않도록 설정
               pinned: false, // Appbar가 화면 상단에 고정되도록 설정
+              automaticallyImplyLeading: false, // 뒤로 가기 화살표 숨김
+
               flexibleSpace: FlexibleSpaceBar(
                 titlePadding: EdgeInsets.all(20),
                 title: Text('Fixer 4 U'),

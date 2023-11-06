@@ -139,6 +139,7 @@ class _LoginPageState extends State<LoginPage> {
       final userDoc = userDocs.docs.first;
       final delYn = userDoc['delYn'];
       final banYn = userDoc['banYn'];
+      final status = userDoc['status'];
 
       if (delYn == 'Y') {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -149,7 +150,7 @@ class _LoginPageState extends State<LoginPage> {
           SnackBar(content: Text('정지된 사용자입니다. 관리자에게 문의 해주세요')),
         );
       } else {
-        Provider.of<UserModel>(context, listen: false).login(id);
+        Provider.of<UserModel>(context, listen: false).login(id, status); // status를 함께 전달
 
         if (id == 'admin') {
           Navigator.push(
@@ -166,7 +167,6 @@ class _LoginPageState extends State<LoginPage> {
             ),
           );
         }
-
         _userId.clear();
         _pw.clear();
       }

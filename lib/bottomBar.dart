@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 
 import 'expert/my_expert.dart';
 import 'join/userModel.dart';
+import 'myPage/myCustomer.dart';
 import 'myPage/my_page.dart';
 
 
@@ -207,8 +208,19 @@ class _BottomBarState extends State<BottomBar> {
               // 사용자가 로그인하지 않은 경우에만 LoginPage로 이동
               Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
             } else {
-              // 사용자가 로그인한 경우에만 MyPage로 이동
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyPage()));
+              // 사용자가 로그인한 경우, userModel의 status 값에 따라 MyCustomer 또는 MyExpert로 이동
+              final status = userModel.status;
+              if (status == 'C') {
+                print("의뢰인");
+                // 'C'인 경우 MyCustomer로 이동
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyCustomer()));
+              } else if (status == 'E') {
+                print("전문가");
+                // 'E'인 경우 MyExpert로 이동
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert()));
+              } else {
+                // 다른 경우에는 어떤 페이지로 이동할지 정의하세요
+              }
             }
           },
           icon: Icon(Icons.person)

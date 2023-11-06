@@ -188,11 +188,10 @@ class _EditProfileState extends State<EditProfile> {
   void _logOut() {
     // 사용자 데이터 초기화 (예: Provider를 사용하면 해당 Provider를 초기화)
     Provider.of<UserModel>(context, listen: false).logout();
-    // 로그인 화면 또는 다른 원하는 화면으로 이동
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => HomePage(), // 로그인 화면으로 이동하도록 변경
+        builder: (context) => HomePage(),
       ),
     );
   }
