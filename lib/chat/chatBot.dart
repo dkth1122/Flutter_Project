@@ -79,9 +79,9 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
     if (documentSnapshot.exists) {
       final data = documentSnapshot.data() as Map<String, dynamic>;
 
-      isNightResponseEnabled = data['isNightResponseEnabled'] ?? false;
-      isOnVacation = data['isOnVacation'] ?? false;
-      isResponseEnabled = data['isResponseEnabled'] ?? false;
+      isNightResponseEnabled = data['isNightResponseEnabled'];
+      isOnVacation = data['isOnVacation'];
+      isResponseEnabled = data['isResponseEnabled'];
       vacationStartDate = (data['vacationStartDate'] as Timestamp).toDate();
       vacationEndDate = (data['vacationEndDate'] as Timestamp).toDate();
 
@@ -121,13 +121,28 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
   String getResponseForQuestion(String question) {
     if (question.contains("야간 응답")) {
       // 사용자가 "야간 응답"과 관련된 질문을 하면 특정 대답 생성
-      return "전문가는 현재 야간응답 중입니다.";
+
+      if(isNightResponseEnabled){
+        return "전문가는 현재 야간응답 중입니다.";
+      }else{
+        return "전문가는 현재 야간응답을 하고 있지 않습니다";
+      }
     } else if (question.contains("휴가 중")) {
       // 사용자가 "휴가 중"과 관련된 질문을 하면 특정 대답 생성
-      return "전문가는 ${_formatDate(vacationStartDate)}부터 ${_formatDate(vacationEndDate)}까지 휴가 중입니다.";
+
+      if(isOnVacation){
+        return "전문가는 ${_formatDate(vacationStartDate)}부터 ${_formatDate(vacationEndDate)}까지 휴가 중입니다.";
+      }else{
+        return "현재 전문가는 휴가 중이 아닙니다.";
+      }
+
     } else if (question.contains("응답 가능")) {
       // 사용자가 "응답 가능"과 관련된 질문을 하면 특정 대답 생성
-      return "전문가는 현재 응답 가능합니다.";
+      if(isResponseEnabled ){
+        return "전문가는 현재 30분 내로 응답 가능합니다.";
+      }else{
+        return "전문가는 현재 30분 내로 응답할 수 없습니다.";
+      }
     } else if (question.contains("도와주세요")) {
       return "고객센터를 이용해주세요";
     } else if (question.contains("채팅 연결")) {
