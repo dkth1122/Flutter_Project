@@ -273,7 +273,7 @@ class _MyCustomerState extends State<MyCustomer> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => MyExpert(),
+                      builder: (context) => MyExpert(userId: userId),
                     ),
                   );
                 },

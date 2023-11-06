@@ -143,10 +143,10 @@ class _CircularDialogState extends State<CircularDialog> {
           children: [
             IconButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => pageChange[pageIndex]),
-                );
+                // Navigator.push(
+                //   context,
+                //   // MaterialPageRoute(builder: (context) => pageChange[pageIndex]),
+                // );
               },
               icon: Icon(
                 icon,
@@ -248,10 +248,10 @@ class _BottomBarState extends State<BottomBar> {
               } else if (status == 'E') {
                 print("전문가");
                 // 'E'인 경우 MyExpert로 이동
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert(userId: userId!)));
               } else {
                 print("예외");
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) =>MyExpert(userId: userId!)));
               }
             }
           },

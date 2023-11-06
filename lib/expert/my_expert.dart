@@ -106,13 +106,8 @@ class _MyExpertState extends State<MyExpert> {
                 children: [
                   CircleAvatar(
                     radius: 70,
-                    backgroundImage: profileImageUrl.isNotEmpty
-                        ? NetworkImage(profileImageUrl)
-                        : Image.asset('assets/profile.png').image,
-
+                    backgroundImage: NetworkImage(profileImageUrl),
                   ),
-
-
                   Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
