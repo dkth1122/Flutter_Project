@@ -27,8 +27,8 @@ class UserCustomer extends StatefulWidget {
 }
 
 class _UserCustomerState extends State<UserCustomer> {
-  final Stream<QuerySnapshot> noticeStream = FirebaseFirestore.instance.collection("notice").limit(3).snapshots();
-  final Stream<QuerySnapshot> faqStream = FirebaseFirestore.instance.collection("faq").limit(5).snapshots();
+  final Stream<QuerySnapshot> noticeStream = FirebaseFirestore.instance.collection("notice").orderBy("timestamp", descending: true).limit(3).snapshots();
+  final Stream<QuerySnapshot> faqStream = FirebaseFirestore.instance.collection("faq").orderBy("timestamp", descending: true).limit(5).snapshots();
   String sessionId = "";
   @override
   Widget build(BuildContext context) {
@@ -94,36 +94,39 @@ class _UserCustomerState extends State<UserCustomer> {
               _faq(),
               Visibility(
                 visible: sessionId != "",
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => Question(),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Question(),
+                          ),
+                        );
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFFF8C42)), // 원하는 색상으로 변경
                       ),
-                    );
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFFF8C42)), // 원하는 색상으로 변경
-                  ),
-                  child: Text("1:1 문의하기"),
-                ),
-              ),
-              Visibility(
-                visible: sessionId != "", // 세션 ID가 있을 때만 버튼을 보이도록 설정
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => MyQuestion(),
+                      child: Text("1:1 문의하기"),
+                    ),
+                    SizedBox(width: 10,),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MyQuestion(),
+                          ),
+                        );
+                      },
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFFF8C42)), // 원하는 색상으로 변경
                       ),
-                    );
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFFF8C42)), // 원하는 색상으로 변경
-                  ),
-                  child: Text("내 문의 보기"),
+                      child: Text("내 문의 보기"),
+                    ),
+                  ],
                 ),
               ),
             ],

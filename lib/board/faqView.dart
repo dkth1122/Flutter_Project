@@ -81,7 +81,8 @@ class _FaqViewState extends State<FaqView> {
                   ),
                 ],
               ),
-            )
+            ),
+            SizedBox(height: 10,),
 
           ],
         ),

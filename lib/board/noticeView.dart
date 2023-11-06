@@ -81,7 +81,8 @@ class _NoticeViewState extends State<NoticeView> {
                   ),
                 ],
               ),
-            )
+            ),
+            SizedBox(height: 10,),
           ],
         ),
       ),
