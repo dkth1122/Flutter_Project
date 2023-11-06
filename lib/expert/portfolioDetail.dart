@@ -15,7 +15,7 @@ class PortfolioDetailPage extends StatefulWidget {
 }
 
 class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
-  late DocumentSnapshot? portfolioDoc;
+  DocumentSnapshot? portfolioDoc; // Nullable로 변경
 
   @override
   void initState() {
@@ -25,28 +25,34 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
 
   Future<void> fetchPortfolioDetails() async {
     try {
-      portfolioDoc = await FirebaseFirestore.instance
+      final doc = await FirebaseFirestore.instance
           .collection('expert')
           .doc(widget.user)
           .collection('portfolio')
           .doc(widget.portfolioItem.id)
           .get();
+      setState(() {
+        portfolioDoc = doc;
+      });
     } catch (e) {
       print('포트폴리오 디테일 가져오기 오류: $e');
     }
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     if (portfolioDoc == null) {
-      return CircularProgressIndicator();
+      return Center(
+        child: CircularProgressIndicator(),
+      );
     }
 
     Map<String, dynamic>? data = portfolioDoc!.data() as Map<String, dynamic>?;
 
     if (data == null) {
-      return Text('포트폴리오 데이터를 찾을 수 없습니다.');
+      return Center(
+        child: Text('포트폴리오 데이터를 찾을 수 없습니다.'),
+      );
     }
 
     return Scaffold(
