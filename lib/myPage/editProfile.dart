@@ -77,7 +77,6 @@ class _EditProfileState extends State<EditProfile> {
   }
 
 
-
   Future<void> updateUserData() async {
     String emailText = _email.text;
 
@@ -136,58 +135,29 @@ class _EditProfileState extends State<EditProfile> {
           });
           _email.clear();
         }
-        final storageRef = FirebaseStorage.instance.ref().child('profile_images/${Uuid().v4()}.png');
-        final uploadTask = storageRef.putFile(_image!);
 
-
-        uploadTask.then((TaskSnapshot snapshot) {
-          // 이미지 업로드가 성공하면, 다운로드 URL을 얻어옵니다.
-          snapshot.ref.getDownloadURL().then((downloadURL) async {
-            // Firestore에 사용자 데이터 업데이트
-            CollectionReference users = FirebaseFirestore.instance.collection("userList");
-            QuerySnapshot snap = await users.where('userId', isEqualTo: widget.data['userId']).get();
-
-            for (QueryDocumentSnapshot doc in snap.docs) {
-              await users.doc(doc.id).update({
-                'email': _email.text,
-                'profileImageUrl': downloadURL, // 이미지 다운로드 URL을 저장
-              });
-
-              setState(() {
-                Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?;
-                if (data != null) {
-                  labelText = data['email'] ?? '';
-                  labelText = _email.text;
-                }
-              });
-              _image = null;
-              _email.clear();
-            }
-
-            // 업데이트 성공 시 사용자에게 성공 메시지 표시
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('업데이트 완료'),
-                  content: Text('이메일 및 프로필 이미지가 성공적으로 업데이트되었습니다.'),
-                  actions: [
-                    TextButton(
-                      child: Text('확인'),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        FocusScope.of(context).unfocus();
-                        setState(() {
-                          labelText = _email.text;
-                        });
-                      },
-                    ),
-                  ],
-                );
-              },
+        // 업데이트 성공 시 사용자에게 성공 메시지 표시
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('업데이트 완료'),
+              content: Text('이메일이 성공적으로 업데이트되었습니다.'),
+              actions: [
+                TextButton(
+                  child: Text('확인'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    FocusScope.of(context).unfocus();
+                    setState(() {
+                      labelText = _email.text;
+                    });
+                  },
+                ),
+              ],
             );
-          });
-        });
+          },
+        );
       } catch (e) {
         // 업데이트 실패 시 사용자에게 실패 메시지 표시
         showDialog(
@@ -195,7 +165,7 @@ class _EditProfileState extends State<EditProfile> {
           builder: (BuildContext context) {
             return AlertDialog(
               title: Text('업데이트 실패'),
-              content: Text('이메일 및 프로필 이미지 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.'),
+              content: Text('이메일 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.'),
               actions: [
                 TextButton(
                   child: Text('확인'),
@@ -211,6 +181,8 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
+
+
   Future<String?> getUserProfileImageUrl() async {
     try {
       CollectionReference users = FirebaseFirestore.instance.collection("userList");
@@ -225,8 +197,41 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
+  void _updateProfileImage(File image) {
+    final storageRef = FirebaseStorage.instance.ref().child('profile_images/${Uuid().v4()}.png');
+    final uploadTask = storageRef.putFile(image);
 
+    uploadTask.then((TaskSnapshot snapshot) {
+      snapshot.ref.getDownloadURL().then((downloadURL) async {
+        CollectionReference users = FirebaseFirestore.instance.collection("userList");
+        QuerySnapshot snap = await users.where('userId', isEqualTo: widget.data['userId']).get();
 
+        for (QueryDocumentSnapshot doc in snap.docs) {
+          await users.doc(doc.id).update({
+            'profileImageUrl': downloadURL,
+          });
+        }
+        // 업데이트 성공 시 사용자에게 성공 메시지 표시
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('프로필 이미지 업데이트 완료'),
+              content: Text('프로필 이미지가 성공적으로 업데이트되었습니다.'),
+              actions: [
+                TextButton(
+                  child: Text('확인'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      });
+    });
+  }
 
   //이메일 중복검사
   Future<bool> isEmailAlreadyRegistered(String email) async {
@@ -354,25 +359,6 @@ class _EditProfileState extends State<EditProfile> {
   @override
   Widget build(BuildContext context) {
 
-    FutureBuilder<String?>(
-      future: getUserProfileImageUrl(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator(); // 이미지 URL을 가져오는 동안 로딩 인디케이터를 표시할 수 있습니다.
-        } else if (snapshot.hasError || snapshot.data == null) {
-          // 오류가 발생하거나 이미지 URL이 사용 불가능한 경우를 처리합니다.
-          return CircleAvatar(
-            radius: 70,
-            backgroundImage: AssetImage('assets/profile.png'),
-          );
-        } else {
-          return CircleAvatar(
-            radius: 70,
-            backgroundImage: NetworkImage(snapshot.data!),
-          );
-        }
-      },
-    );
 
 
     return MaterialApp(
@@ -446,27 +432,46 @@ class _EditProfileState extends State<EditProfile> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.all(10.0),
-                    child: CircleAvatar(
-                      radius: 70,
-                      // backgroundImage: NetworkImage(snapshot.data!),
-                    ),
+                    child: FutureBuilder<String?>(
+                      future: getUserProfileImageUrl(),
+                      // snapshot의 데이터 상태에 따라 이미지를 표시합니다.
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          // 이미지 URL을 가져오는 동안 로딩 인디케이터 표시
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError || snapshot.data == null) {
+                          // 오류가 발생하거나 이미지 URL이 사용 불가능한 경우를 처리합니다.
+                          return CircleAvatar(
+                            radius: 70,
+                            backgroundImage: AssetImage('assets/profile.png'), // 기본 이미지로 대체
+                          );
+                        } else {
+                          // 이미지 URL을 사용 가능한 경우, CircleAvatar에 이미지 적용
+                          return CircleAvatar(
+                            radius: 70,
+                            backgroundImage: NetworkImage(snapshot.data!),
+                          );
+                        }
+                      },
+                    )
                   ),
                   Padding(
-                      padding: const EdgeInsets.all(1.0), // 카메라 버튼과 CircleAvatar 사이의 간격을 조절
-                      child: InkWell(
-                        onTap: () {
-                          // 클릭시 모달 팝업을 띄워준다.
-                          showModalBottomSheet(context: context, builder: ((builder) => bottomSheet()));
-                        },
-                        child: Icon(
-                          Icons.camera_alt,
-                          color: Colors.grey,
-                          size: 40,
-                        ),
-                      )
+                    padding: const EdgeInsets.all(1.0), // 카메라 버튼과 CircleAvatar 사이의 간격을 조절
+                    child: InkWell(
+                      onTap: () {
+                        // 클릭시 모달 팝업을 띄워준다.
+                        showModalBottomSheet(context: context, builder: ((builder) => bottomSheet()));
+                      },
+                      child: Icon(
+                        Icons.camera_alt,
+                        color: Colors.grey,
+                        size: 40,
+                      ),
+                    ),
                   ),
                 ],
               ),
+
 
               buildTextField(widget.data['email'], "바꿀 이메일을 입력하세요.", '이메일'),
 
@@ -550,12 +555,15 @@ class _EditProfileState extends State<EditProfile> {
                 setState(() {
                   _image = imageFile;
                 });
+                // 이미지를 선택한 후에 바로 업데이트 수행
+                _updateProfileImage(imageFile);
               } else {
                 // 이미지 선택이 취소되면 이미지 변수 초기화
                 setState(() {
                   _image = null;
                 });
               }
+              Navigator.pop(context);
             },
             label: Text('Gallery', style: TextStyle(fontSize: 20)),
           ),

@@ -240,10 +240,11 @@ class _BottomBarState extends State<BottomBar> {
             } else {
               // 사용자가 로그인한 경우, userModel의 status 값에 따라 MyCustomer 또는 MyExpert로 이동
               final status = userModel.status;
+              final userId = userModel.userId;
               if (status == 'C') {
                 print("의뢰인");
                 // 'C'인 경우 MyCustomer로 이동
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyCustomer()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyCustomer(userId: userId!)));
               } else if (status == 'E') {
                 print("전문가");
                 // 'E'인 경우 MyExpert로 이동
