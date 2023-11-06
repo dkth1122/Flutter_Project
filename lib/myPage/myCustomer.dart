@@ -9,14 +9,46 @@ import '../join/userModel.dart';
 import 'editProfile.dart';
 
 class MyCustomer extends StatefulWidget {
-  const MyCustomer({super.key});
+  final String userId;
+
+  const MyCustomer({required this.userId, Key? key}) : super(key: key);
 
   @override
-  State<MyCustomer> createState() => _MyCustomerState();
+  _MyCustomerState createState() => _MyCustomerState(userId: userId);
 }
 
 class _MyCustomerState extends State<MyCustomer> {
+  final String userId;
   late Map<String, dynamic> data;
+  String profileImageUrl = '';
+
+  _MyCustomerState({required this.userId});
+
+  @override
+  void initState() {
+    super.initState();
+    loadUserProfileImageUrl();
+  }
+
+  void loadUserProfileImageUrl() async {
+    String? imageUrl = await getUserProfileImageUrl(userId);
+    setState(() {
+      profileImageUrl = imageUrl ?? 'assets/profile.png';
+    });
+  }
+
+  Future<String?> getUserProfileImageUrl(String userId) async {
+    try {
+      CollectionReference users = FirebaseFirestore.instance.collection("userList");
+      QuerySnapshot snap = await users.where('userId', isEqualTo: userId).get();
+
+      for (QueryDocumentSnapshot doc in snap.docs) {
+        return doc['profileImageUrl'] as String?;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,14 +96,13 @@ class _MyCustomerState extends State<MyCustomer> {
       ),
       body: Column(
         children: [
-
           Padding(
             padding: const EdgeInsets.all(20.0),
             child: Row(
               children: [
                 CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage('assets/profile.png'),
+                  radius: 70,
+                  backgroundImage: NetworkImage(profileImageUrl),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -98,7 +129,6 @@ class _MyCustomerState extends State<MyCustomer> {
             color: Colors.grey,
             thickness: 5.0,
           ),
-
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Column(
@@ -185,19 +215,16 @@ class _MyCustomerState extends State<MyCustomer> {
               ),
             ],
           ),
-
         ],
       ),
-
     );
   }
-  Widget _userInfo() {
-    UserModel userModel = Provider.of<UserModel>(context);
 
+  Widget _userInfo() {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("userList")
-          .where("userId", isEqualTo: userModel.userId)
+          .where("userId", isEqualTo: widget.userId)
           .limit(1)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
@@ -227,31 +254,28 @@ class _MyCustomerState extends State<MyCustomer> {
 
                   CollectionReference users = FirebaseFirestore.instance.collection('userList');
                   users
-                      .where('userId', isEqualTo: userModel.userId)
+                      .where('userId', isEqualTo: widget.userId)
                       .limit(1)
                       .get()
                       .then((QuerySnapshot querySnapshot) {
                     if (querySnapshot.docs.isNotEmpty) {
-                      // userId와 userModel.userId가 일치하는 문서가 존재하면 해당 문서를 업데이트합니다.
                       DocumentReference docRef = querySnapshot.docs.first.reference;
-                      // 업데이트할 데이터
                       Map<String, dynamic> dataToUpdate = {
                         'status': 'E',
                       };
                       docRef.update(dataToUpdate).then((_) {
                         print("문서 업데이트 성공");
-                        // 업데이트 성공 후, 원하는 작업을 수행할 수 있습니다.
                       }).catchError((error) {
                         print("문서 업데이트 오류: $error");
-                        // 업데이트 오류 처리
                       });
                     }
                   });
                   Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
+                    context,
+                    MaterialPageRoute(
                       builder: (context) => MyExpert(),
-                  ),);
+                    ),
+                  );
                 },
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.all(Colors.white),
@@ -275,8 +299,4 @@ class _MyCustomerState extends State<MyCustomer> {
       },
     );
   }
-
-
 }
-
-
