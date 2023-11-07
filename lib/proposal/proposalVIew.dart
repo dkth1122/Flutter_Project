@@ -30,54 +30,81 @@ class _ProposalViewState extends State<ProposalView> {
   @override
   void initState() {
     super.initState();
-    _checkAcceptStatus(); // 위에서 정의한 함수를 initState에서 호출하여 초기 상태를 확인합니다.
+    _checkAcceptStatus();
+    _incrementAcceptCount();
+  }
+
+  void _incrementAcceptCount() {
+    FirebaseFirestore.instance
+        .collection('proposal')
+        .where('title', isEqualTo: widget.proposalTitle)
+        .get()
+        .then((QuerySnapshot snapshot) {
+      snapshot.docs.forEach((document) {
+        final currentCount = document['cnt'] as int;
+        document.reference.update({'cnt': currentCount + 1});
+      });
+
+      setState(() {
+        // UI 업데이트
+      });
+    });
   }
 
   void _checkAcceptStatus() {
-    FirebaseFirestore.instance.collection("userList")
-        .where("userId", isEqualTo: widget.userId)
+    FirebaseFirestore.instance
+        .collection("accept")
+        .where("uId", isEqualTo: widget.userId)
+        .where("aName", isEqualTo: widget.proposalTitle)
         .get()
         .then((querySnapshot) {
-      if (querySnapshot.docs.isNotEmpty) {
-        final userDoc = querySnapshot.docs.first;
-        userDoc.reference.collection("accept")
-            .where("docId", isEqualTo: widget.documentId)
-            .get()
-            .then((acceptQuerySnapshot) {
-          setState(() {
-            isAccepted = acceptQuerySnapshot.docs.isNotEmpty;
-          });
-        });
-      }
+      setState(() {
+        isAccepted = querySnapshot.docs.isNotEmpty;
+      });
     });
   }
-
 
   void _addAccept() {
     if (isAccepted) {
-      return; // 이미 클릭한 상태면 아무것도 하지 않음
+      FirebaseFirestore.instance
+          .collection('accept')
+          .where('uId', isEqualTo: widget.userId)
+          .where('aName', isEqualTo: widget.proposalTitle)
+          .get()
+          .then((QuerySnapshot snapshot) {
+        for (QueryDocumentSnapshot doc in snapshot.docs) {
+          doc.reference.delete().then((value) {
+            print("Document successfully deleted!");
+          }).catchError((error) {
+            print("Error removing document: $error");
+          });
+        }
+      })
+          .catchError((error) {
+        print("Error getting documents: $error");
+      });
+    } else {
+      FirebaseFirestore.instance.collection('accept').add({
+        'uId': widget.userId,
+        'aName': widget.proposalTitle,
+        'proposer': widget.proposer,
+      })
+          .then((value) {
+        print("Accept document added with ID: ${value.id}");
+      })
+          .catchError((error) {
+        print("Error adding Accept document: $error");
+      });
     }
 
-    FirebaseFirestore.instance.collection("userList")
-        .where("userId", isEqualTo: widget.userId)
-        .get()
-        .then((querySnapshot) {
-      if (querySnapshot.docs.isNotEmpty) {
-        final userDoc = querySnapshot.docs.first;
-        userDoc.reference.collection("accept").doc(widget.documentId).set({
-          "docId": widget.documentId,
-        }, SetOptions(merge: true)); // SetOptions를 사용하여 덮어쓰지 않도록 설정
-      }
-    });
-
-
     setState(() {
-      isAccepted = true;
+      isAccepted = !isAccepted;
     });
 
-    // "proposal" 컬렉션의 "accept" 필드를 증가시킴
-    FirebaseFirestore.instance.collection("proposal").doc(widget.documentId).update({"accept": FieldValue.increment(1)});
+    int incrementValue = isAccepted ? 1 : -1;
+    FirebaseFirestore.instance.collection("proposal").doc(widget.documentId).update({"accept": FieldValue.increment(incrementValue)});
   }
+
 
 
 
@@ -102,8 +129,10 @@ class _ProposalViewState extends State<ProposalView> {
         ),
         actions: [
           IconButton(
-            onPressed: _addAccept,//userList의 새 컬렉션 값 증가
-            icon: isAccepted ? Icon(Icons.check_box) : Icon(Icons.check_box_outlined),
+            onPressed: _addAccept,
+            icon: isAccepted
+                ? Icon(Icons.check_box)
+                : Icon(Icons.check_box_outlined),
           ),
         ],
       ),

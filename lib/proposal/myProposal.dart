@@ -135,7 +135,7 @@ class _MyProjectProposalState extends State<MyProjectProposal> {
                     _price.clear();
                   } else {
                     int price = int.parse(value);
-                    if (price <= 1 || price > 100000000) {
+                    if (price < 0 || price > 100000000) {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {

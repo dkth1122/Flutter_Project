@@ -51,7 +51,7 @@ class _MyProposalViewState extends State<MyProposalView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '프로젝트제목: ${widget.proposalTitle}',
+                  '제목: ${widget.proposalTitle}',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -59,14 +59,14 @@ class _MyProposalViewState extends State<MyProposalView> {
                 ),
                 Divider(),
                 Text(
-                  '프로젝트설명: ${widget.proposalContent}',
+                  '설명: ${widget.proposalContent}',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 SizedBox(height: 8),
-                Text('예산: \$${widget.proposalPrice.toString()}'),
+                Text('예산: ${widget.proposalPrice.toString()}원'),
                 Text('프로젝트 시작일과 종료일은 채팅으로 협의하세요~'),
                 // 다른 프로젝트 세부 정보 추가
               ],
