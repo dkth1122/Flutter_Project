@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/proposal/proposalVIew.dart';
+import 'package:provider/provider.dart';
+
+import '../join/userModel.dart';
 
 class ProposalList extends StatefulWidget {
   const ProposalList({super.key});
@@ -10,6 +13,8 @@ class ProposalList extends StatefulWidget {
 }
 
 class _ProposalListState extends State<ProposalList> {
+  bool isAccepted = false;
+
 
   Widget _buildInfoBox(String value, String label) {
     return Container(
@@ -42,10 +47,14 @@ class _ProposalListState extends State<ProposalList> {
 
 
   Widget _listProposal() {
+    UserModel userModel = Provider.of<UserModel>(context, listen: false);
+    final userId = userModel.userId;
+
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("proposal")
-          .orderBy("sendTime", descending: true)
+          .orderBy("user")
+          .where("user", isNotEqualTo: userId)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
         if (!snap.hasData) {
@@ -58,6 +67,7 @@ class _ProposalListState extends State<ProposalList> {
             DocumentSnapshot doc = snap.data!.docs[index];
             Map<String, dynamic> data =
             doc.data() as Map<String, dynamic>;
+            String documentId = doc.id;
             return ListTile(
               tileColor: Color(0xFFEFEFEF), // 타일 배경색 설정
               contentPadding: EdgeInsets.all(16),
@@ -82,8 +92,11 @@ class _ProposalListState extends State<ProposalList> {
                   ),
                 ],
               ),
-
-              trailing: IconButton(onPressed: () {}, icon: Icon(Icons.check_box_outlined),),
+              trailing: IconButton(
+                onPressed: () {
+                },
+                icon:Icon(Icons.check_box),
+              ),
               onTap: (){
                 Navigator.push(context,  MaterialPageRoute(
                   builder: (context) => ProposalView(
@@ -91,6 +104,8 @@ class _ProposalListState extends State<ProposalList> {
                     proposalContent: data["content"],
                     proposalPrice: data["price"],
                     proposer: data["user"],
+                    documentId: documentId,
+                    userId : userId!
                   ),
                 ),
                 );
