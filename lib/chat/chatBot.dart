@@ -157,6 +157,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       ),
       body: Column(
         children: [
+          SizedBox(height: 20,),
           Expanded(
             child: flg
                 ? _buildNoResponseMessage()
@@ -198,7 +199,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
 
   Widget _buildBotMessage(String text) {
     return Container(
-      margin: EdgeInsets.fromLTRB(0, 8, 0, 8),
+      margin: EdgeInsets.only(bottom: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
