@@ -4,20 +4,54 @@ import 'package:project_flutter/expert/ratings.dart';
 import 'package:project_flutter/expert/revenue.dart';
 import 'package:project_flutter/myPage/myCustomer.dart';
 import 'package:provider/provider.dart';
-
 import '../join/userModel.dart';
-import '../myPage/customerLike.dart';
 import '../myPage/editProfile.dart';
 import 'messageResponse.dart';
 import 'myPortfolio.dart';
 
 class MyExpert extends StatefulWidget {
+  final String userId;
+
+  const MyExpert({required this.userId, Key? key}) : super(key: key);
+
   @override
-  State<MyExpert> createState() => _MyExpertState();
+  State<MyExpert> createState() => _MyExpertState(userId: userId);
 }
 
 class _MyExpertState extends State<MyExpert> {
+  final String userId;
   late Map<String, dynamic> data;
+  String profileImageUrl = '';
+
+  _MyExpertState({required this.userId});
+
+  @override
+  void initState() {
+    super.initState();
+    loadExpertProfileImageUrl(); // 프로필 이미지 URL을 로드
+  }
+
+  void loadExpertProfileImageUrl() async {
+    String? imageUrl = await getExpertProfileImageUrl(userId);
+    setState(() {
+      profileImageUrl = imageUrl ?? 'assets/profile.png';
+    });
+  }
+
+  Future<String?> getExpertProfileImageUrl(String userId) async {
+    try {
+      CollectionReference users = FirebaseFirestore.instance.collection("userList");
+      QuerySnapshot snap = await users.where('userId', isEqualTo: userId).get();
+
+      for (QueryDocumentSnapshot doc in snap.docs) {
+        return doc['profileImageUrl'] as String?;
+      }
+    } catch (e) {
+      return null;
+    }
+  }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -69,8 +103,8 @@ class _MyExpertState extends State<MyExpert> {
               child: Row(
                 children: [
                   CircleAvatar(
-                    radius: 50,
-                    backgroundImage: AssetImage('assets/profile.png'),
+                    radius: 70,
+                    backgroundImage: NetworkImage(profileImageUrl),
                   ),
                   Padding(
                     padding: const EdgeInsets.all(20.0),

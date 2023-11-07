@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import '../join/userModel.dart';
 
 class ChatResponsePage extends StatefulWidget {
-  final String roomId; // 룸 아이디 추가
+  final String roomId;
 
   ChatResponsePage({required this.roomId});
 
@@ -14,7 +14,7 @@ class ChatResponsePage extends StatefulWidget {
 }
 
 class _ChatResponsePageState extends State<ChatResponsePage> {
-  final String roomId; // 룸 아이디 추가
+  final String roomId;
   _ChatResponsePageState({required this.roomId});
 
   String? selectedResponse;
@@ -22,11 +22,8 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
     '전문가 지금 응답 가능한가요?',
     '전문가가 야간 응답이 가능한가요?',
     '전문가는 휴가 중인가요?',
-    '도와주세요!',
-    '채팅 연결'
   ];
 
-  // Firestore 데이터
   bool isNightResponseEnabled = false;
   bool isOnVacation = false;
   bool isResponseEnabled = false;
@@ -50,7 +47,6 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       print("로그인 안됨");
     }
 
-    _fetchMessageResponse();
     _parseRoomId(roomId);
     print("상대 유저 ======> $otherUser");
   }
@@ -62,21 +58,20 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       String user1 = users[0];
       String user2 = users[1];
 
-      // 현재 사용자와 비교하여 다른 사용자를 식별합니다.
       if (user1 != user) {
         otherUser = user1;
       } else if (user2 != user) {
         otherUser = user2;
       }
+      _fetchMessageResponse(otherUser);
     }
   }
 
-  Future<void> _fetchMessageResponse() async {
+  Future<void> _fetchMessageResponse(String otherUser) async {
     final firestore = FirebaseFirestore.instance;
-    final documentSnapshot =
-    await firestore.collection("messageResponse").doc(otherUser).get();
+    final documentSnapshot = await firestore.collection("messageResponse").doc(otherUser).get();
 
-    if (documentSnapshot.exists) {
+    if (documentSnapshot != null && documentSnapshot.exists) {
       final data = documentSnapshot.data() as Map<String, dynamic>;
 
       isNightResponseEnabled = data['isNightResponseEnabled'];
@@ -90,7 +85,6 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       });
       print("flg 지금 ============> $flg");
     } else {
-      // 문서가 존재하지 않으면 특정 변수를 false로 설정
       setState(() {
         flg = true;
       });
@@ -98,58 +92,39 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       print("문서가 Firestore에 존재하지 않습니다.");
     }
 
-    // 답변 업데이트
     _updateResponse();
   }
 
-
   void _updateResponse() {
     if (selectedResponse != null) {
-      // 사용자의 선택을 메시지로 추가
       _addMessage("사용자", selectedResponse!);
     }
 
-    String userQuestion = selectedResponse ?? ""; // 사용자의 질문을 가져옵니다.
-
-    // 사용자의 질문에 대한 특정 대답 생성
+    String userQuestion = selectedResponse ?? "";
     String botResponse = getResponseForQuestion(userQuestion);
-
-    // 대화에 챗봇 메시지 추가
     _addMessage("챗봇", botResponse);
   }
 
   String getResponseForQuestion(String question) {
     if (question.contains("야간 응답")) {
-      // 사용자가 "야간 응답"과 관련된 질문을 하면 특정 대답 생성
-
-      if(isNightResponseEnabled){
+      if (isNightResponseEnabled) {
         return "전문가는 현재 야간응답 중입니다.";
-      }else{
+      } else {
         return "전문가는 현재 야간응답을 하고 있지 않습니다";
       }
     } else if (question.contains("휴가 중")) {
-      // 사용자가 "휴가 중"과 관련된 질문을 하면 특정 대답 생성
-
-      if(isOnVacation){
+      if (isOnVacation) {
         return "전문가는 ${_formatDate(vacationStartDate)}부터 ${_formatDate(vacationEndDate)}까지 휴가 중입니다.";
-      }else{
+      } else {
         return "현재 전문가는 휴가 중이 아닙니다.";
       }
-
     } else if (question.contains("응답 가능")) {
-      // 사용자가 "응답 가능"과 관련된 질문을 하면 특정 대답 생성
-      if(isResponseEnabled ){
+      if (isResponseEnabled) {
         return "전문가는 현재 30분 내로 응답 가능합니다.";
-      }else{
+      } else {
         return "전문가는 현재 30분 내로 응답할 수 없습니다.";
       }
-    } else if (question.contains("도와주세요")) {
-      return "고객센터를 이용해주세요";
-    } else if (question.contains("채팅 연결")) {
-      return "채팅 연결을 도와드리겠습니다!";
     }
-
-    // 특정 질문이 아닌 경우 기본 대답
     return "안녕하세요! 무엇을 도와드릴까요?";
   }
 
@@ -178,9 +153,11 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('메시지 응답 페이지'),
+        backgroundColor: Color(0xFFFCAF58),
       ),
       body: Column(
         children: [
+          SizedBox(height: 20,),
           Expanded(
             child: flg
                 ? _buildNoResponseMessage()
@@ -196,7 +173,9 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: possibleResponses.map((response) {
+            children: flg
+                ? []
+                : possibleResponses.map((response) {
               return ResponseButton(
                 response: response,
                 isSelected: response == selectedResponse,
@@ -215,7 +194,6 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
   }
 
   void _processUserResponse(String selectedResponse) {
-    // 사용자 응답은 이미 대화에 추가됨, 여기에서 추가 작업 필요 없음
     _updateResponse();
   }
 
@@ -228,7 +206,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
           Container(
             padding: EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: Colors.blue,
+              color: Color(0xFFFF8C42),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -254,7 +232,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
           Container(
             padding: EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: Colors.grey,
+              color: Color(0xFF4E598C),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -289,7 +267,7 @@ class ResponseButton extends StatelessWidget {
       onPressed: onPressed,
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all(
-          isSelected ? Colors.blue : Colors.grey,
+          isSelected ? Color(0xFFFF9C784) : Colors.grey,
         ),
       ),
       child: Text(

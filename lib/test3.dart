@@ -44,7 +44,7 @@ class _CircularDialogState extends State<CircularDialog> {
   List<Offset> iconOffsets = [];
   List<String> addButtonTexts = ["expert", "chat", "고객센터", "4", "5", "6", "상품", "테스트"];
   List<IconData> iconData = [Icons.star, Icons.message, Icons.people, Icons.chat, Icons.access_alarms_rounded, Icons.back_hand, Icons.add_circle_outline, Icons.telegram_sharp];
-  List<Widget> pageChange = [MyExpert(),ChatList(),UserCustomer(),MyApp(),MyApp(),MyApp(),Product(),Test()];
+  // List<Widget> pageChange = [MyExpert(),ChatList(),UserCustomer(),MyApp(),MyApp(),MyApp(),Product(),Test()];
   List<double> iconRotations = [pi / 2, 135 * (pi / 180), pi, 225 * (pi / 180), 270 * (pi / 180), 315 * (pi / 180), 360 * (pi / 180), 45 * (pi / 180)]; // 각 아이콘의 회전 각도
 
   @override
@@ -143,10 +143,10 @@ class _CircularDialogState extends State<CircularDialog> {
           children: [
             IconButton(
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => pageChange[pageIndex]),
-                );
+                // Navigator.push(
+                //   context,
+                //   // MaterialPageRoute(builder: (context) => pageChange[pageIndex]),
+                // );
               },
               icon: Icon(
                 icon,
@@ -238,11 +238,11 @@ class _BottomBarState extends State<BottomBar> {
               if (status == 'C') {
                 print("의뢰인");
                 // 'C'인 경우 MyCustomer로 이동
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyCustomer()));
+                // Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyCustomer()));
               } else if (status == 'E') {
                 print("전문가");
                 // 'E'인 경우 MyExpert로 이동
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert()));
+                // Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert()));
               } else {
                 // 다른 경우에는 어떤 페이지로 이동할지 정의하세요
               }

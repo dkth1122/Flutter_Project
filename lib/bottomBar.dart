@@ -6,10 +6,12 @@ import 'package:project_flutter/join/login_email.dart';
 import 'package:project_flutter/myPage/customerLike.dart';
 import 'package:project_flutter/product/product.dart';
 import 'package:project_flutter/test.dart';
+import 'package:project_flutter/tutorial.dart';
 import 'package:provider/provider.dart';
 
 import 'expert/my_expert.dart';
 import 'join/userModel.dart';
+import 'main.dart';
 import 'myPage/myCustomer.dart';
 
 class CircularDialog extends StatefulWidget {
@@ -42,9 +44,9 @@ class _CircularDialogState extends State<CircularDialog> {
   }
 
   List<Offset> iconOffsets = [];
-  List<String> addButtonTexts = ["expert", "chat", "고객센터", "4", "5", "6", "상품", "테스트"];
+  List<String> addButtonTexts = ["expert", "chat", "고객센터", "테스트", "5", "6", "상품", "튜토리얼"];
   List<IconData> iconData = [Icons.star, Icons.message, Icons.people, Icons.chat, Icons.access_alarms_rounded, Icons.back_hand, Icons.add_circle_outline, Icons.telegram_sharp];
-  List<Widget> pageChange = [MyExpert(),ChatList(),UserCustomer(),MyApp(),MyApp(),MyApp(),Product(),Test()];
+  List<Widget> pageChange = [Test(),ChatList(),UserCustomer(),Test(),HomePage(),HomePage(),Product(),Tutorial()];
   List<double> iconRotations = [pi / 2, 135 * (pi / 180), pi, 225 * (pi / 180), 270 * (pi / 180), 315 * (pi / 180), 360 * (pi / 180), 45 * (pi / 180)]; // 각 아이콘의 회전 각도
 
   @override
@@ -104,7 +106,11 @@ class _CircularDialogState extends State<CircularDialog> {
                         children: <Widget>[
                           InkWell(
                             onTap: () {
-                              Navigator.pop(context);
+
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => HomePage()),
+                              );
                             },
                             child: Image.asset(
                               'assets/logo.png',
@@ -154,7 +160,10 @@ class _CircularDialogState extends State<CircularDialog> {
             ),
             InkWell(
               onTap: (){
-
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => pageChange[pageIndex]),
+                );
               },
               child: Text(text)
             ),
@@ -248,10 +257,10 @@ class _BottomBarState extends State<BottomBar> {
               } else if (status == 'E') {
                 print("전문가");
                 // 'E'인 경우 MyExpert로 이동
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert(userId: userId!)));
               } else {
                 print("예외");
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert()));
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) =>MyExpert(userId: userId!)));
               }
             }
           },
