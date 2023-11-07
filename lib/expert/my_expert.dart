@@ -6,6 +6,7 @@ import 'package:project_flutter/myPage/myCustomer.dart';
 import 'package:provider/provider.dart';
 import '../join/userModel.dart';
 import '../myPage/editProfile.dart';
+import '../myPage/proposalList.dart';
 import 'messageResponse.dart';
 import 'myPortfolio.dart';
 
@@ -133,17 +134,53 @@ class _MyExpertState extends State<MyExpert> {
             ),
 
 
-            Container(
-              padding: EdgeInsets.all(16.0),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
+                children: [
                   Text(
-                    '보낸 제안',
+                    "보낸제안",
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
-                  // 작업 가능한 프로젝트 목록
-                  // 프로젝트 보러가기 버튼
+                  Container(
+                    child: Column(
+                      children: [
+                        Text("작업가능한 프로젝트를 확인하시고 금액을 제안해 주세용."),
+                        Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context)=>ProposalList()));
+                              },
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(Colors.white),
+                                side: MaterialStateProperty.all(
+                                  BorderSide(
+                                    color: Color(0xff424242),
+                                    width: 0.5,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                "프로젝트 보러가기",
+                                style: TextStyle(color: Color(0xff424242)),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                    margin: EdgeInsets.all(20.0),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: Colors.grey,
+                        width: 1.0,
+                      ),
+                      borderRadius: BorderRadius.circular(4.0),
+                    ),
+                  ),
                 ],
               ),
             ),

@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:project_flutter/myPage/proposal.dart';
+import 'package:project_flutter/myPage/myProposal.dart';
 import 'package:project_flutter/myPage/proposalView.dart';
 
 class ProposalList extends StatefulWidget {
@@ -73,7 +73,7 @@ class _ProposalListState extends State<ProposalList> {
               onPressed:(){
                 Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context)=>ProjectProposal()));
+                    MaterialPageRoute(builder: (context)=>MyProjectProposal()));
               },
               child: Text("의뢰하기"))
         ],

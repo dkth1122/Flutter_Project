@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/expert/my_expert.dart';
 import 'package:project_flutter/main.dart';
-import 'package:project_flutter/myPage/proposal.dart';
+import 'package:project_flutter/myPage/myProposal.dart';
 import 'package:project_flutter/myPage/proposalList.dart';
 import 'package:project_flutter/myPage/purchaseManagement.dart';
 import 'package:provider/provider.dart';
@@ -149,7 +149,7 @@ class _MyCustomerState extends State<MyCustomer> {
                               onPressed: () {
                                 Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context)=>ProjectProposal()));
+                                    MaterialPageRoute(builder: (context)=>MyProjectProposal()));
                               },
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(Colors.white),

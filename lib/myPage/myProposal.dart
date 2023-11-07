@@ -4,14 +4,14 @@ import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
 
-class ProjectProposal extends StatefulWidget {
-  const ProjectProposal({super.key});
+class MyProjectProposal extends StatefulWidget {
+  const MyProjectProposal({super.key});
 
   @override
-  State<ProjectProposal> createState() => _ProjectProposalState();
+  State<MyProjectProposal> createState() => _MyProjectProposalState();
 }
 
-class _ProjectProposalState extends State<ProjectProposal> {
+class _MyProjectProposalState extends State<MyProjectProposal> {
 
   final TextEditingController _title = TextEditingController();
   final TextEditingController _content = TextEditingController();
