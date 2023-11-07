@@ -50,7 +50,6 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       print("로그인 안됨");
     }
 
-    _fetchMessageResponse();
     _parseRoomId(roomId);
     print("상대 유저 ======> $otherUser");
   }
@@ -65,18 +64,19 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       // 현재 사용자와 비교하여 다른 사용자를 식별합니다.
       if (user1 != user) {
         otherUser = user1;
+
       } else if (user2 != user) {
         otherUser = user2;
       }
+      _fetchMessageResponse(otherUser);
     }
   }
 
-  Future<void> _fetchMessageResponse() async {
+  Future<void> _fetchMessageResponse(String otherUser) async {
     final firestore = FirebaseFirestore.instance;
-    final documentSnapshot =
-    await firestore.collection("messageResponse").doc(otherUser).get();
+    final documentSnapshot = await firestore.collection("messageResponse").doc(otherUser).get();
 
-    if (documentSnapshot.exists) {
+    if (documentSnapshot != null && documentSnapshot.exists) {
       final data = documentSnapshot.data() as Map<String, dynamic>;
 
       isNightResponseEnabled = data['isNightResponseEnabled'];
@@ -90,7 +90,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       });
       print("flg 지금 ============> $flg");
     } else {
-      // 문서가 존재하지 않으면 특정 변수를 false로 설정
+      // 문서가 존재하지 않거나 null인 경우 처리
       setState(() {
         flg = true;
       });
@@ -101,6 +101,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
     // 답변 업데이트
     _updateResponse();
   }
+
 
 
   void _updateResponse() {
@@ -119,8 +120,12 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
   }
 
   String getResponseForQuestion(String question) {
+
+
+
     if (question.contains("야간 응답")) {
       // 사용자가 "야간 응답"과 관련된 질문을 하면 특정 대답 생성
+      print("야간 응답 ====> $isNightResponseEnabled");
 
       if(isNightResponseEnabled){
         return "전문가는 현재 야간응답 중입니다.";
