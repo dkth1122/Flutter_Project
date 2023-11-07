@@ -108,9 +108,9 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
   String getResponseForQuestion(String question) {
     if (question.contains("야간 응답")) {
       if (isNightResponseEnabled) {
-        return "전문가는 현재 야간응답 중입니다.";
+        return "전문가는 현재 23:00~08:00(KST) 동안 야간 응답이 가능합니다.";
       } else {
-        return "전문가는 현재 야간응답을 하고 있지 않습니다";
+        return "전문가는 현재 야간 응답이 불가능 합니다.";
       }
     } else if (question.contains("휴가 중")) {
       if (isOnVacation) {

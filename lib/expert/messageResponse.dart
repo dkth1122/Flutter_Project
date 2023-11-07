@@ -108,58 +108,73 @@ class _MessageResponsenState extends State<MessageResponse> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('휴가 설정'),
+        title: Text('휴가 설정', style: TextStyle(fontWeight: FontWeight.bold),),
+        backgroundColor: Color(0xFFFCAF58),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.save),
+            onPressed: () => saveSettingsToFirestore(),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Column(
-              children: [
-                Row(
-                  children: [
-                    Text('시작일: ${DateFormat('yyyy-MM-dd').format(vacationStartDate ?? DateTime.now())}'),
-                    ElevatedButton(
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  ListTile(
+                    title: Text(
+                      '시작일: ${DateFormat('yyyy-MM-dd').format(vacationStartDate ?? DateTime.now())}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    trailing: IconButton(
                       onPressed: () => selectDate(context, '시작일'),
-                      child: Text('시작일 선택'),
+                      icon: Icon(Icons.calendar_month),
                     ),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Text('종료일: ${DateFormat('yyyy-MM-dd').format(vacationEndDate ?? DateTime.now())}'),
-                    ElevatedButton(
+                  ),
+                  ListTile(
+                    title: Text(
+                      '종료일: ${DateFormat('yyyy-MM-dd').format(vacationEndDate ?? DateTime.now())}',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    trailing: IconButton(
                       onPressed: () => selectDate(context, '종료일'),
-                      child: Text('종료일 선택'),
+                      icon: Icon(Icons.calendar_month),
                     ),
-                  ],
-                ),
-                Text('휴가 일수: ${calculateVacationDays()}일'),
-                buildSwitch('휴가 중', isOnVacation),
-              ],
+                  ),
+                  Text(
+                    '휴가 일수: ${calculateVacationDays()}일',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  buildSwitch('휴가 중', isOnVacation),
+                ],
+              ),
             ),
-            Column(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("지금 상담 가능"),
-                    Text("의뢰인의 문의 메시지에 최대 30분 이내로 응답 가능"),
-                    buildSwitch('30분 이내 응답 가능', isResponseEnabled),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('야간 응답 제외'),
-                    Text('야간에 받는 첫 문의 메시지를 평균 응답 시간 집계에서 제외'),
-                    buildSwitch('야간 응답', isNightResponseEnabled),
-                  ],
-                ),
-              ],
+            Divider(
+              color: Colors.grey,
+              height: 1.0,
             ),
-            ElevatedButton(
-              onPressed: () => saveSettingsToFirestore(),
-              child: Text('저장'),
+            ListTile(
+              title: Text(
+                '지금 상담 가능',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text('의뢰인의 문의 메시지에 최대 30분 이내로 응답 가능'),
+              trailing: buildSwitch('30분 이내 응답 가능', isResponseEnabled),
+            ),
+            Divider(
+              color: Colors.grey,
+              height: 1.0,
+            ),
+            ListTile(
+              title: Text(
+                '야간 응답 가능',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text('23:00~08:00(KST)까지 의뢰인의 문의 메시지에 응답 가능'),
+              trailing: buildSwitch('야간 응답', isNightResponseEnabled),
             ),
           ],
         ),
@@ -168,16 +183,12 @@ class _MessageResponsenState extends State<MessageResponse> {
   }
 
   Widget buildSwitch(String label, bool value) {
-    return Row(
-      children: [
-        Text('$label:'),
-        Switch(
-          value: value,
-          onChanged: (bool newValue) {
-            toggleSetting(label);
-          },
-        ),
-      ],
+    return Switch(
+      value: value,
+      onChanged: (bool newValue) {
+        toggleSetting(label);
+      },
+      activeColor: Color(0xFFFF8C42),
     );
   }
 }
