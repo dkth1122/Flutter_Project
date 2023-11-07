@@ -67,5 +67,8 @@ flutter {
 
 dependencies {
     implementation 'com.google.firebase:firebase-analytics'
+    // add fcm meta-data 
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version'
+    implementation platform('com.google.firebase:firebase-bom:29.0.2')
 }
 
