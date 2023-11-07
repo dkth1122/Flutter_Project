@@ -352,7 +352,7 @@ class _EditProfileState extends State<EditProfile> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => HomePage(),
+        builder: (context) => MyHomePage(),
       ),
     );
   }

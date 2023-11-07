@@ -5,6 +5,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:project_flutter/product/productView.dart';
 import 'package:project_flutter/search/search.dart';
 import 'package:project_flutter/bottomBar.dart';
+import 'package:project_flutter/tutorial.dart';
 import 'package:provider/provider.dart';
 import 'admin/adminDomain.dart';
 import 'category/categoryProduct.dart';
@@ -68,6 +69,55 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Widget home = MyHomePage();
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+    await um.loadUserLoginState();
+    if (um.isLogin) {
+      setState(() {
+        home = MyHomePage();
+      });
+    } else {
+      setState(() {
+        home = Tutorial();
+      });
+    }
+  }
+
+
+  String sessionId = "";
+  @override
+  Widget build(BuildContext context) {
+
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+
+    if (um.isLogin) {
+      sessionId = um.userId!;
+    } else {
+      sessionId = "";
+    }
+
+    final userModel = Provider.of<UserModel>(context, listen: false);
+    bool isAdmin = userModel.userId == 'admin';
+
+    return home;
+  }
+
+}
+
+class MyHomePage extends StatefulWidget {
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
   int _current = 0;
   int _current2 = 0;
   final CarouselController _controller = CarouselController();
@@ -219,8 +269,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                     // 가장 많이 본 서비스
                     Container(
-                      padding: EdgeInsets.all(10),
-                      child: _cntProduct()
+                        padding: EdgeInsets.all(10),
+                        child: _cntProduct()
                     ),
                     SizedBox(height: 20,),
 
@@ -588,10 +638,10 @@ class _HomePageState extends State<HomePage> {
                     height: 100,
                     padding: EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 0.6,
-                        color: Color.fromRGBO(182, 182, 182, 0.6)
-                      )
+                        border: Border.all(
+                            width: 0.6,
+                            color: Color.fromRGBO(182, 182, 182, 0.6)
+                        )
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,

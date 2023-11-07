@@ -30,7 +30,7 @@ class _TutorialState extends State<Tutorial> {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => MyHomePage()),
       );
     }
   }
