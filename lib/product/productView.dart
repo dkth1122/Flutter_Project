@@ -594,6 +594,69 @@ class _ProductViewState extends State<ProductView>
               '상품을 구매한 경우에만 후기 등록 가능합니다.',
             ),
           ),
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.black),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            padding: EdgeInsets.all(16),
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('review')
+                  .where('pName', isEqualTo: widget.productName)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  // 데이터가 있는 경우
+                  final reviews = snapshot.data!.docs;
+                  if (reviews.isEmpty) {
+                    // 검색된 후기가 없는 경우
+                    return Text('등록된 후기가 없습니다.');
+                  } else {
+                    return Column(
+                      children: reviews.map((review) {
+                        final starRating = review['star'];
+                        final userId = review['userId'];
+                        final reviewContent = review['rContent'];
+
+                        // 별점을 기반으로 별표 문자열 생성
+                        String starString = '';
+                        for (int i = 0; i < 5; i++) {
+                          if (i < starRating) {
+                            starString += '★';
+                          } else {
+                            starString += '☆';
+                          }
+                        }
+
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border(bottom: BorderSide(color: Colors.black)),
+                          ),
+                          padding: EdgeInsets.symmetric(vertical: 8),
+                          child: Row(
+                            children: [
+                              Text(
+                                starString,
+                                style: TextStyle(fontSize: 24),
+                              ),
+                              SizedBox(width: 16),
+                              Text(userId),
+                              SizedBox(width: 16),
+                              Text(reviewContent),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  }
+                } else {
+                  // 데이터가 없는 경우 또는 로딩 중인 경우
+                  return Text('아직 등록된 후기가 없습니다.');
+                }
+              },
+            ),
+          ),
         ],
       ),
     );
