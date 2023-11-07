@@ -523,6 +523,32 @@ class _ProductViewState extends State<ProductView>
               fontWeight: FontWeight.bold,
             ),
           ),
+          SizedBox(width: 8),
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('review')
+                .where('pName', isEqualTo: widget.productName)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final reviews = snapshot.data!.docs;
+                if (reviews.isNotEmpty) {
+                  double totalRating = 0;
+                  for (var review in reviews) {
+                    totalRating += review['star'];
+                  }
+                  double averageRating = totalRating / reviews.length;
+                  return Text(
+                    '(★ ${averageRating.toStringAsFixed(1)})',
+                    style: TextStyle(
+                      fontSize: 15,
+                    ),
+                  );
+                }
+              }
+              return SizedBox();
+            },
+          ),
           RatingBar.builder(
             initialRating: rating,
             minRating: 0,
@@ -569,7 +595,7 @@ class _ProductViewState extends State<ProductView>
                           String review = reviewController.text;
                           // 상품 구매 여부 확인 후 후기 작성
                           FirebaseFirestore.instance
-                              .collection('order')
+                              .collection('orders')
                               .where('productName', isEqualTo: widget.productName)
                               .where('user', isEqualTo: um.userId)
                               .get()
@@ -611,7 +637,7 @@ class _ProductViewState extends State<ProductView>
                   final reviews = snapshot.data!.docs;
                   if (reviews.isEmpty) {
                     // 검색된 후기가 없는 경우
-                    return Text('등록된 후기가 없습니다.');
+                    return Text('아직 등록된 후기가 없습니다.');
                   } else {
                     return Column(
                       children: reviews.map((review) {
@@ -652,7 +678,7 @@ class _ProductViewState extends State<ProductView>
                   }
                 } else {
                   // 데이터가 없는 경우 또는 로딩 중인 경우
-                  return Text('아직 등록된 후기가 없습니다.');
+                  return CircularProgressIndicator();
                 }
               },
             ),
@@ -665,9 +691,9 @@ class _ProductViewState extends State<ProductView>
   void submitReview(int star, String reviewDe, String pName, String user) {
     FirebaseFirestore.instance.collection('review').add({
       'star': star,
-      'reviewDe': reviewDe,
+      'rContent': reviewDe,
       'pName': pName,
-      'user': user,
+      'userId': user,
     });
   }
 
