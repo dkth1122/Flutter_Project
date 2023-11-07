@@ -225,13 +225,13 @@ class _ChatListState extends State<ChatList> {
                             ),
                             Column(
                               children: [
-                                Text(
-                                  '10:30 AM', // Add message timestamp here
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                ),
+                                // Text(
+                                //   '10:30 AM', // Add message timestamp here
+                                //   style: TextStyle(
+                                //     fontSize: 12,
+                                //     color: Colors.grey,
+                                //   ),
+                                // ),
                                 SizedBox(height: 8),
                                 //알림용,,,
                                 CircleAvatar(
