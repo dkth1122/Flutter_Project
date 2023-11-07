@@ -199,14 +199,14 @@ class _ProductState extends State<Product> {
                   });
                 }else if (selectedSort == '평점 높은 순') {
                   sortedProductList.sort((a, b) {
-                    final aStarAvg = a['starAvg'] as double;
-                    final bStarAvg = b['starAvg'] as double;
+                    final aStarAvg = a['starAvg'] as double? ?? 0.0;
+                    final bStarAvg = b['starAvg'] as double? ?? 0.0;
                     return bStarAvg.compareTo(aStarAvg);
                   });
                 } else if (selectedSort == '후기 많은 순') {
                   sortedProductList.sort((a, b) {
-                    final aReviewCount = a['reviewCount'] as int;
-                    final bReviewCount = b['reviewCount'] as int;
+                    final aReviewCount = a['reviewCount'] as int? ?? 0;
+                    final bReviewCount = b['reviewCount'] as int? ?? 0;
                     return bReviewCount.compareTo(aReviewCount);
                   });
                 }
@@ -413,12 +413,19 @@ class _ProductState extends State<Product> {
 
     if (reviewCount != 0) {
       averageRating /= reviewCount;
-    } else {
-      return 0.0;
     }
 
     starAvg = averageRating;
     return starAvg;
+  }
+
+  Future<int> getReviewCount(String productName) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('review')
+        .where('pName', isEqualTo: productName)
+        .get();
+
+    return querySnapshot.docs.length;
   }
 
 
