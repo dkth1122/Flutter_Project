@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/expert/my_expert.dart';
 import 'package:project_flutter/main.dart';
+import 'package:project_flutter/myPage/proposal.dart';
+import 'package:project_flutter/myPage/proposalList.dart';
 import 'package:project_flutter/myPage/purchaseManagement.dart';
 import 'package:provider/provider.dart';
 import '../join/userModel.dart';
@@ -141,21 +143,48 @@ class _MyCustomerState extends State<MyCustomer> {
                     child: Column(
                       children: [
                         Text("요구사항을 작성하시고, 딱 맞는 전문가와의 거래를 진행하세요"),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(Colors.white),
-                            side: MaterialStateProperty.all(
-                              BorderSide(
-                                color: Color(0xff424242),
-                                width: 0.5,
+                        Column(
+                          children: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context)=>ProjectProposal()));
+                              },
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(Colors.white),
+                                side: MaterialStateProperty.all(
+                                  BorderSide(
+                                    color: Color(0xff424242),
+                                    width: 0.5,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                "프로젝트 의뢰하기",
+                                style: TextStyle(color: Color(0xff424242)),
+                              ),
+                            ),ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context)=>ProposalList()));
+                              },
+                              style: ButtonStyle(
+                                backgroundColor: MaterialStateProperty.all(Colors.white),
+                                side: MaterialStateProperty.all(
+                                  BorderSide(
+                                    color: Color(0xff424242),
+                                    width: 0.5,
+                                  ),
+                                ),
+                              ),
+                              child: Text(
+                                "내가 제안한 프로젝트 리스트",
+                                style: TextStyle(color: Color(0xff424242)),
                               ),
                             ),
-                          ),
-                          child: Text(
-                            "프로젝트 의뢰하기",
-                            style: TextStyle(color: Color(0xff424242)),
-                          ),
+                          ],
                         ),
                       ],
                     ),
