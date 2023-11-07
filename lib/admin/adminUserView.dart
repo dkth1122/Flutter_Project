@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../board/questionAnswerView.dart';
+
 class AdminUserView {
   final String userId;
   final String uId;
@@ -30,8 +32,14 @@ class AdminUserView {
 
 class AdminUserViewPage extends StatelessWidget {
   final AdminUserView user;
+  late Stream<QuerySnapshot> questionStream;
 
-  AdminUserViewPage({required this.user});
+  AdminUserViewPage({required this.user}) {
+    questionStream = FirebaseFirestore.instance
+        .collection("question")
+        .where('user', isEqualTo: user.uId)
+        .snapshots();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +111,8 @@ class AdminUserViewPage extends StatelessWidget {
                                       .doc(user.userId)
                                       .update({'banYn': updatedBanYn});
 
-                                  FirebaseFirestore.instance.collection('ban').add({
+                                  FirebaseFirestore.instance.collection('ban')
+                                      .add({
                                     'uId': user.uId,
                                     'bdate': currentTime,
                                     'bReason': bReason,
@@ -161,10 +170,11 @@ class AdminUserViewPage extends StatelessWidget {
                   }
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFFCAF58)),
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                      Color(0xFFFCAF58)),
                 ),
               ),
-              Divider(color :Colors.grey),
+              Divider(color: Colors.grey),
               Text(
                 '쿠폰 정보',
                 style: TextStyle(
@@ -186,7 +196,9 @@ class AdminUserViewPage extends StatelessWidget {
                       if (snapshot.data != null) {
                         List<String> coupons = [];
                         snapshot.data!.docs.forEach((couponDoc) {
-                          final couponData = couponDoc.data() as Map<String, dynamic>?;
+                          final couponData = couponDoc.data() as Map<
+                              String,
+                              dynamic>?;
                           if (couponData != null) {
                             coupons.add(couponData['couponInfo'].toString());
                           }
@@ -194,13 +206,14 @@ class AdminUserViewPage extends StatelessWidget {
 
                         return Column(
                           children: snapshot.data!.docs.map((couponDoc) {
-                            final couponData = couponDoc.data() as Map<String, dynamic>;
+                            final couponData = couponDoc.data() as Map<
+                                String,
+                                dynamic>;
                             final cName = couponData['cName'];
                             final discount = couponData['discount'];
                             return Text('쿠폰: $cName($discount%)');
                           }).toList(),
                         );
-
                       } else {
                         return Text('No Data'); // 데이터가 없는 경우 처리
                       }
@@ -230,7 +243,8 @@ class AdminUserViewPage extends StatelessWidget {
                                       addCName = value.trim(); // 트림 적용
                                     });
                                   },
-                                  decoration: InputDecoration(labelText: '쿠폰 이름'),
+                                  decoration: InputDecoration(
+                                      labelText: '쿠폰 이름'),
                                 ),
                                 DropdownButton<int>(
                                   value: addDiscount,
@@ -274,7 +288,8 @@ class AdminUserViewPage extends StatelessWidget {
                                     );
                                   } else {
                                     // Firestore에 새로운 쿠폰 추가 로직
-                                    FirebaseFirestore.instance.collection('coupon').add({
+                                    FirebaseFirestore.instance.collection(
+                                        'coupon').add({
                                       'cName': addCName,
                                       'discount': addDiscount,
                                       'userId': user.uId,
@@ -298,18 +313,21 @@ class AdminUserViewPage extends StatelessWidget {
                   );
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFFCAF58)),
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                      Color(0xFFFCAF58)),
                 ),
                 child: Text('쿠폰 추가'),
               ),
-              Divider(color :Colors.grey),
+              Divider(color: Colors.grey),
               Text(
                 '문의 정보',
                 style: TextStyle(
                   fontSize: 30,
                 ),
               ),
-              Divider(color :Colors.grey),
+              _questionAnswer(),
+
+              Divider(color: Colors.grey),
               Text('탈퇴 여부: ${user.delYn}'),
             ],
           ),
@@ -317,4 +335,41 @@ class AdminUserViewPage extends StatelessWidget {
       ),
     );
   }
+
+  Widget _questionAnswer() {
+    return StreamBuilder(
+      stream: questionStream,
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
+        if (!snap.hasData) {
+          return Transform.scale(
+            scale: 0.1,
+            child: CircularProgressIndicator(strokeWidth: 20,),
+          );
+        }
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: snap.data!.docs.length,
+          itemBuilder: (context, index) {
+            DocumentSnapshot doc = snap.data!.docs[index];
+            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+            return ListTile(
+              title: Text('${data['title']}'),
+              subtitle: Text("작성자 : ${data['user']}"),
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => QuestionAnswerView(document: doc),
+                    )
+                );
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
 }
