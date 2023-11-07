@@ -174,7 +174,6 @@ class AdminUserViewPage extends StatelessWidget {
                       Color(0xFFFCAF58)),
                 ),
               ),
-              Divider(color: Colors.grey),
               Text(
                 '쿠폰 정보',
                 style: TextStyle(
@@ -318,7 +317,6 @@ class AdminUserViewPage extends StatelessWidget {
                 ),
                 child: Text('쿠폰 추가'),
               ),
-              Divider(color: Colors.grey),
               Text(
                 '문의 정보',
                 style: TextStyle(
@@ -327,7 +325,6 @@ class AdminUserViewPage extends StatelessWidget {
               ),
               _questionAnswer(),
 
-              Divider(color: Colors.grey),
               Text('탈퇴 여부: ${user.delYn}'),
             ],
           ),
