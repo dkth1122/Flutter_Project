@@ -82,10 +82,9 @@ class _RevenueState extends State<Revenue> {
 
   //출금 완료 내역 따로
   Future<void> fetchcompletedWithdraw() async {
-
     prices3 = []; // 기존 prices3를 초기화
     final orderCollection = _firestore.collection('orders');
-    final orderQuery = await orderCollection.where('seller', isEqualTo: user).where('withdraw', isEqualTo : 'Y').get();
+    final orderQuery = await orderCollection.where('seller', isEqualTo: user).where('withdraw', isEqualTo: 'Y').get();
     final orderDocs = orderQuery.docs;
 
     for (QueryDocumentSnapshot orderDoc in orderDocs) {
@@ -94,7 +93,11 @@ class _RevenueState extends State<Revenue> {
     }
 
     // prices3 리스트에는 'withdraw' 필드가 'Y'인 주문의 가격만 저장
-    completedWithdrawals = prices3.reduce((a, b) => a + b).toDouble();
+    double totalWithdrawals = prices3.fold(0.0, (previous, current) => previous + current);
+
+    setState(() {
+      completedWithdrawals = totalWithdrawals;
+    });
   }
 
 
