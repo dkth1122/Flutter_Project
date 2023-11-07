@@ -4,9 +4,7 @@ import 'package:project_flutter/expert/ratings.dart';
 import 'package:project_flutter/expert/revenue.dart';
 import 'package:project_flutter/myPage/myCustomer.dart';
 import 'package:provider/provider.dart';
-
 import '../join/userModel.dart';
-import '../myPage/customerLike.dart';
 import '../myPage/editProfile.dart';
 import 'messageResponse.dart';
 import 'myPortfolio.dart';
@@ -15,12 +13,13 @@ class MyExpert extends StatefulWidget {
   final String userId;
 
   const MyExpert({required this.userId, Key? key}) : super(key: key);
+
   @override
   State<MyExpert> createState() => _MyExpertState(userId: userId);
 }
 
 class _MyExpertState extends State<MyExpert> {
-  late final String userId;
+  final String userId;
   late Map<String, dynamic> data;
   String profileImageUrl = '';
 
@@ -29,21 +28,20 @@ class _MyExpertState extends State<MyExpert> {
   @override
   void initState() {
     super.initState();
-    loadUserProfileImageUrl(); // 프로필 이미지 URL을 로드
+    loadExpertProfileImageUrl(); // 프로필 이미지 URL을 로드
   }
 
-  void loadUserProfileImageUrl() async {
-    String? imageUrl = await getUserProfileImageUrl(userId);
+  void loadExpertProfileImageUrl() async {
+    String? imageUrl = await getExpertProfileImageUrl(userId);
     setState(() {
       profileImageUrl = imageUrl ?? 'assets/profile.png';
     });
   }
 
-  Future<String?> getUserProfileImageUrl(String userId) async {
+  Future<String?> getExpertProfileImageUrl(String userId) async {
     try {
-      UserModel userModel = Provider.of<UserModel>(context);
       CollectionReference users = FirebaseFirestore.instance.collection("userList");
-      QuerySnapshot snap = await users.where('userId', isEqualTo: userModel.userId).get();
+      QuerySnapshot snap = await users.where('userId', isEqualTo: userId).get();
 
       for (QueryDocumentSnapshot doc in snap.docs) {
         return doc['profileImageUrl'] as String?;
