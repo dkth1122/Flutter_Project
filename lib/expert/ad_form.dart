@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'ad_model.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Firebase Authentication 추가
-import 'package:provider/provider.dart'; // Provider 추가
-import '../join/userModel.dart'; // 사용자 모델 파일 임포트
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
+import '../join/userModel.dart';
 
 class AdForm extends StatefulWidget {
   @override
@@ -14,10 +14,12 @@ class _AdFormState extends State<AdForm> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _budgetController = TextEditingController();
+  int selectedBudget = 99000; // 선택된 예산 값
   DateTime _startDate = DateTime.now();
-  DateTime _endDate = DateTime.now();
-  String user = ''; // 사용자 정보 추가
+  DateTime fixedEndDate30 = DateTime.now().add(Duration(days: 30)); // 30일 뒤로 설정
+  String user = '';
+
+  double discountRate = 0.0;
 
   @override
   void initState() {
@@ -25,10 +27,9 @@ class _AdFormState extends State<AdForm> {
     UserModel um = Provider.of<UserModel>(context, listen: false);
     if (um.isLogin) {
       user = um.userId!;
-      print(user);
     } else {
       user = '없음';
-      print('로그인 안됨');
+      print('로그인X');
     }
   }
 
@@ -37,91 +38,112 @@ class _AdFormState extends State<AdForm> {
     return Scaffold(
       appBar: AppBar(
         title: Text('광고 신청'),
+        backgroundColor: Color(0xFF4E598C), // 앱 바의 배경색
       ),
-      body: Form(
-        key: _formKey,
-        child: Column(
-          children: [
-            TextFormField(
-              controller: _titleController,
-              decoration: InputDecoration(labelText: '제목'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return '제목을 입력하세요';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _descriptionController,
-              decoration: InputDecoration(labelText: '설명'),
-            ),
-            TextFormField(
-              controller: _budgetController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: '예산'),
-              validator: (value) {
-                if (value!.isEmpty) {
-                  return '예산을 입력하세요';
-                }
-                return null;
-              },
-            ),
-            Text('시작일: $_startDate'),
-            ElevatedButton(
-              onPressed: () {
-                showDatePicker(
-                  context: context,
-                  initialDate: _startDate,
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime(2030),
-                ).then((newDate) {
-                  if (newDate != null) {
-                    setState(() {
-                      _startDate = newDate;
-                    });
-                  }
-                });
-              },
-              child: Text('시작일 선택'),
-            ),
-            Text('종료일: $_endDate'),
-            ElevatedButton(
-              onPressed: () {
-                showDatePicker(
-                  context: context,
-                  initialDate: _endDate,
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime(2030),
-                ).then((newDate) {
-                  if (newDate != null) {
-                    setState(() {
-                      _endDate = newDate;
-                    });
-                  }
-                });
-              },
-              child: Text('종료일 선택'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  final newAd = Ad(
-                    id: UniqueKey().toString(),
-                    title: _titleController.text,
-                    description: _descriptionController.text,
-                    budget: double.parse(_budgetController.text),
-                    startDate: _startDate,
-                    endDate: _endDate,
-                    userId: user, // 사용자 정보 추가
-                  );
+      body: Container(
+        padding: EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: _titleController,
+                  decoration: InputDecoration(
+                    labelText: '제목',
+                    fillColor: Colors.white, // 입력 필드의 배경색
+                    filled: true,
+                  ),
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return '제목을 입력하세요';
+                    }
+                    return null;
+                  },
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextFormField(
+                  controller: _descriptionController,
+                  decoration: InputDecoration(
+                    labelText: '설명',
+                    fillColor: Colors.white, // 입력 필드의 배경색
+                    filled: true,
+                  ),
+                ),
+              ),
+              Text('예산: $selectedBudget 원', style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFFFF9C784)),),
+              Text('시작일: 신청 시작 당일', style: TextStyle(color: Color(0xFFFCAF58)),),
+              Text('종료일: 시작일로부터 정확히 30일 뒤', style: TextStyle(color: Color(0xFFFCAF58)),),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedBudget = 99000;
+                        _startDate = DateTime.now();
+                        fixedEndDate30 = DateTime.now().add(Duration(days: 30));
+                      });
+                    },
+                    child: Text('30일 - 99,000원', style: TextStyle(color: Colors.white),),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Color(0xFF4E598C)), // 버튼의 배경색
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedBudget = 282150;
+                        _startDate = DateTime.now();
+                        fixedEndDate30 = DateTime.now().add(Duration(days: 90));
+                      });
+                    },
+                    child: Text('90일 - 282,150 (5% 할인)', style: TextStyle(color: Colors.white),),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Color(0xFF4E598C)), // 버튼의 배경색
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        selectedBudget = 1084050;
+                        _startDate = DateTime.now();
+                        fixedEndDate30 = DateTime.now().add(Duration(days: 365));
+                      });
+                    },
+                    child: Text('365일 - 1,084,050원 (10% 할인)', style: TextStyle(color: Colors.white),),
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(Color(0xFF4E598C)), // 버튼의 배경색
+                    ),
+                  ),
+                ],
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    final newAd = Ad(
+                      id: UniqueKey().toString(),
+                      title: _titleController.text,
+                      description: _descriptionController.text,
+                      budget: selectedBudget,
+                      startDate: _startDate,
+                      endDate: fixedEndDate30,
+                      userId: user,
+                    );
 
-                  saveAdToFirestore(newAd);
-                }
-              },
-              child: Text('신청'),
-            ),
-          ],
+                    saveAdToFirestore(newAd);
+                  }
+                },
+                child: Text('신청', style: TextStyle(color: Colors.white),),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Color(0xFF4E598C)), // 버튼의 배경색
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -152,3 +174,4 @@ class _AdFormState extends State<AdForm> {
     );
   }
 }
+

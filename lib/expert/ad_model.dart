@@ -2,7 +2,7 @@ class Ad {
   final String id;
   final String title;
   final String description;
-  final double budget;
+  final int budget;
   final DateTime startDate;
   final DateTime endDate;
   final String userId; // 사용자 정보 추가
