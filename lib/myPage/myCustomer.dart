@@ -107,7 +107,7 @@ class _MyCustomerState extends State<MyCustomer> {
                     backgroundImage: NetworkImage(profileImageUrl),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.all(20.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -263,11 +263,21 @@ class _MyCustomerState extends State<MyCustomer> {
             children: [
               Row(
                 children: [
-                  Text(
-                    '의뢰인',
-                    style: TextStyle(
-                      backgroundColor: Colors.yellow,
+                  Container(
+                    padding: EdgeInsets.all(4.0), // 원하는 패딩 설정
+                    decoration: BoxDecoration(
+                      color: Colors.yellow, // 배경색 설정
+                      borderRadius: BorderRadius.circular(8.0), // 보더를 둥글게 만듦
                     ),
+                    child: Text(
+                      '의뢰인',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 5,
                   ),
                   Text(
                     data['nick'],

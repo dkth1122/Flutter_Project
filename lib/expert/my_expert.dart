@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/expert/ratings.dart';
 import 'package:project_flutter/expert/revenue.dart';
+import 'package:project_flutter/expert/salesManagement.dart';
 import 'package:project_flutter/myPage/myCustomer.dart';
 import 'package:provider/provider.dart';
 import '../join/userModel.dart';
@@ -50,6 +51,17 @@ class _MyExpertState extends State<MyExpert> {
       }
     } catch (e) {
       return null;
+    }
+  }
+  Future<int> getProductCount(String userId) async {
+    try {
+      CollectionReference products = FirebaseFirestore.instance.collection('Product');
+      QuerySnapshot querySnapshot = await products.where('userId', isEqualTo: userId).get();
+      int productCount = querySnapshot.size;
+      return productCount;
+    } catch (e) {
+      print('Error retrieving product count: $e');
+      return 0; // 에러 발생 시 0을 반환하거나 다른 에러 처리 방식을 사용할 수 있습니다.
     }
   }
 
@@ -196,15 +208,35 @@ class _MyExpertState extends State<MyExpert> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Text(
-                    '판매 정보',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween, // 오른쪽 끝에 버튼 배치
+                    children: <Widget>[
+                      Text(
+                        '판매 정보',
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context)=>SalesManagementPage()));
+                        },
+                        child: Text(
+                          '전체보기',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.blue, // 파란색 텍스트
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 10),
                   Text(
                     '3개월 이내 판매중인 건수:',
                     style: TextStyle(fontSize: 18),
                   ),
+                // int count = await getProductCount(userId);
                   Text(
                     '50',
                     style: TextStyle(
@@ -216,6 +248,7 @@ class _MyExpertState extends State<MyExpert> {
                 ],
               ),
             ),
+
             Divider(
               color: Colors.grey,
               thickness: 5.0,
@@ -296,11 +329,21 @@ class _MyExpertState extends State<MyExpert> {
             children: [
               Row(
                 children: [
-                  Text(
-                    '전문가',
-                    style: TextStyle(
-                      backgroundColor: Colors.yellow,
+                  Container(
+                    padding: EdgeInsets.all(4.0), // 원하는 패딩 설정
+                    decoration: BoxDecoration(
+                      color: Colors.yellow, // 배경색 설정
+                      borderRadius: BorderRadius.circular(8.0), // 보더를 둥글게 만듦
                     ),
+                    child: Text(
+                      '전문가',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 5,
                   ),
                   Text(
                     data['nick'],
