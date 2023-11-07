@@ -512,18 +512,19 @@ class _ProductViewState extends State<ProductView>
 
     UserModel um = Provider.of<UserModel>(context, listen: false);
 
-    return Center(
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             '후기',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(width: 8),
+          SizedBox(height: 8),
           StreamBuilder<QuerySnapshot>(
             stream: FirebaseFirestore.instance
                 .collection('review')
@@ -549,6 +550,7 @@ class _ProductViewState extends State<ProductView>
               return SizedBox();
             },
           ),
+          SizedBox(height: 16),
           RatingBar.builder(
             initialRating: rating,
             minRating: 0,
@@ -566,127 +568,119 @@ class _ProductViewState extends State<ProductView>
             },
           ),
           SizedBox(height: 16),
-          Container(
-            child: um.isLogin
-                ? Column(
-              children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    children: [
-                      Flexible(
-                        child: TextField(
-                          controller: reviewController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: '후기를 입력해주세요',
-                          ),
+          um.isLogin
+              ? Column(
+            children: [
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: reviewController,
+                        decoration: InputDecoration(
+                          border: InputBorder.none,
+                          hintText: '후기를 입력해주세요',
                         ),
                       ),
-                      SizedBox(width: 8),
-                      IconButton(
-                        icon: Icon(Icons.send),
-                        color: Color(0xFF4E598C),
-                        onPressed: () {
-                          String review = reviewController.text;
-                          // 상품 구매 여부 확인 후 후기 작성
-                          FirebaseFirestore.instance
-                              .collection('orders')
-                              .where('productName', isEqualTo: widget.productName)
-                              .where('user', isEqualTo: um.userId)
-                              .get()
-                              .then((snapshot) {
-                            if (snapshot.docs.isNotEmpty) {
-                              // 상품을 구매한 경우 후기 작성 가능
-                              submitReview(rating.toInt(), review, widget.productName, um.userId!);
-                            } else {
-                              // 상품을 구매하지 않은 경우 경고 메시지 표시
-                              _showPurchaseAlert(context);
-                            }
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                Divider(color: Colors.grey),
-              ],
-            )
-                : Text(
-              '상품을 구매한 경우에만 후기 등록 가능합니다.',
-            ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.black),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            padding: EdgeInsets.all(16),
-            child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance
-                  .collection('review')
-                  .where('pName', isEqualTo: widget.productName)
-                  .snapshots(),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  // 데이터가 있는 경우
-                  final reviews = snapshot.data!.docs;
-                  if (reviews.isEmpty) {
-                    // 검색된 후기가 없는 경우
-                    return Text('아직 등록된 후기가 없습니다.');
-                  } else {
-                    return Column(
-                      children: reviews.map((review) {
-                        final starRating = review['star'];
-                        final userId = review['userId'];
-                        final reviewContent = review['rContent'];
-
-                        // 별점을 기반으로 별표 문자열 생성
-                        String starString = '';
-                        for (int i = 0; i < 5; i++) {
-                          if (i < starRating) {
-                            starString += '★';
+                    ),
+                    SizedBox(width: 8),
+                    IconButton(
+                      icon: Icon(Icons.send),
+                      color: Color(0xFF4E598C),
+                      onPressed: () {
+                        String review = reviewController.text;
+                        FirebaseFirestore.instance
+                            .collection('orders')
+                            .where('productName', isEqualTo: widget.productName)
+                            .where('user', isEqualTo: um.userId)
+                            .get()
+                            .then((snapshot) {
+                          if (snapshot.docs.isNotEmpty) {
+                            submitReview(rating.toInt(), review, widget.productName, um.userId!);
                           } else {
-                            starString += '☆';
+                            _showPurchaseAlert(context);
                           }
-                        }
-
-                        return Container(
-                          decoration: BoxDecoration(
-                            border: Border(bottom: BorderSide(color: Colors.black)),
-                          ),
-                          padding: EdgeInsets.symmetric(vertical: 8),
-                          child: Row(
-                            children: [
-                              Text(
-                                starString,
-                                style: TextStyle(fontSize: 24),
-                              ),
-                              SizedBox(width: 16),
-                              Text(userId),
-                              SizedBox(width: 16),
-                              Text(reviewContent),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    );
-                  }
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 16),
+            ],
+          )
+              : Text(
+            '상품을 구매한 경우에만 후기 등록 가능합니다.',
+          ),
+          StreamBuilder<QuerySnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('review')
+                .where('pName', isEqualTo: widget.productName)
+                .snapshots(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final reviews = snapshot.data!.docs;
+                if (reviews.isEmpty) {
+                  return Text('아직 등록된 후기가 없습니다.');
                 } else {
-                  // 데이터가 없는 경우 또는 로딩 중인 경우
-                  return CircularProgressIndicator();
+                  return Column(
+                    children: reviews.map((review) {
+                      final starRating = review['star'];
+                      final userId = review['userId'];
+                      final reviewContent = review['rContent'];
+
+                      String starString = '';
+                      for (int i = 0; i < 5; i++) {
+                        if (i < starRating) {
+                          starString += '★';
+                        } else {
+                          starString += '☆';
+                        }
+                      }
+
+                      return Container(
+                        margin: EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  starString,
+                                  style: TextStyle(fontSize: 24),
+                                ),
+                                SizedBox(width: 16),
+                                Text(userId),
+                              ],
+                            ),
+                            SizedBox(height: 8),
+                            Text(reviewContent),
+                          ],
+                        ),
+                      );
+                    }).toList(),
+                  );
                 }
-              },
-            ),
+              } else {
+                return CircularProgressIndicator();
+              }
+            },
           ),
         ],
       ),
     );
   }
+
 
   void submitReview(int star, String reviewDe, String pName, String user) {
     FirebaseFirestore.instance.collection('review').add({
