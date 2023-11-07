@@ -1,7 +1,19 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 class PurchaseManagementPage extends StatefulWidget {
   @override
   _PurchaseManagementPageState createState() => _PurchaseManagementPageState();
+}
+class PurchaseItem {
+  final String title;
+  final String product;
+  final double price;
+
+  PurchaseItem({
+    required this.title,
+    required this.product,
+    required this.price,
+  });
 }
 
 class _PurchaseManagementPageState extends State<PurchaseManagementPage> {
@@ -74,11 +86,12 @@ class _PurchaseManagementPageState extends State<PurchaseManagementPage> {
     required VoidCallback onPressed,
   }) {
     return ElevatedButton.icon(
-      icon: Icon(icon ?? Icons.arrow_drop_down, color: Colors.grey),
-      label: Text(text ?? "기본 텍스트", style: TextStyle(color: Colors.grey),),
+      icon: Icon(icon ?? Icons.arrow_drop_down),
+      label: Text(text ?? "기본 텍스트"),
       style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Colors.white),
-        side: MaterialStateProperty.all(BorderSide(color: Colors.grey, width: 1.0)),
+        side: MaterialStateProperty.all(BorderSide(width: 1.0, color:Color(0xFFFF8C42))),
+        backgroundColor: MaterialStateProperty.all(Color(0xFFFF8C42) ),
+        foregroundColor: MaterialStateProperty.all(Colors.white),
       ),
       onPressed: onPressed,
     );
@@ -118,33 +131,52 @@ class _PurchaseManagementPageState extends State<PurchaseManagementPage> {
     );
   }
 
+  Future<List<PurchaseItem>> fetchPurchaseList() async {
+    try {
+      CollectionReference purchases = FirebaseFirestore.instance.collection("purchases");
+      QuerySnapshot snapshot = await purchases.get();
+
+      List<PurchaseItem> purchaseList = snapshot.docs.map((doc) {
+        return PurchaseItem(
+          title: doc['title'] as String,
+          product: doc['product'] as String,
+          price: doc['price'] as double,
+        );
+      }).toList();
+
+      return purchaseList;
+    } catch (e) {
+      // Handle any potential errors here
+      return [];
+    }
+  }
+
+
+
+
 
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        fontFamily: 'Pretendard',
-      ),
-      home: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: Text(
             "구매관리",
-            style: TextStyle(color: Colors.grey),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           centerTitle: true,
-          backgroundColor: Colors.white,
+          backgroundColor: Color(0xFFFCAF58),
           elevation: 1.0,
-          iconTheme: IconThemeData(color: Colors.grey),
+          iconTheme: IconThemeData(color: Colors.white),
           leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.grey),
+            icon: Icon(Icons.arrow_back),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.info_outline, color: Colors.grey),
+              icon: Icon(Icons.info_outline),
               onPressed: () {
                 _showInfoModal(context);
               },
@@ -209,7 +241,6 @@ class _PurchaseManagementPageState extends State<PurchaseManagementPage> {
               ),
             ),
           ],
-        ),
       ),
     );
   }

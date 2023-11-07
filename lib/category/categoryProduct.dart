@@ -27,7 +27,6 @@ class CategoryProduct extends StatefulWidget {
 
 class _CategoryProductState extends State<CategoryProduct> {
   int _current = 0;
-  int _current2 = 0;
   final CarouselController _controller = CarouselController();
 
   List<String> imageBanner = ['assets/banner1.webp','assets/banner2.webp','assets/banner3.webp','assets/banner4.webp','assets/banner5.webp'];
@@ -35,7 +34,7 @@ class _CategoryProductState extends State<CategoryProduct> {
   Widget build(BuildContext context) {
     String sendText = widget.sendText;
     return Scaffold(
-      appBar: AppBar(title: Text("카테고리 상품"),),
+      appBar: AppBar(title: Text("카테고리 상품"),backgroundColor: Color(0xFFFCAF58),),
       body: Column(
         children: [
           SizedBox(height: 10,),
@@ -53,8 +52,12 @@ class _CategoryProductState extends State<CategoryProduct> {
               ],
             ),
           ),
-          SizedBox(height: 10,),
-          Expanded(child: _categoryList(sendText))
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(10),
+              child: _categoryList(sendText)
+            )
+          )
         ],
       ),
     );
@@ -95,20 +98,66 @@ class _CategoryProductState extends State<CategoryProduct> {
                   ),
                 );
               },
-              child: ListTile(
-                leading: Image.network(
-                  data['iUrl'],
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
-                title: Text(data['pName']),
-                subtitle: Text(
-                  data['pDetail'].length > 15
-                      ? '${data['pDetail'].substring(0, 15)}...'
-                      : data['pDetail'],
-                ),
-                trailing: Text('${(data['price'])}원'),
+              child: Column(
+                children: [
+                  SizedBox(height: 10,),
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 0.6,
+                            color: Color.fromRGBO(182, 182, 182, 0.6)
+                        )
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
+                              child: Image.network(
+                                data['iUrl'],
+                                width: 130,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            SizedBox(width: 10,),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  data['pName'],
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                Container(
+                                  width: 110,
+                                  child: Text(
+                                    data['pDetail'].length > 20
+                                        ? '${data['pDetail'].substring(0, 20)}...'
+                                        : data['pDetail'],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              '조회수: ${data['cnt'].toString()}',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ],
               ),
             );
           },

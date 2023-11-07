@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+
+import '../join/userModel.dart';
 
 class Revenue extends StatefulWidget {
   @override
@@ -7,25 +11,121 @@ class Revenue extends StatefulWidget {
 }
 
 class _RevenueState extends State<Revenue> {
-  List<String> months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  List<double> earnings = [1000, 1500, 1200, 2200, 1800, 2100, 2300, 1000, 1500, 1200, 2200, 1800];
-  double availableEarnings = 1000.0;
-  double expectedEarnings = 2000.0;
-  double completedWithdrawals = 500.0;
+  List<String> months = [
+    '1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'
+  ];
+
+  List<double> earnings = List.generate(12, (index) => 0.0);
+  double availableEarnings = 0.0;
+  double completedWithdrawals = 0.0;
+
+  List<int> prices = [];
+  List<int> prices2 = [];
+  List<int> prices3 = [];
+  List<String> productNames = [];
+  List<DateTime> timestamps = [];
+
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  String user = "";
+
+  @override
+  void initState() {
+    super.initState();
+
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+    if (um.isLogin) {
+      user = um.userId!;
+      print(user);
+    } else {
+      user = "없음";
+      print("로그인 안됨");
+    }
+
+    fetchData();
+    fetchPrices();
+    fetchcompletedWithdraw();
+  }
+
+  Future<void> fetchData() async {
+    final orderCollection = _firestore.collection('orders');
+    final orderQuery = await orderCollection.where('seller', isEqualTo: user).get();
+    final orderDocs = orderQuery.docs;
+
+    for (QueryDocumentSnapshot orderDoc in orderDocs) {
+      int price = orderDoc['price'] as int;
+      Timestamp timestamp = orderDoc['timestamp'] as Timestamp;
+      DateTime timestampDateTime = timestamp.toDate();
+
+      prices.add(price);
+      timestamps.add(timestampDateTime);
+    }
+
+    updateEarningsData();
+  }
+
+  //출금 가능 내역 따로
+  Future<void> fetchPrices() async {
+
+    prices2 = []; // 기존 prices2를 초기화
+    final orderCollection = _firestore.collection('orders');
+    final orderQuery = await orderCollection.where('seller', isEqualTo: user).where('withdraw', isEqualTo : 'N').get();
+    final orderDocs = orderQuery.docs;
+
+    for (QueryDocumentSnapshot orderDoc in orderDocs) {
+      int price2 = orderDoc['price'] as int;
+      prices2.add(price2);
+    }
+
+    // prices2 리스트에는 'withdraw' 필드가 'N'인 주문의 가격만 저장
+    availableEarnings = prices2.reduce((a, b) => a + b).toDouble();
+  }
+
+  //출금 완료 내역 따로
+  Future<void> fetchcompletedWithdraw() async {
+
+    prices3 = []; // 기존 prices3를 초기화
+    final orderCollection = _firestore.collection('orders');
+    final orderQuery = await orderCollection.where('seller', isEqualTo: user).where('withdraw', isEqualTo : 'Y').get();
+    final orderDocs = orderQuery.docs;
+
+    for (QueryDocumentSnapshot orderDoc in orderDocs) {
+      int price3 = orderDoc['price'] as int;
+      prices3.add(price3);
+    }
+
+    // prices3 리스트에는 'withdraw' 필드가 'Y'인 주문의 가격만 저장
+    completedWithdrawals = prices3.reduce((a, b) => a + b).toDouble();
+  }
+
+
+
+  void updateEarningsData() {
+    List<double> updatedEarnings = List.generate(12, (index) => 0.0);
+
+    for (int i = 0; i < prices.length; i++) {
+      DateTime timestamp = timestamps[i];
+      int month = timestamp.month;
+      updatedEarnings[month - 1] += prices[i].toDouble();
+    }
+
+    setState(() {
+      earnings = updatedEarnings;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          backgroundColor: Colors.white, // 배경색
-          elevation: 0, // 그림자 효과 제거
-          title: Text(
-            '수익관리',
-            style: TextStyle(
-              color: Colors.black, // 타이틀 색상
-              fontSize: 24.0, // 타이틀 폰트 크기
-            ),
+        backgroundColor: Color(0xFFFCAF58),
+        elevation: 0,
+        title: Text(
+          '수익관리',
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 24.0,
           ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -35,8 +135,8 @@ class _RevenueState extends State<Revenue> {
             Container(
               decoration: BoxDecoration(
                 border: Border.all(
-                  color: Colors.grey[300]!, // Container의 외곽 보더 색상
-                  width: 1.0,              // Container의 외곽 보더 두께
+                  color: Colors.grey[300]!,
+                  width: 1.0,
                 ),
                 borderRadius: BorderRadius.circular(8.0),
               ),
@@ -49,13 +149,60 @@ class _RevenueState extends State<Revenue> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
-                        onPressed: () {
-                          // 출금 신청 로직을 추가
+                        child: Text('출금 신청'),
+                        onPressed: () async {
+                          if (availableEarnings == 0.0) {
+                            // 출금 가능 수익이 0인 경우 스낵바 표시
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('출금 가능한 수익이 없습니다.'),
+                                duration: Duration(seconds: 3), // 스낵바 표시 시간
+                              ),
+                            );
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text('출금 신청 확인'),
+                                  content: Text('출금을 신청하시겠습니까?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(); // 다이얼로그 닫기
+                                      },
+                                      child: Text('취소'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        // 출금 신청 로직 추가
+                                        QuerySnapshot orderQuery = await _firestore
+                                            .collection('orders')
+                                            .where('seller', isEqualTo: user)
+                                            .get();
+
+                                        for (QueryDocumentSnapshot orderDoc in orderQuery.docs) {
+                                          await _firestore.collection('orders').doc(orderDoc.id).update({
+                                            'withdraw': 'Y',
+                                          });
+                                        }
+
+                                        // 다이얼로그 닫기
+                                        Navigator.of(context).pop();
+
+                                        // 출금 신청 후 다른 작업 수행
+                                      },
+                                      child: Text('출금 신청'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.amber, // 버튼 색상 설정
+                          primary: Colors.amber,
                         ),
-                        child: Text('출금 신청'),
                       ),
                       SizedBox(width: 10),
                       ElevatedButton(
@@ -63,20 +210,15 @@ class _RevenueState extends State<Revenue> {
                           // 출금 취소 로직을 추가
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.grey, // 버튼 색상 설정
+                          primary: Colors.grey,
                         ),
                         child: Text('출금 취소'),
                       ),
                     ],
                   ),
                   Divider(
-                    color: Colors.grey[300]!, // 구분선의 색상
-                    thickness: 1.0,            // 구분선의 두께
-                  ),
-                  _buildStatRow("예상 수익금", expectedEarnings),
-                  Divider(
-                    color: Colors.grey[300]!, // 구분선의 색상
-                    thickness: 1.0,            // 구분선의 두께
+                    color: Colors.grey[300]!,
+                    thickness: 1.0,
                   ),
                   _buildStatRow("출금 완료 수익금", completedWithdrawals),
                 ],
@@ -89,8 +231,8 @@ class _RevenueState extends State<Revenue> {
                 width: 500,
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Colors.grey[300]!, // Container의 외곽 보더 색상
-                    width: 1.0,              // Container의 외곽 보더 두께
+                    color: Colors.grey[300]!,
+                    width: 1.0,
                   ),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
@@ -100,7 +242,6 @@ class _RevenueState extends State<Revenue> {
                     titlesData: FlTitlesData(
                       leftTitles: SideTitles(
                         showTitles: true,
-                        //Y축에 담을 정보 내용
                         getTextStyles: (context, value) => TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
@@ -118,7 +259,7 @@ class _RevenueState extends State<Revenue> {
                         getTextStyles: (context, value) => TextStyle(
                           color: Colors.black,
                           fontWeight: FontWeight.bold,
-                          fontSize: 14,
+                          fontSize: 10,
                         ),
                         getTitles: (value) {
                           int index = value.toInt();
@@ -140,8 +281,7 @@ class _RevenueState extends State<Revenue> {
                       show: false,
                     ),
                     minY: 0,
-                    //추후 1~12월 거래액 중 최대값을 maxY에 넣기
-                    maxY: 2500,
+                    maxY: earnings.reduce((a, b) => a > b ? a : b),
                     barGroups: List.generate(
                       months.length,
                           (index) => BarChartGroupData(
@@ -177,7 +317,7 @@ class _RevenueState extends State<Revenue> {
           ),
         ),
         Text(
-          '\$${value.toStringAsFixed(2)}',
+          '${value.toInt()} 원',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,

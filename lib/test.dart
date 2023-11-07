@@ -1,59 +1,126 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'join/userModel.dart';
+
+import 'main.dart';
+
+void main() {
+  runApp(
+    MaterialApp(
+      home: Test(),
+    ),
+  );
+}
 
 class Test extends StatefulWidget {
-  const Test({super.key});
+  const Test({Key? key});
 
   @override
   State<Test> createState() => _TestState();
 }
 
 class _TestState extends State<Test> {
-  bool _isLogged = false; // 로그인 여부를 나타내는 상태
-  bool _isFavorite = false; // 하트 아이콘의 색을 나타내는 상태
-  final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").snapshots();
+  int currentPage = 0;
+  double positionTop = 0.0;
 
-  @override
-  void initState() {
-    super.initState();
-    String sessionId = "";
+  final List<String> tutorialPages = ["1", "2", "3"];
 
-    UserModel um = Provider.of<UserModel>(context, listen: false);
-
-    if (um.isLogin) {
-      sessionId = um.userId!;
-      _isLogged = true; // 로그인되어 있으면 _isLogged를 true로 설정
-      print(sessionId);
-    } else {
-      sessionId = "";
-      print("상품페이지 로그인 안됨");
-      print(sessionId);
+  Future<void> showDialogWithPosition() async {
+    if (mounted) {
+      await showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            insetPadding: EdgeInsets.all(0),
+            child: Stack(
+              children: [
+                Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  color: Colors.transparent,
+                ),
+                Positioned(
+                  top: positionTop,
+                  right: 10,
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: MediaQuery.of(context).size.height / 2 - 20,
+                  left: MediaQuery.of(context).size.width / 2 - 60,
+                  child: ElevatedButton(
+                    child: Text('이전'),
+                    onPressed: previousPage,
+                  ),
+                ),
+                Positioned(
+                  top: MediaQuery.of(context).size.height / 2 - 20,
+                  left: MediaQuery.of(context).size.width / 2 + 20,
+                  child: ElevatedButton(
+                    child: Text('다음'),
+                    onPressed: nextPage,
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      );
     }
   }
 
-  void _toggleFavorite() {
-    if (_isLogged) {
+
+
+  void nextPage() {
+    if (currentPage < tutorialPages.length - 1) {
       setState(() {
-        _isFavorite = !_isFavorite; // 클릭할 때마다 색을 토글
+        currentPage++;
+        positionTop += 100.0;
+        showDialogWithPosition(); // 위치를 변경한 다음 다시 Dialog를 열기
+      });
+    } else {
+      Navigator.pop(context); // Dialog 닫기
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    }
+  }
+
+  void previousPage() {
+    if (currentPage > 0) {
+      setState(() {
+        currentPage--;
+        showDialogWithPosition(); // 위치를 변경한 다음 다시 Dialog를 열기
       });
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(milliseconds: 1), () {
+      showDialogWithPosition();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("테스트"),),
+      appBar: AppBar(
+        title: Text('다이얼로그 테스트'),
+      ),
       body: Center(
-        child: _isLogged
-            ? IconButton(
-          onPressed: () {
-          },
-          icon: Icon(Icons.add_circle_outline
-          ),
-        )
-            : Text(""),
+        child: ElevatedButton(
+          onPressed: showDialogWithPosition,
+          child: Text('다이얼로그 열기'),
+        ),
       ),
     );
   }

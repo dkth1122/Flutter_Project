@@ -42,13 +42,11 @@ dependencies:
   flutter_secure_storage:
   dio:
   path_provider:
-  fl_chart: ^0.36.0
+  fl_chart: ^0.40.0
   flutter_rating_bar:
   firebase_messaging:
   flutter_local_notifications:
   get:
-  webview_flutter:
-
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

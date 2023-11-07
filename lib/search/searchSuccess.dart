@@ -13,7 +13,6 @@ void main() async {
   runApp(SearchSuccess(searchText: '',));
 }
 
-
 class SearchSuccess extends StatefulWidget {
   final String searchText;
 
@@ -28,12 +27,12 @@ class _SearchSuccessState extends State<SearchSuccess> {
   Widget build(BuildContext context) {
     String searchText = widget.searchText;
     return Scaffold(
-      appBar: AppBar(title: Text("검색성공"),),
+      appBar: AppBar(title: Text("검색성공"),backgroundColor: Color(0xFFFCAF58),),
       body: SingleChildScrollView(
         child: Column(
           children: [
             SizedBox(height: 20,),
-            Text("검색어 : $searchText", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+            Text("검색어: $searchText", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
             SizedBox(height: 20,),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -42,8 +41,10 @@ class _SearchSuccessState extends State<SearchSuccess> {
                 Text("상품 리스트", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
               ],
             ),
-            SizedBox(height: 20,),
-            searchListProduct(),
+            Container(
+              padding: EdgeInsets.all(10),
+              child: searchListProduct()
+            ),
             SizedBox(height: 20,),
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -79,6 +80,11 @@ class _SearchSuccessState extends State<SearchSuccess> {
           return pDetail.contains(widget.searchText) || pName.contains(widget.searchText);
         }).toList();
 
+        if (filteredDocs.isEmpty) {
+          // 상품 리스트가 없을 때 '상품 리스트 없음'을 출력합니다.
+          return Text('상품 리스트 없음');
+        }
+
         return ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
@@ -104,20 +110,66 @@ class _SearchSuccessState extends State<SearchSuccess> {
                   ),
                 );
               },
-              child: ListTile(
-                leading: Image.network(
-                  data['iUrl'],
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
-                title: Text(data['pName']),
-                subtitle: Text(
-                  data['pDetail'].length > 15
-                      ? '${data['pDetail'].substring(0, 15)}...'
-                      : data['pDetail'],
-                ),
-                trailing: Text('${(data['price'])}원'),
+              child: Column(
+                children: [
+                  SizedBox(height: 10,),
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 0.6,
+                            color: Color.fromRGBO(182, 182, 182, 0.6)
+                        )
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
+                              child: Image.network(
+                                data['iUrl'],
+                                width: 130,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            SizedBox(width: 10,),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  data['pName'],
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                Container(
+                                  width: 110,
+                                  child: Text(
+                                    data['pDetail'].length > 20
+                                        ? '${data['pDetail'].substring(0, 20)}...'
+                                        : data['pDetail'],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              '가격: ${data['price'].toString()}',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ],
               ),
             );
           },
@@ -125,6 +177,7 @@ class _SearchSuccessState extends State<SearchSuccess> {
       },
     );
   }
+
   Widget searchListPortFolio() {
     return StreamBuilder(
       stream: FirebaseFirestore.instance.collectionGroup("portfolio").snapshots(),
@@ -137,13 +190,13 @@ class _SearchSuccessState extends State<SearchSuccess> {
             .where((document) {
           Map<String, dynamic> data = document.data() as Map<String, dynamic>;
           String title = data['title'];
-          String description = data['description'];
+          String description = data['portfolioDescription'];
           return title.contains(widget.searchText) || description.contains(widget.searchText);
         }).toList();
 
         if (filteredDocs.isEmpty) {
-          // 포트폴리오 데이터가 없을 때 "포트폴리오 리스트"를 숨깁니다.
-          return SizedBox.shrink();
+          // 포트폴리오 리스트가 없을 때 '상품 리스트 없음'을 출력합니다.
+          return Text('포트폴리오 리스트 없음');
         }
 
         return ListView.builder(
@@ -153,28 +206,94 @@ class _SearchSuccessState extends State<SearchSuccess> {
           itemBuilder: (context, index) {
             Map<String, dynamic> data = filteredDocs[index].data() as Map<String, dynamic>;
 
+
             return InkWell(
               onTap: () {
               },
-              child: ListTile(
-                leading: Image.network(
-                  data['thumbnailUrl'],
-                  width: 100,
-                  height: 100,
-                  fit: BoxFit.cover,
-                ),
-                title: Text(data['title']),
-                subtitle: Text(
-                  data['description'].length > 15
-                      ? '${data['description'].substring(0, 15)}...'
-                      : data['description'],
-                ),
+              child: Column(
+                children: [
+                  SizedBox(height: 10,),
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 0.6,
+                            color: Color.fromRGBO(182, 182, 182, 0.6)
+                        )
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
+                              child: Image.network(
+                                data['thumbnailUrl'],
+                                width: 130,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            SizedBox(width: 10,),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  data['title'],
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                Container(
+                                  width: 110,
+                                  child: Text(
+                                    data['portfolioDescription'].length > 20
+                                        ? '${data['portfolioDescription'].substring(0, 20)}...'
+                                        : data['portfolioDescription'],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              '카테고리: ${data['category']}',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ],
               ),
             );
+            // return InkWell(
+            //   onTap: () {
+            //     // 포트폴리오를 눌렀을 때 실행할 동작을 여기에 추가할 수 있습니다.
+            //   },
+            //   child: ListTile(
+            //     leading: Image.network(
+            //       data['thumbnailUrl'],
+            //       width: 100,
+            //       height: 100,
+            //       fit: BoxFit.cover,
+            //     ),
+            //     title: Text(data['title']),
+            //     subtitle: Text(
+            //       data['description'].length > 15
+            //           ? '${data['description'].substring(0, 15)}...'
+            //           : data['description'],
+            //     ),
+            //   ),
+            // );
           },
         );
       },
     );
   }
-
 }

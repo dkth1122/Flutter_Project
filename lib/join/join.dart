@@ -129,12 +129,19 @@ class _JoinState extends State<Join> {
         SnackBar(content: Text('가입완료. ${_name.text}님 환영합니다!')),
       );
 
+      FirebaseFirestore.instance.collection('coupon').add({
+        'cName': '회원가입 축하 쿠폰',
+        'discount': 10,
+        'userId': _id.text,
+      });
+
       _id.clear();
       _pw.clear();
       _pw2.clear();
       _email.clear();
       _nick.clear();
       _birth.clear();
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),

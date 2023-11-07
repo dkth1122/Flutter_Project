@@ -51,6 +51,7 @@ class _AdminUserState extends State<AdminUser> {
                       userListStream = FirebaseFirestore.instance.collection('userList')
                           .where('userId', isGreaterThanOrEqualTo: searchKeyword)
                           .where('userId', isLessThan: searchKeyword + 'z')
+                          .where('userId', isNotEqualTo: 'admin')
                           .orderBy('userId')
                           .snapshots();
                     });
@@ -72,51 +73,51 @@ class _AdminUserState extends State<AdminUser> {
                 } else {
                   return ListView(
                     children: snapshot.data!.docs.map((DocumentSnapshot document) {
-                Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-                String userId = document.id;
-                String uId = data['userId'];
-                String name = data['name'] ?? '이름 없음';
-                String nick = data['nick'] ?? '';
-                String email = data['email'];
-                String birth = data['birth'];
-                Timestamp timestamp = data['cdatetime'];
-                String cdatetime = timestamp.toDate().toString();
-                String banYn = data['banYn'];
-                String delYn = data['delYn'];
-                String status = data['status'];
+                      Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+                      String userId = document.id;
+                      String uId = data['userId'];
+                      String name = data['name'] ?? '이름 없음';
+                      String nick = data['nick'] ?? '';
+                      String email = data['email'];
+                      String birth = data['birth'];
+                      Timestamp timestamp = data['cdatetime'];
+                      String cdatetime = timestamp.toDate().toString();
+                      String banYn = data['banYn'];
+                      String delYn = data['delYn'];
+                      String status = data['status'];
 
-                return ListTile(
-                  title: Row(
-                    children: [
-                      Text(name, style: TextStyle(color: Colors.black)),
-                      Text(' ($nick)', style: TextStyle(color: Colors.grey)),
-                    ],
-                  ),
-                  subtitle: Text(userId),
-                  trailing: IconButton(
-                    icon: Icon(Icons.remove_red_eye),
-                    onPressed: () {
-                      AdminUserView user = AdminUserView(
-                        userId,
-                        uId,
-                        name,
-                        nick,
-                        email,
-                        birth,
-                        cdatetime,
-                        banYn,
-                        delYn,
-                        status,
-                      );
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AdminUserViewPage(user: user),
+                      return ListTile(
+                        title: Row(
+                          children: [
+                            Text(name, style: TextStyle(color: Colors.black)),
+                            Text(' ($nick)', style: TextStyle(color: Colors.grey)),
+                          ],
+                        ),
+                        subtitle: Text(uId),
+                        trailing: IconButton(
+                          icon: Icon(Icons.remove_red_eye),
+                          onPressed: () {
+                            AdminUserView user = AdminUserView(
+                              userId,
+                              uId,
+                              name,
+                              nick,
+                              email,
+                              birth,
+                              cdatetime,
+                              banYn,
+                              delYn,
+                              status,
+                            );
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AdminUserViewPage(user: user),
+                              ),
+                            );
+                          },
                         ),
                       );
-                    },
-                  ),
-                );
                     }).toList(),
                   );
                 }

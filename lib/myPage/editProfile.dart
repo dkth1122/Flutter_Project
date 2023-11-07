@@ -1,10 +1,14 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:project_flutter/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_flutter/myPage/alertControl.dart';
 import 'package:provider/provider.dart';
+import 'package:uuid/uuid.dart';
 import '../join/userModel.dart';
 import 'deleteAccount.dart';
 
@@ -18,10 +22,11 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   TextEditingController _email = TextEditingController();
   String labelText = ''; // 초기 labelText 값
+  String emailValidationMessage = '';//이메일 유효성메시지
 
 
   final ImagePicker _imagePicker = ImagePicker();
-  XFile? _image;
+  File? _image;
 
   Padding buildTextField(String labelText, String hintText, String value) {
     return Padding(
@@ -34,10 +39,36 @@ class _EditProfileState extends State<EditProfile> {
             child: Text(value, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
           ),
           TextField(
+            onChanged: (email) {
+              String emailText = _email.text;
+              if (!isEmailValid(emailText)) {
+                setState(() {
+                  emailValidationMessage = '유효하지 않은 이메일 형식입니다.';
+                });
+              } else {
+                isEmailAlreadyRegistered(emailText).then((isDuplicate) {
+                  if (isDuplicate) {
+                    setState(() {
+                      emailValidationMessage = '중복된 이메일 주소입니다.';
+                    });
+                  } else {
+                    setState(() {
+                      emailValidationMessage = '사용 가능한 이메일 주소입니다.';
+                    });
+                  }
+                });
+              }
+            },
             controller: _email,
             decoration: InputDecoration(
               labelText: labelText,
               hintText: hintText,
+            ),
+          ),
+          Text(
+            emailValidationMessage,
+            style: TextStyle(
+              color: emailValidationMessage == '사용 가능한 이메일 주소입니다.' ? Colors.blue : Colors.red,
             ),
           ),
         ],
@@ -45,66 +76,196 @@ class _EditProfileState extends State<EditProfile> {
     );
   }
 
+
   Future<void> updateUserData() async {
+    String emailText = _email.text;
+
+    if (emailText.isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('이메일 누락'),
+            content: Text('이메일을 입력해주세요.'),
+            actions: [
+              TextButton(
+                child: Text('확인'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // 다이얼로그 닫기
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else if (!isEmailValid(emailText)) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('유효하지 않은 이메일 형식'),
+            content: Text('올바른 이메일 형식으로 입력해주세요.'),
+            actions: [
+              TextButton(
+                child: Text('확인'),
+                onPressed: () {
+                  Navigator.of(context).pop(); // 다이얼로그 닫기
+                },
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      try {
+        CollectionReference users = FirebaseFirestore.instance.collection("userList");
+        QuerySnapshot snap = await users.where('userId', isEqualTo: widget.data['userId']).get();
+
+        for (QueryDocumentSnapshot doc in snap.docs) {
+          await users.doc(doc.id).update({'email': _email.text});
+
+          setState(() {
+            Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?; // 데이터를 Map으로 변환
+            if (data != null) {
+              setState(() {
+                labelText = data['email'] ?? '';
+                labelText = _email.text; // labelText를 업데이트
+              });
+            }
+          });
+          _email.clear();
+        }
+
+        // 업데이트 성공 시 사용자에게 성공 메시지 표시
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('업데이트 완료'),
+              content: Text('이메일이 성공적으로 업데이트되었습니다.'),
+              actions: [
+                TextButton(
+                  child: Text('확인'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    FocusScope.of(context).unfocus();
+                    setState(() {
+                      labelText = _email.text;
+                    });
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } catch (e) {
+        // 업데이트 실패 시 사용자에게 실패 메시지 표시
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('업데이트 실패'),
+              content: Text('이메일 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.'),
+              actions: [
+                TextButton(
+                  child: Text('확인'),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // 알림 다이얼로그 닫기
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
+
+
+
+  Future<String?> getUserProfileImageUrl() async {
     try {
       CollectionReference users = FirebaseFirestore.instance.collection("userList");
       QuerySnapshot snap = await users.where('userId', isEqualTo: widget.data['userId']).get();
 
       for (QueryDocumentSnapshot doc in snap.docs) {
-        await users.doc(doc.id).update({'email': _email.text});
-
-        setState(() {
-          Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?; // 데이터를 Map으로 변환
-          if (data != null) {
-            labelText = data['email'] ?? '';
-            labelText = _email.text; // labelText를 업데이트
-          }
-        });
-        _email.clear();
+        return doc['profileImageUrl'] as String?;
       }
-      // 업데이트 성공 시 사용자에게 성공 메시지 표시
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('업데이트 완료'),
-            content: Text('이메일이 성공적으로 업데이트되었습니다.'),
-            actions: [
-              TextButton(
-                child: Text('확인'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  FocusScope.of(context).unfocus();
-                  setState(() {
-                    labelText = _email.text;
-                  });
-                },
-              ),
-            ],
-          );
-        },
-      );
     } catch (e) {
-      // 업데이트 실패 시 사용자에게 실패 메시지 표시
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('업데이트 실패'),
-            content: Text('이메일 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.'),
-            actions: [
-              TextButton(
-                child: Text('확인'),
-                onPressed: () {
-                  Navigator.of(context).pop(); // 알림 다이얼로그 닫기
-                },
-              ),
-            ],
-          );
-        },
-      );
+      // 여기서 오류 처리를 수행합니다. 예를 들어, 기본 이미지 URL을 반환할 수 있습니다.
+      return null;
     }
   }
+
+  void _updateProfileImage(File image) {
+    final storageRef = FirebaseStorage.instance.ref().child('profile_images/${Uuid().v4()}.png');
+    final uploadTask = storageRef.putFile(image);
+
+    uploadTask.then((TaskSnapshot snapshot) {
+      snapshot.ref.getDownloadURL().then((downloadURL) async {
+        CollectionReference users = FirebaseFirestore.instance.collection("userList");
+        QuerySnapshot snap = await users.where('userId', isEqualTo: widget.data['userId']).get();
+
+        for (QueryDocumentSnapshot doc in snap.docs) {
+          await users.doc(doc.id).update({
+            'profileImageUrl': downloadURL,
+          });
+        }
+        // 업데이트 성공 시 사용자에게 성공 메시지 표시
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('프로필 이미지 업데이트 완료'),
+              content: Text('프로필 이미지가 성공적으로 업데이트되었습니다.'),
+              actions: [
+                TextButton(
+                  child: Text('확인'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      });
+    });
+  }
+
+  //이메일 중복검사
+  Future<bool> isEmailAlreadyRegistered(String email) async {
+    bool isDuplicate = false;
+    // Firebase Firestore 인스턴스 가져오기
+    final FirebaseFirestore _fs = FirebaseFirestore.instance;
+
+    try {
+      // 'userList' 컬렉션에서 이메일이 주어진 이메일과 일치하는 문서를 쿼리합니다.
+      final QuerySnapshot query = await _fs
+          .collection('userList')
+          .where('email', isEqualTo: _email.text)
+          .get();
+
+      // 쿼리 결과에서 문서가 하나 이상 반환되면, 해당 이메일이 이미 등록되었음을 나타냅니다.
+      if (query.docs.isNotEmpty) {
+        isDuplicate = true;
+      }
+    } catch (e) {
+      // 오류 처리: 데이터베이스 쿼리 중 오류 발생
+      print('Error: $e');
+    }
+
+    return isDuplicate;
+  }
+
+  //이메일 형식 유효성검사
+  bool isEmailValid(String email) {
+    String pattern = r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$';
+    RegExp regExp = RegExp(pattern);
+    return regExp.hasMatch(email);
+  }
+
+
 
   Future<void> updateUserPassword(newPasswordController, currentPasswordController, Function(bool) setShowError) async {
     try {
@@ -188,16 +349,18 @@ class _EditProfileState extends State<EditProfile> {
   void _logOut() {
     // 사용자 데이터 초기화 (예: Provider를 사용하면 해당 Provider를 초기화)
     Provider.of<UserModel>(context, listen: false).logout();
-    // 로그인 화면 또는 다른 원하는 화면으로 이동
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => HomePage(), // 로그인 화면으로 이동하도록 변경
+        builder: (context) => HomePage(),
       ),
     );
   }
   @override
   Widget build(BuildContext context) {
+
+
+
     return MaterialApp(
       theme: ThemeData(
         primaryColor: Color(0xFF4E598C),
@@ -251,19 +414,48 @@ class _EditProfileState extends State<EditProfile> {
           ],
         ),
 
-        body: Column(
-          children: [
-            Stack(
-              alignment: Alignment.bottomRight, // 카메라 버튼을 오른쪽 하단에 배치
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: CircleAvatar(
-                    radius: 70,
-                    backgroundImage: AssetImage('assets/profile.png'),
+        body: RefreshIndicator(
+          onRefresh: () async {
+            // 이 부분에서 실제 데이터를 가져오거나 다른 작업을 수행합니다.
+            await updateUserData(); // 예: 데이터 업데이트 함수를 호출
+
+            // 데이터가 업데이트된 후, 화면을 다시 그립니다.
+            setState(() {
+              // 데이터를 가져와서 labelText를 업데이트합니다.
+              labelText = 'New Email from Refresh'; // 실제 데이터 가져오는 로직으로 변경
+            });
+          },
+          child: Column(
+            children: [
+              Stack(
+                alignment: Alignment.bottomRight, // 카메라 버튼을 오른쪽 하단에 배치
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: FutureBuilder<String?>(
+                      future: getUserProfileImageUrl(),
+                      // snapshot의 데이터 상태에 따라 이미지를 표시합니다.
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          // 이미지 URL을 가져오는 동안 로딩 인디케이터 표시
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError || snapshot.data == null) {
+                          // 오류가 발생하거나 이미지 URL이 사용 불가능한 경우를 처리합니다.
+                          return CircleAvatar(
+                            radius: 70,
+                            backgroundImage: AssetImage('assets/profile.png'), // 기본 이미지로 대체
+                          );
+                        } else {
+                          // 이미지 URL을 사용 가능한 경우, CircleAvatar에 이미지 적용
+                          return CircleAvatar(
+                            radius: 70,
+                            backgroundImage: NetworkImage(snapshot.data!),
+                          );
+                        }
+                      },
+                    )
                   ),
-                ),
-                Padding(
+                  Padding(
                     padding: const EdgeInsets.all(1.0), // 카메라 버튼과 CircleAvatar 사이의 간격을 조절
                     child: InkWell(
                       onTap: () {
@@ -275,61 +467,63 @@ class _EditProfileState extends State<EditProfile> {
                         color: Colors.grey,
                         size: 40,
                       ),
-                    )
-                ),
-              ],
-            ),
-
-            buildTextField(widget.data['email'], "바꿀 이메일을 입력하세요.", '이메일'),
-
-            Divider(
-              color: Colors.grey,
-              thickness: 5.0,
-            ),
-            Expanded(
-              child: ListView(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                children: [
-                  ListTile(
-                    title: Text('알림설정'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AlertControl(), // 로그인 화면으로 이동하도록 변경
-                        ),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    title: Text('비밀번호 변경'),
-                    onTap: () {
-                      _showChangePasswordDialog();
-                    },
-                  ),
-
-                  ListTile(
-                    title: Text('로그아웃'),
-                    onTap: () {
-                      _logOut();
-                    },
-                  ),
-                  ListTile(
-                    title: Text('회원탈퇴'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DeleteAccount(data : widget.data), // 로그인 화면으로 이동하도록 변경
-                        ),
-                      );
-                    },
+                    ),
                   ),
                 ],
               ),
-            ),
-          ],
+
+
+              buildTextField(widget.data['email'], "바꿀 이메일을 입력하세요.", '이메일'),
+
+              Divider(
+                color: Colors.grey,
+                thickness: 5.0,
+              ),
+              Expanded(
+                child: ListView(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  children: [
+                    ListTile(
+                      title: Text('알림설정'),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AlertControl(), // 로그인 화면으로 이동하도록 변경
+                          ),
+                        );
+                      },
+                    ),
+                    ListTile(
+                      title: Text('비밀번호 변경'),
+                      onTap: () {
+                        _showChangePasswordDialog();
+                      },
+                    ),
+
+                    ListTile(
+                      title: Text('로그아웃'),
+                      onTap: () {
+                        _logOut();
+                      },
+                    ),
+                    ListTile(
+                      title: Text('회원탈퇴'),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DeleteAccount(data : widget.data), // 로그인 화면으로 이동하도록 변경
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -346,40 +540,32 @@ class _EditProfileState extends State<EditProfile> {
       child: Column(
         children: [
           Text(
-            'Choose Profile photo',
+            '프로필사진을 선택하세요',
             style: TextStyle(
               fontSize: 20,
             ),
           ),
           SizedBox(height: 20,),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              TextButton.icon(
-                icon: Icon(Icons.camera, size: 40),
-                onPressed: () async{
-                  XFile? image = await _imagePicker.pickImage(source: ImageSource.camera);
-                  if (image != null) {
-                    setState(() {
-                      _image = image;
-                    });
-                  }
-                },
-                label: Text('Camera', style: TextStyle(fontSize: 20)),
-              ),
-              TextButton.icon(
-                icon: Icon(Icons.photo_library, size: 40),
-                onPressed: () async{
-                  XFile? image = await _imagePicker.pickImage(source: ImageSource.gallery);
-                  if (image != null) {
-                    setState(() {
-                      _image = image;
-                    });
-                  }
-                },
-                label: Text('Gallery', style: TextStyle(fontSize: 20)),
-              ),
-            ],
+          TextButton.icon(
+            icon: Icon(Icons.photo_library, size: 40),
+            onPressed: () async{
+              final pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
+              if (pickedFile != null) {
+                final imageFile = File(pickedFile.path);
+                setState(() {
+                  _image = imageFile;
+                });
+                // 이미지를 선택한 후에 바로 업데이트 수행
+                _updateProfileImage(imageFile);
+              } else {
+                // 이미지 선택이 취소되면 이미지 변수 초기화
+                setState(() {
+                  _image = null;
+                });
+              }
+              Navigator.pop(context);
+            },
+            label: Text('Gallery', style: TextStyle(fontSize: 20)),
           ),
         ],
       ),

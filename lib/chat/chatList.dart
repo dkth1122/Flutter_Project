@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:project_flutter/payment/paymentTest.dart';
+import 'package:project_flutter/product/payment.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
 import 'chat.dart';
+import 'chatBot.dart';
 
 class ChatList extends StatefulWidget {
   @override
@@ -36,13 +37,6 @@ class _ChatListState extends State<ChatList> {
         title: Row(
           children: [
             Text("채팅 목록"),
-            IconButton(onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                  builder: (context) => Payment())
-              );
-            }, icon: Icon(Icons.move_down))
           ],
         ),
         backgroundColor: Color(0xFFFCAF58),
@@ -114,10 +108,6 @@ class _ChatListState extends State<ChatList> {
               String roomName3 = '${data['user2'] as String?}' + '_' + '$user1';
               String roomName4 = '$user1' + '_' + '${data['user2'] as String?}';
 
-              print('$roomName1');
-              print('$roomName2');
-              print('$roomName3');
-              print('$roomName4');
 
               // 이 부분에서 서브컬렉션의 필드 값을 가져올 수 있음
               return StreamBuilder<QuerySnapshot>(
@@ -235,26 +225,31 @@ class _ChatListState extends State<ChatList> {
                             ),
                             Column(
                               children: [
-                                Text(
-                                  '10:30 AM', // Add message timestamp here
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                ),
+                                // Text(
+                                //   '10:30 AM', // Add message timestamp here
+                                //   style: TextStyle(
+                                //     fontSize: 12,
+                                //     color: Colors.grey,
+                                //   ),
+                                // ),
                                 SizedBox(height: 8),
                                 //알림용,,,
                                 CircleAvatar(
                                   radius: 16,
                                   backgroundColor: Color(0xFFFCAF58),
-                                  child: Text(
-                                    '2', // Add unread message count here
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.white,
+                                  child: TextButton(
+                                    onPressed: (){
+                                      // 물음표 버튼을 클릭했을 때 ChatResponsePage로 이동하고 doc.id 전달
+                                      Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ChatResponsePage(roomId: document.id),
+                                          )
+                                      );
+                                    },
+                                    child: Text("?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),),
                                     ),
                                   ),
-                                ),
                               ],
                             ),
                           ],
@@ -325,5 +320,4 @@ class _ChatListState extends State<ChatList> {
       },
     );
   }
-
 }

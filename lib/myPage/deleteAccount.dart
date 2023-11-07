@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../main.dart';
+
 class DeleteAccount extends StatefulWidget {
   final Map<String, dynamic> data;
   DeleteAccount({required this.data});
@@ -198,8 +200,12 @@ class _DeleteAccountState extends State<DeleteAccount> {
                                                       actions: [
                                                         TextButton(
                                                           onPressed: () {
-                                                            Navigator.of(context).pop();
-                                                            Navigator.of(context).popUntil((route) => route.isFirst);
+                                                            Navigator.pushReplacement(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder: (context) => HomePage(),
+                                                              ),
+                                                            );
                                                           },
                                                           child: Text("홈페이지로 이동"),
                                                         )

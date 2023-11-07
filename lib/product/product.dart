@@ -1,16 +1,12 @@
+import 'package:carousel_slider/carousel_controller.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:project_flutter/bottomBar.dart';
 import 'package:project_flutter/product/productAdd.dart';
 import 'package:project_flutter/product/productView.dart';
-import 'package:project_flutter/join/userModel.dart';
-import 'package:project_flutter/test2.dart';
-import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
-
-import '../chat/chatList.dart';
-import '../join/login_email.dart';
-import '../myPage/my_page.dart';
 
 class Product extends StatefulWidget {
   @override
@@ -20,6 +16,9 @@ class Product extends StatefulWidget {
 class _ProductState extends State<Product> {
   int selectedCategoryIndex = -1;
   late Stream<QuerySnapshot>? productStream = null;
+  final CarouselController _controller = CarouselController();
+  List<String> imageBanner = ['assets/banner1.webp','assets/banner2.webp','assets/banner3.webp','assets/banner4.webp','assets/banner5.webp'];
+  int _current = 0;
   List<String> categories = [
     'UX기획',
     '웹',
@@ -115,14 +114,13 @@ class _ProductState extends State<Product> {
                 ),
               ),
             ),
-            Container(
-              height: 100, // 광고 영역의 높이를 150으로 고정
-              color: Colors.black, // 광고 영역의 배경색 설정
-              alignment: Alignment.center, // 광고 내용을 가운데로 정렬
-              child: Text(
-                '여기에 광고를 한다면 매출이 얼마나 오를까\n02-000-0000',
-                style: TextStyle(fontSize: 18, color: Colors.white),
-                textAlign: TextAlign.center,
+            SizedBox(
+              height: 150,
+              child: Stack(
+                children: [
+                  sliderWidget(),
+                  sliderIndicator(),
+                ],
               ),
             ),
             Container(
@@ -314,50 +312,65 @@ class _ProductState extends State<Product> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomAppBar(
-        height: 60,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Product())
-                  );
-                },
-                icon: Icon(Icons.add_circle_outline)
-            ),
-            IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => ChatList())
-                  );
-                },
-                icon: Icon(Icons.chat_outlined)
-            ),
-            IconButton(
-              onPressed: () async {
-                final userModel = Provider.of<UserModel>(context, listen: false);
-                if (userModel.isLogin) {
-                  // 사용자가 로그인한 경우에만 MyPage로 이동
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyPage()));
-                } else {
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
-                }
-              },
-              icon: Icon(Icons.person),
-            ),
-            IconButton(
-                onPressed: (){
-                  Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => Test2())
-                  );
-                },
-                icon: Icon(Icons.telegram_sharp)
-            ),
-          ],
-        ),
+      bottomNavigationBar: BottomBar(),
+    );
+  }
+
+  Widget sliderWidget() {
+    return CarouselSlider(
+      carouselController: _controller,
+      items: imageBanner.map(
+            (imagePath) {
+          return Builder(
+            builder: (context) {
+              return SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                ),
+              );
+            },
+          );
+        },
+      ).toList(),
+      options: CarouselOptions(
+        height: 150,
+        viewportFraction: 1.0,
+        autoPlay: true,
+        autoPlayInterval: const Duration(seconds: 2),
+        onPageChanged: (index, reason) {
+          setState(() {
+            _current = index;
+          });
+        },
       ),
     );
   }
+
+  Widget sliderIndicator() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: imageBanner.asMap().entries.map((entry) {
+          return GestureDetector(
+            onTap: () => _controller.animateToPage(entry.key),
+            child: Container(
+              width: 12,
+              height: 12,
+              margin:
+              const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color:
+                Colors.white.withOpacity(_current == entry.key ? 0.9 : 0.4),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
 }
