@@ -123,6 +123,8 @@ class _JoinState extends State<Join> {
         'banYn': 'N', // 기본값 N
         'delYn': 'N', // 기본값 N
         'cdatetime': FieldValue.serverTimestamp(), // 가입시간
+        'profileImageUrl' : 'https://firebasestorage.googleapis.com/v0/b/projectflutter-15fe4.appspot.com/o/profile_images%2F830aeba4-0c48-49a1-bb23-ead9d2c796b7.png?alt=media&token=d74f9ad5-21f3-4741-8b4c-5831c11b73e6' //기본프로필로 설정
+
       });
 
       ScaffoldMessenger.of(context).showSnackBar(

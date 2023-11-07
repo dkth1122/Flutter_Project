@@ -465,18 +465,18 @@ class _ProductViewState extends State<ProductView>
                         if(snapshot.hasData){
                           final userDocs=snapshot.data!.docs;
                           if(userDocs.isNotEmpty){
-                            final userData=userDocs.first.data() as Map<String,dynamic>;
-                            /*final userProfileImage=userData['userProfile'] as String;*/
-                            final userNick=userData['nick'] as String;
+                            final userData = userDocs.first.data() as Map<String,dynamic>;
+                            final userProfileImage = userData['profileImageUrl'] as String;
+                            final userNick = userData['nick'] as String;
 
                             return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children:[
-/*                                CircleAvatar( // 원 모양 프로필 이미지
+                                CircleAvatar(
                                   radius: 40,
-                                  backgroundImage: AssetImage('dog4.png'),
-                                  *//*NetworkImage(userProfileImage),*//*
-                                ),*/
+                                  backgroundImage: NetworkImage(userProfileImage),
+                                ),
+                                SizedBox(width: 5),
                                 Text(userNick), // 닉네임 출력
                                 TextButton(
                                   onPressed: _toggleChat,
