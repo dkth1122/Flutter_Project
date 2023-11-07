@@ -48,10 +48,9 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
     }
 
     _parseRoomId(roomId);
-    print("상대 유저 ======> $otherUser");
   }
 
-  void _parseRoomId(String roomId) {
+  void _parseRoomId(String roomId) async {
     List<String> users = roomId.split("_");
 
     if (users.length == 2) {
@@ -63,7 +62,9 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       } else if (user2 != user) {
         otherUser = user2;
       }
-      _fetchMessageResponse(otherUser);
+
+      await _fetchMessageResponse(otherUser);
+      print("상대 유저 ======> $otherUser");
     }
   }
 
@@ -79,19 +80,13 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       isResponseEnabled = data['isResponseEnabled'];
       vacationStartDate = (data['vacationStartDate'] as Timestamp).toDate();
       vacationEndDate = (data['vacationEndDate'] as Timestamp).toDate();
-
-      setState(() {
-        flg = false;
-      });
-      print("flg 지금 ============> $flg");
-    } else {
-      setState(() {
-        flg = true;
-      });
-      print("flg 지금 ============> $flg");
-      print("문서가 Firestore에 존재하지 않습니다.");
     }
 
+    setState(() {
+      flg = !documentSnapshot.exists;
+    });
+
+    print("flg 지금 ============> $flg");
     _updateResponse();
   }
 
@@ -227,24 +222,21 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
     return Container(
       margin: EdgeInsets.only(bottom: 8.0),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Container(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
             padding: EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: Color(0xFF4E598C),
-              borderRadius: BorderRadius.only(
+                color: Color(0xFF4E598C),
+                borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-                bottomLeft: Radius.circular(16),
-              ),
+            topRight: Radius.circular(16),
+            bottomLeft: Radius.circular(16),
+                ),
             ),
-            child: Text(
-              text,
-              style: TextStyle(color: Colors.white),
-            ),
+              child: Text(text, style: TextStyle(color: Colors.white),),
           ),
-        ],
+          ],
       ),
     );
   }
