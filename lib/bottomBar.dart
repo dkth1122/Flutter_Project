@@ -5,6 +5,7 @@ import 'package:project_flutter/customer/userCustomer.dart';
 import 'package:project_flutter/join/login_email.dart';
 import 'package:project_flutter/myPage/customerLike.dart';
 import 'package:project_flutter/product/product.dart';
+import 'package:project_flutter/subBottomBar.dart';
 import 'package:project_flutter/test.dart';
 import 'package:project_flutter/tutorial.dart';
 import 'package:provider/provider.dart';
@@ -46,7 +47,7 @@ class _CircularDialogState extends State<CircularDialog> {
   List<Offset> iconOffsets = [];
   List<String> addButtonTexts = ["expert", "chat", "고객센터", "테스트", "5", "6", "상품", "튜토리얼"];
   List<IconData> iconData = [Icons.star, Icons.message, Icons.people, Icons.chat, Icons.access_alarms_rounded, Icons.back_hand, Icons.add_circle_outline, Icons.telegram_sharp];
-  List<Widget> pageChange = [Test(),ChatList(),UserCustomer(),Test(),HomePage(),HomePage(),Product(),Tutorial()];
+  List<Widget> pageChange = [Test(),ChatList(),UserCustomer(),Test(),SubBottomBar(),MyHomePage(),Product(),Tutorial()];
   List<double> iconRotations = [pi / 2, 135 * (pi / 180), pi, 225 * (pi / 180), 270 * (pi / 180), 315 * (pi / 180), 360 * (pi / 180), 45 * (pi / 180)]; // 각 아이콘의 회전 각도
 
   @override
@@ -109,7 +110,7 @@ class _CircularDialogState extends State<CircularDialog> {
 
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => HomePage()),
+                                MaterialPageRoute(builder: (context) => MyHomePage()),
                               );
                             },
                             child: Image.asset(

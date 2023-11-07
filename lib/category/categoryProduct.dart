@@ -3,9 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
 import '../firebase_options.dart';
 import '../product/productView.dart';
+import '../subBottomBar.dart';
 
 
 void main() async {
@@ -60,6 +60,7 @@ class _CategoryProductState extends State<CategoryProduct> {
           )
         ],
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
   Widget _categoryList(String sendText) {

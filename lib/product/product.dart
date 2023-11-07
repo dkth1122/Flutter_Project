@@ -30,7 +30,8 @@ class _ProductState extends State<Product> {
     '기타',
   ];
   String selectedCategory = '전체';
-  String selectedSort = '기본 순'; // 선택된 정렬 방식
+  String selectedSort = '기본 순';
+  double starAvg = 0.0;
 
   // 정렬 방식 목록
   List<String> sortOptions = [
@@ -55,8 +56,6 @@ class _ProductState extends State<Product> {
 
   @override
   Widget build(BuildContext context) {
-
-    List<Map<String, dynamic>> sortedProductList = [];
 
     return Scaffold(
       appBar: AppBar(
@@ -114,7 +113,7 @@ class _ProductState extends State<Product> {
                 ),
               ),
             ),
-            SizedBox(
+/*            SizedBox(
               height: 150,
               child: Stack(
                 children: [
@@ -122,7 +121,7 @@ class _ProductState extends State<Product> {
                   sliderIndicator(),
                 ],
               ),
-            ),
+            ),*/ //광고 넘어갈 때 마다 오류로 잠시 막아둠
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
@@ -167,7 +166,7 @@ class _ProductState extends State<Product> {
 
                 final productList = snapshot.data!.docs;
 
-                List<QueryDocumentSnapshot> sortedProductList = List.from(productList);
+                List<Map<String, dynamic>> sortedProductList = productList.map((doc) => doc.data() as Map<String, dynamic>).toList();
 
                 sortedProductList = sortedProductList.where((document) {
                   final category = document['category'] as String;
@@ -198,6 +197,18 @@ class _ProductState extends State<Product> {
                     final bPrice = b['price'] as int;
                     return aPrice.compareTo(bPrice);
                   });
+                }else if (selectedSort == '평점 높은 순') {
+                  sortedProductList.sort((a, b) {
+                    final aStarAvg = a['starAvg'] as double? ?? 0.0;
+                    final bStarAvg = b['starAvg'] as double? ?? 0.0;
+                    return bStarAvg.compareTo(aStarAvg);
+                  });
+                } else if (selectedSort == '후기 많은 순') {
+                  sortedProductList.sort((a, b) {
+                    final aReviewCount = a['reviewCount'] as int? ?? 0;
+                    final bReviewCount = b['reviewCount'] as int? ?? 0;
+                    return bReviewCount.compareTo(aReviewCount);
+                  });
                 }
 
                 return GridView.builder(
@@ -217,15 +228,24 @@ class _ProductState extends State<Product> {
 
                     final formattedPrice = NumberFormat("#,###").format(price);
 
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ProductView(
-                              productName: productName,
-                              price: price.toString(),
-                              imageUrl: imageUrl,
+                    return FutureBuilder<double>(
+                      future: getAverageRating(productName),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator(); // 평균을 계산하는 중이면 로딩 표시
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}'); // 오류가 있을 경우 오류 표시
+                        } else {
+                          starAvg = snapshot.data ?? 0.0; // 계산된 평균 평점
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => ProductView(
+                                    productName: productName,
+                                    price: price.toString(),
+                                    imageUrl: imageUrl,
                             ),
                           ),
                         );
@@ -249,8 +269,8 @@ class _ProductState extends State<Product> {
                               left: 0,
                               right: 0,
                               child: Container(
-                                padding: EdgeInsets.all(8), // 내용과 상하 좌우 간격 조절
-                                color: Colors.black.withOpacity(0.2), // 검정색 배경 색상 및 불투명도 설정
+                                padding: EdgeInsets.all(8),
+                                color: Colors.black.withOpacity(0.2),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -268,7 +288,7 @@ class _ProductState extends State<Product> {
                                         );
                                       },
                                       child: Text(
-                                        productName,
+                                        '$productName (★$starAvg)',
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,
@@ -302,8 +322,10 @@ class _ProductState extends State<Product> {
                             ),
                           ],
                         ),
-
                       ),
+                          );
+                        }
+                      },
                     );
                   },
                 );
@@ -372,5 +394,39 @@ class _ProductState extends State<Product> {
       ),
     );
   }
+
+  Future<double> getAverageRating(String productName) async {
+    double averageRating = 0.0;
+    double reviewCount = 0.0;
+
+    await FirebaseFirestore.instance
+        .collection('review')
+        .where('pName', isEqualTo: productName)
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        final star = doc['star'].toDouble();
+        averageRating += star;
+        reviewCount++;
+      });
+    });
+
+    if (reviewCount != 0) {
+      averageRating /= reviewCount;
+    }
+
+    starAvg = averageRating;
+    return starAvg;
+  }
+
+  Future<int> getReviewCount(String productName) async {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('review')
+        .where('pName', isEqualTo: productName)
+        .get();
+
+    return querySnapshot.docs.length;
+  }
+
 
 }

@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:project_flutter/product/payment.dart';
 import 'package:provider/provider.dart';
 
+import '../expert/ad_form.dart';
 import '../join/userModel.dart';
 import 'chat.dart';
 import 'chatBot.dart';
@@ -37,6 +37,14 @@ class _ChatListState extends State<ChatList> {
         title: Row(
           children: [
             Text("채팅 목록"),
+            TextButton(onPressed: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AdForm(),
+                  )
+              );
+            }, child: Text("이동"))
           ],
         ),
         backgroundColor: Color(0xFFFCAF58),

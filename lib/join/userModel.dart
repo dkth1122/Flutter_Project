@@ -9,7 +9,7 @@ class UserModel with ChangeNotifier {
   bool get isLogin => _userId != null;
 
   UserModel() {
-    _loadUserLoginState();
+    loadUserLoginState();
   }
 
   void login(String id, String status) {
@@ -29,7 +29,7 @@ class UserModel with ChangeNotifier {
   final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   // 사용자 로그인 상태를 안전한 저장소에서 불러오는 메서드
-  Future<void> _loadUserLoginState() async {
+  Future<void> loadUserLoginState() async {
     final userId = await _storage.read(key: 'userId');
     final status = await _storage.read(key: 'status'); // status를 읽어옴
     if (userId != null) {
