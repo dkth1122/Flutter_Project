@@ -198,7 +198,7 @@ class _ExpertRatingState extends State<ExpertRating> {
               child: Column(
                 children: <Widget>[
                   Text(
-                    '등급 기록',
+                    '등급별 조건',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                   ),
                 ],

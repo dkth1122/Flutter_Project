@@ -113,7 +113,7 @@ class _ProductState extends State<Product> {
                 ),
               ),
             ),
-/*            SizedBox(
+            SizedBox(
               height: 150,
               child: Stack(
                 children: [
@@ -121,7 +121,7 @@ class _ProductState extends State<Product> {
                   sliderIndicator(),
                 ],
               ),
-            ),*/ //광고 넘어갈 때 마다 오류로 잠시 막아둠
+            ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
