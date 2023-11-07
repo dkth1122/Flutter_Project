@@ -138,7 +138,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
     return Center(
       child: Text(
         '해당 전문가는 메시지 응답 설정을 하지 않았습니다.',
-        style: TextStyle(fontSize: 16),
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -147,7 +147,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('메시지 응답 페이지'),
+        title: Text('메시지 응답 페이지',style: TextStyle(fontWeight: FontWeight.bold),),
         backgroundColor: Color(0xFFFCAF58),
       ),
       body: Column(
@@ -210,7 +210,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
             ),
             child: Text(
               text,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -234,7 +234,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
             bottomLeft: Radius.circular(16),
                 ),
             ),
-              child: Text(text, style: TextStyle(color: Colors.white),),
+              child: Text(text, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
           ),
           ],
       ),
@@ -264,7 +264,7 @@ class ResponseButton extends StatelessWidget {
       ),
       child: Text(
         response,
-        style: TextStyle(color: Colors.white),
+        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       ),
     );
   }
