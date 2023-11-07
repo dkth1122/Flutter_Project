@@ -11,8 +11,9 @@ class PortfolioItem {
   final String title;
   final String description;
   final String thumbnailUrl;
+  final String category;
 
-  PortfolioItem(this.id, this.title, this.description, this.thumbnailUrl);
+  PortfolioItem(this.id, this.title, this.description, this.thumbnailUrl, this.category);
 }
 
 class Portfolio extends StatefulWidget {
@@ -52,12 +53,13 @@ class _PortfolioState extends State<Portfolio> {
           Map<String, dynamic> data = portfolioDoc.data() as Map<String, dynamic>;
 
           // 필수 필드의 존재 여부를 확인하고 처리
-          if (data['title'] != null && data['description'] != null && data['thumbnailUrl'] != null) {
+          if (data['title'] != null && data['description'] != null && data['thumbnailUrl'] != null && data['category'] != null) {
             item = PortfolioItem(
               portfolioDoc.id,
               data['title'],
               data['description'],
               data['thumbnailUrl'],
+              data['category'],
             );
             setState(() {
               portfolioItems.add(item);
@@ -77,8 +79,12 @@ class _PortfolioState extends State<Portfolio> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('포트폴리오'),
-        actions: <Widget>[
+        title: Text(
+          '포트폴리오',
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
+        ),
+        backgroundColor: Color(0xFF4E598C),
+          actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
@@ -87,33 +93,109 @@ class _PortfolioState extends State<Portfolio> {
           ),
         ],
       ),
-      body: ListView.builder(
-        itemCount: portfolioItems.length,
-        itemBuilder: (context, index) {
-          final item = portfolioItems[index];
-          return Card(
-            child: ListTile(
-              leading: Image.network(
-                item.thumbnailUrl,
-                width: 100,
-                height: 100,
-              ),
-              title: Text(
-                item.title,
-                style: TextStyle(fontSize: 18),
-              ),
-              subtitle: Text(item.description),
+      body: Container(
+        padding: EdgeInsets.all(10),
+        child: ListView.builder(
+          itemCount: portfolioItems.length,
+          itemBuilder: (context, index) {
+            final item = portfolioItems[index];
+            return InkWell(
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PortfolioDetailPage(portfolioItem : item, user: user),
-                  ),
-                );
+                print(user);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PortfolioDetailPage(portfolioItem : item, user: user),
+                        ),
+                      );
               },
-            ),
-          );
-        },
+              child: Column(
+                children: [
+                  SizedBox(height: 10,),
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 0.6,
+                            color: Color.fromRGBO(182, 182, 182, 0.6)
+                        )
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
+                              child: Image.network(
+                                item.thumbnailUrl,
+                                width: 130,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            SizedBox(width: 10,),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.title,
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                Container(
+                                  width: 110,
+                                  child: Text(
+                                    item.description.length > 20
+                                        ? '${item.description.substring(0, 20)}...'
+                                        : item.description,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              '카테고리 : ${item.category}',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+
+            // return Card(
+            //   child: ListTile(
+            //     leading: Image.network(
+            //       item.thumbnailUrl,
+            //       width: 100,
+            //       height: 100,
+            //     ),
+            //     title: Text(
+            //       item.title,
+            //       style: TextStyle(fontSize: 18),
+            //     ),
+            //     subtitle: Text(item.description),
+            //     onTap: () {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //           builder: (context) => PortfolioDetailPage(portfolioItem : item, user: user),
+            //         ),
+            //       );
+            //     },
+            //   ),
+            // );
+          },
+        ),
       ),
     );
   }

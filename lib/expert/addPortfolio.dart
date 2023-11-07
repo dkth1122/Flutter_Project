@@ -249,18 +249,19 @@ class _AddPortfolioState extends State<AddPortfolio> {
           title: Text(
             '포트폴리오 등록',
             style: TextStyle(
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
+              color: Colors.white,
+              fontWeight: FontWeight.bold
             ),
           ),
-          backgroundColor: Colors.orange,
+          backgroundColor: Color(0xFF4E598C),
         ),
         body: Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
           child: ListView(
             children: <Widget>[
+              SizedBox(height: 10,),
               Text(
-                '등록을 위해 아래 정보를 \n입력해주세요',
+                '등록을 위해 아래 정보를 입력해주세요',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -272,18 +273,29 @@ class _AddPortfolioState extends State<AddPortfolio> {
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 16.0),
+              Text(
+                "제목",
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
               TextField(
                 controller: titleController,
                 decoration: InputDecoration(
-                  labelText: '제목',
                   border: OutlineInputBorder(),
                 ),
               ),
               SizedBox(height: 12.0),
-              TextField(
+              Text(
+                "내용",
+                style: TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+              TextFormField(
                 controller: descriptionController,
+                maxLines: 15,
                 decoration: InputDecoration(
-                  labelText: '설명',
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -316,6 +328,9 @@ class _AddPortfolioState extends State<AddPortfolio> {
                   _selectThumbnailImage(context);
                 },
                 child: Text('이미지 선택'),
+                style: ElevatedButton.styleFrom(
+                  primary: Color(0xFF4E598C),
+                ),
               ),
               // 이미지 선택 부분
               Text("서브 이미지 선택", style: TextStyle(fontWeight: FontWeight.bold)),
@@ -325,6 +340,9 @@ class _AddPortfolioState extends State<AddPortfolio> {
                   _selectSubImage(context);
                 },
                 child: Text('이미지 선택'),
+                style: ElevatedButton.styleFrom(
+                  primary: Color(0xFF4E598C),
+                ),
               ),
 
               Column(
@@ -358,17 +376,22 @@ class _AddPortfolioState extends State<AddPortfolio> {
                 ],
               ),
               SizedBox(height: 12.0),
-              ListTile(
-                title: Text(
-                  "카테고리: $selectedCategory",
-                  style: TextStyle(
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                onTap: () {
-                  _showCategorySelection(context);
-                },
+              Row(
+                children: [
+                  InkWell(
+                    onTap: (){
+                      _showCategorySelection(context);
+                    },
+                    child: Text(
+                      "카테고리: $selectedCategory",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16
+                      ),
+                    ),
+                  )
+                ],
               ),
               SizedBox(height: 12.0),
               Wrap(
@@ -397,15 +420,19 @@ class _AddPortfolioState extends State<AddPortfolio> {
                     },
                     child: Text(
                       "시작: ${startDate != null ? DateFormat('yyyy-MM-dd').format(startDate!) : '날짜 선택'}",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
-                  Text("~"),
+                  Text("~",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                   TextButton(
                     onPressed: () {
                       _selectEndDate(context);
                     },
                     child: Text(
                       "끝: ${endDate != null ? DateFormat('yyyy-MM-dd').format(endDate!) : '날짜 선택'}",
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -477,6 +504,9 @@ class _AddPortfolioState extends State<AddPortfolio> {
                   }
                 },
                 child: Text('포트폴리오 등록'),
+                style: ElevatedButton.styleFrom(
+                  primary: Color(0xFF4E598C),
+                ),
               ),
               SizedBox(height: 16.0),
                 ListView.builder(
