@@ -1,22 +1,25 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:project_flutter/myPage/myProposal.dart';
-import 'package:project_flutter/myPage/proposalView.dart';
+import 'package:project_flutter/proposal/myProposal.dart';
 
-class ProposalList extends StatefulWidget {
-  const ProposalList({super.key});
+import 'myProposalView.dart';
+
+class MyProposalList extends StatefulWidget {
+  final String userId;
+  const MyProposalList({required this.userId, Key? key}) : super(key: key);
 
   @override
-  State<ProposalList> createState() => _ProposalListState();
+  State<MyProposalList> createState() => _MyProposalListState();
 }
 
-class _ProposalListState extends State<ProposalList> {
+class _MyProposalListState extends State<MyProposalList> {
 
-  Widget _listProposal() {
+  Widget _listMyProposal() {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("proposal")
-          .orderBy("sendTime", descending: true)
+          .where("user", isEqualTo: widget.userId)
+          // .orderBy("sendTime", descending: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
         if (!snap.hasData) {
@@ -35,7 +38,8 @@ class _ProposalListState extends State<ProposalList> {
               trailing: Text(data["price"].toString()),
               onTap: (){
                   Navigator.push(context,  MaterialPageRoute(
-                      builder: (context) => ProposalView(
+                      builder: (context) => MyProposalView(
+                        user : widget.userId,
                         proposalTitle: data["title"],
                         proposalContent: data["content"],
                         proposalPrice: data["price"],
@@ -81,7 +85,7 @@ class _ProposalListState extends State<ProposalList> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _listProposal()
+            _listMyProposal()
           ],
         ),
       ),

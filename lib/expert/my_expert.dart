@@ -6,7 +6,8 @@ import 'package:project_flutter/myPage/myCustomer.dart';
 import 'package:provider/provider.dart';
 import '../join/userModel.dart';
 import '../myPage/editProfile.dart';
-import '../myPage/proposalList.dart';
+import '../proposal/myProposalList.dart';
+import '../proposal/proposalList.dart';
 import 'messageResponse.dart';
 import 'myPortfolio.dart';
 

@@ -2,11 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/expert/my_expert.dart';
 import 'package:project_flutter/main.dart';
-import 'package:project_flutter/myPage/myProposal.dart';
-import 'package:project_flutter/myPage/proposalList.dart';
+import 'package:project_flutter/proposal/myProposal.dart';
 import 'package:project_flutter/myPage/purchaseManagement.dart';
 import 'package:provider/provider.dart';
 import '../join/userModel.dart';
+import '../proposal/myProposalList.dart';
 import 'editProfile.dart';
 
 class MyCustomer extends StatefulWidget {
@@ -168,7 +168,7 @@ class _MyCustomerState extends State<MyCustomer> {
                               onPressed: () {
                                 Navigator.push(
                                     context,
-                                    MaterialPageRoute(builder: (context)=>ProposalList()));
+                                    MaterialPageRoute(builder: (context)=>MyProposalList(userId : userId)));
                               },
                               style: ButtonStyle(
                                 backgroundColor: MaterialStateProperty.all(Colors.white),

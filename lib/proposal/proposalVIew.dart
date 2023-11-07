@@ -4,12 +4,13 @@ class ProposalView extends StatefulWidget {
   final String proposalTitle;
   final String proposalContent;
   final int proposalPrice;
-
+  final String proposer;
 
   const ProposalView({
     required this.proposalTitle,
     required this.proposalContent,
     required this.proposalPrice,
+    required this.proposer,
   });
 
   @override
@@ -26,7 +27,7 @@ class _ProposalViewState extends State<ProposalView> {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Color(0xFFFCAF58),
+        backgroundColor:Color(0xFF4E598C),
         elevation: 1.0,
         iconTheme: IconThemeData(color: Colors.white),
         leading: IconButton(
@@ -36,9 +37,12 @@ class _ProposalViewState extends State<ProposalView> {
           },
         ),
         actions: [
-          IconButton(onPressed: (){
-            //공유하기 기능
-          }, icon: Icon(Icons.share)),
+          IconButton(
+            icon: Icon(Icons.share),
+            onPressed: () {
+              // 공유 기능 추가
+            },
+          ),
         ],
       ),
       body: ListView(
@@ -49,24 +53,52 @@ class _ProposalViewState extends State<ProposalView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  '프로젝트제목: ${widget.proposalTitle}',
+                  '프로젝트 제목',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                Text(
+                  widget.proposalTitle,
+                  style: TextStyle(fontSize: 16),
+                ),
                 Divider(),
                 Text(
-                  '프로젝트설명: ${widget.proposalContent}',
+                  '프로젝트 설명',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
-                Text('예산: \$${widget.proposalPrice.toString()}'),
-                Text('프로젝트 시작일과 종료일은 채팅으로 협의하세요~'),
-                // 다른 프로젝트 세부 정보 추가
+                Text(
+                  widget.proposalContent,
+                  style: TextStyle(fontSize: 16),
+                ),
+                Divider(),
+                Text(
+                  '예산',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '${widget.proposalPrice}원',
+                  style: TextStyle(fontSize: 16),
+                ),
+                Divider(),
+                Text(
+                  '의뢰인',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  widget.proposer,
+                  style: TextStyle(fontSize: 16),
+                ),
               ],
             ),
           ),
