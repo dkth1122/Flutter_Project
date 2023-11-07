@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../expert/ad_form.dart';
@@ -16,6 +17,8 @@ class _ChatListState extends State<ChatList> {
   String user1 = "";
   String user2 = "";
   Map<String, String> lastMessages = {}; // 각 채팅방의 마지막 메시지를 저장할 맵
+  //마지막 메시지 시간
+  String timeFormat = "";
 
   @override
   void initState() {
@@ -37,12 +40,12 @@ class _ChatListState extends State<ChatList> {
         title: Row(
           children: [
             Text("채팅 목록"),
-            TextButton(onPressed: (){
+            TextButton(onPressed: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AdForm(),
-                  )
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AdForm(),
+                ),
               );
             }, child: Text("이동"))
           ],
@@ -68,215 +71,180 @@ class _ChatListState extends State<ChatList> {
       stream: FirebaseFirestore.instance.collectionGroup("chat").snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
         if (snap.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
+          return Center(child: CircularProgressIndicator());
         }
 
-        final chatList = snap.data?.docs;
+        final chatList = snap.data?.docs ?? [];
 
-
-        if (chatList == null || chatList.isEmpty) {
+        if (chatList.isEmpty) {
           return Center(child: Text('No chats available'));
         }
-        // "status" 필드가 'D'인 채팅을 필터링
-        final filteredChatList = chatList.where((document) {
-          final data = document.data() as Map<String, dynamic>?;
-          if (data == null || (!data.containsKey('user1') && !data.containsKey('user2'))) {
-            return false;
-          }
 
-          final status = data['status'] as String?;
-          return status != 'D';
-        }).toList();
-
-
-        return chatList == null || chatList.isEmpty
-            ? Center(child: Text('No chats available'))
-            : ListView.builder(
-          itemCount: filteredChatList.length,
+        return ListView.builder(
+          itemCount: chatList.length,
           itemBuilder: (context, index) {
-            final document = filteredChatList[index];
-            final data = document.data() as Map<String, dynamic>?;
-            if (data == null ||
-                (!data.containsKey('user1') && !data.containsKey('user2'))) {
+            final document = chatList[index];
+            final data = document.data() as Map<String, dynamic>;
+            final String? user1Value = data['user1'] as String?;
+            final String? user2Value = data['user2'] as String?;
+            // 사용자 ID에 따라 필터링하려면 다음과 같이 조건을 추가하십시오.
+            if (user1Value != user1 && user2Value != user1) {
+              // 사용자1과 일치하지 않는 경우 또는 사용자2와 일치하지 않는 경우 이 채팅방을 건너뜁니다.
               return Container();
             }
-            final user1Value = data['user1'] as String?;
-            final user2Value = data['user2'] as String?;
-            String chatTitle = '';
-            if (user1Value == user1 || user2Value == user1) {
-              if (user1Value == user1) {
-                chatTitle = '$user2Value 님과의 채팅' ?? "No User";
-              } else {
-                chatTitle = '$user1Value 님과의 채팅' ?? "No User";
-              }
+            final chatTitle = (user1Value != null && user1Value == user1)
+                ? '$user2Value 님과의 채팅'
+                : '$user1Value 님과의 채팅';
 
-              String roomName1 = '$user1' + '_' + '${data['user1'] as String?}';
-              String roomName2 = '${data['user1'] as String?}' + '_' + '$user1';
+            final String roomName = document.id;
 
-              String roomName3 = '${data['user2'] as String?}' + '_' + '$user1';
-              String roomName4 = '$user1' + '_' + '${data['user2'] as String?}';
-
-
-              // 이 부분에서 서브컬렉션의 필드 값을 가져올 수 있음
-              return StreamBuilder<QuerySnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('chat')
-                    .where('roomId', whereIn: [roomName1, roomName2, roomName3, roomName4])
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-
-                  final chatRooms = snapshot.data?.docs;
-
-                  if (chatRooms != null && chatRooms.isNotEmpty) {
-                    for (var room in chatRooms) {
-                      final roomName = room['roomId'];
-
-                      // 해당 채팅방에 대한 마지막 메시지 쿼리
-                      FirebaseFirestore.instance
-                          .collection('chat')
-                          .doc(roomName)
-                          .collection('message')
-                          .orderBy('sendTime', descending: true)
-                          .limit(1) // 마지막 메시지 1개만 가져오도록 설정
-                          .get()
-                          .then((QuerySnapshot querySnapshot) {
-                        if (querySnapshot.docs.isNotEmpty) {
-                          final lastMessage = querySnapshot.docs[0];
-                          final lastMessageData =
-                          lastMessage.data() as Map<String, dynamic>;
-
-                          String lastMessageText =
-                          lastMessageData['text'] as String;
-
-                          var lastMessageImageUrl =
-                          lastMessageData['imageUrl'];
-
-                          print("내용 ====> $lastMessageText");
-
-                          // 이제 lastMessageText 또는 lastMessageImageUrl을 사용할 수 있습니다.
-                          if (lastMessageText != null) {
-                            lastMessages[roomName] = lastMessageText;
-                          } else if (lastMessageImageUrl != null) {
-                            // 이미지 처리
-                            lastMessageText = "이미지를 보냈습니다.";
-                            lastMessages[roomName] = lastMessageText;
-                          } else {
-                            lastMessages[roomName] = lastMessageText;
-                          }
-                        }
-                      });
-                    }
-                  }
-
-                  return Card(
-                    elevation: 3,
-                    margin:
-                    EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: InkWell(
-                      onTap: () async {
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ChatApp(roomId: document.id),
-                          ),
-                        );
-                        // ChatApp에서 돌아왔을 때 메시지를 읽었음을 표시
-                        await _markMessagesAsRead(document.id);
-                      },
-                      onLongPress: () {
-                        // 채팅방을 나가기 위한 확인 대화 상자 표시
-                        _showLeaveChatRoomDialog(context, document.id);
-                      },
-                      child: Padding(
-                        padding: EdgeInsets.all(16),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            CircleAvatar(
-                              radius: 30,
-                              // Add profile image here
-                              backgroundImage: AssetImage('assets/dog1.PNG'),
-                            ),
-                            SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    chatTitle,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                  SizedBox(height: 4),
-                                  // 서브컬렉션의 필드 값을 이용하여 마지막 메시지 설정
-                                  Text(
-                                    lastMessages[document.id] ?? '이미지를 보냈습니다.',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Column(
-                              children: [
-                                // Text(
-                                //   '10:30 AM', // Add message timestamp here
-                                //   style: TextStyle(
-                                //     fontSize: 12,
-                                //     color: Colors.grey,
-                                //   ),
-                                // ),
-                                SizedBox(height: 8),
-                                //알림용,,,
-                                CircleAvatar(
-                                  radius: 16,
-                                  backgroundColor: Color(0xFFFCAF58),
-                                  child: TextButton(
-                                    onPressed: (){
-                                      // 물음표 버튼을 클릭했을 때 ChatResponsePage로 이동하고 doc.id 전달
-                                      Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => ChatResponsePage(roomId: document.id),
-                                          )
-                                      );
-                                    },
-                                    child: Text("?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
+            return FutureBuilder<QuerySnapshot>(
+              future: FirebaseFirestore.instance
+                  .collection('chat')
+                  .doc(roomName)
+                  .collection('message')
+                  .orderBy('sendTime', descending: true)
+                  .limit(1)
+                  .get(),
+              builder: (context, AsyncSnapshot<QuerySnapshot> lastMessageSnapshot) {
+                if (lastMessageSnapshot.connectionState == ConnectionState.waiting) {
+                  return ListTile(
+                    title: Text(chatTitle),
+                    subtitle: Text('로딩중'),
+                    leading: CircleAvatar(
+                      backgroundImage: AssetImage('assets/dog1.PNG'),
                     ),
                   );
-                },
-              );
-            } else {
-              return Container();
-            }
+                }
+
+                if (lastMessageSnapshot.hasError) {
+                  return ListTile(
+                    title: Text(chatTitle),
+                    subtitle: Text('로드 실패.'),
+                    leading: CircleAvatar(
+                      backgroundImage: AssetImage('assets/dog1.PNG'),
+                    ),
+                  );
+                }
+
+                String lastMessageText = 'No last message';
+                Widget? trailingWidget;
+
+                if (lastMessageSnapshot.hasData && lastMessageSnapshot.data!.docs.isNotEmpty) {
+                  final lastMessageData = lastMessageSnapshot.data!.docs.first.data() as Map<String, dynamic>;
+                  lastMessageText = lastMessageData['text'] as String? ?? 'No last message';
+                  final String? lastMessageImageUrl = lastMessageData['imageUrl'] as String?;
+
+                  if (lastMessageImageUrl != null && lastMessageImageUrl.isNotEmpty) {
+                    trailingWidget = Image.network(lastMessageImageUrl, width: 40, height: 40);
+                  }
+                  // sendTime을 표시하기 위한 코드 수정
+                  final lastMessageTime = lastMessageData['sendTime'] as Timestamp?;
+                  final messageDateTime = lastMessageTime?.toDate();
+                  timeFormat = DateFormat.jm().format(messageDateTime!);
+
+                }
+
+                return Card(
+                  elevation: 3,
+                  margin:
+                  EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: InkWell(
+                    onTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ChatApp(roomId: document.id),
+                        ),
+                      );
+                      // ChatApp에서 돌아왔을 때 메시지를 읽었음을 표시
+                      await _markMessagesAsRead(document.id);
+                    },
+                    onLongPress: () {
+                      // 채팅방을 나가기 위한 확인 대화 상자 표시
+                      _showLeaveChatRoomDialog(context, document.id);
+                    },
+                    child: Padding(
+                      padding: EdgeInsets.all(16),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            // Add profile image here
+                            backgroundImage: AssetImage('assets/dog1.PNG'),
+                          ),
+                          SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  chatTitle,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                // 서브컬렉션의 필드 값을 이용하여 마지막 메시지 설정
+                                Text(
+                                  lastMessageText,
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Column(
+                            children: [
+                              Text(
+                                timeFormat,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              //챗봇용
+                              CircleAvatar(
+                                radius: 16,
+                                backgroundColor: Color(0xFFFCAF58),
+                                child: TextButton(
+                                  onPressed: () {
+                                    // 물음표 버튼을 클릭했을 때 ChatResponsePage로 이동하고 doc.id 전달
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ChatResponsePage(roomId: document.id),
+                                      ),
+                                    );
+                                  },
+                                  child: Text("?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            );
           },
         );
       },
     );
   }
-
-
 
   Future<void> _markMessagesAsRead(String roomId) async {
     final myId = user1; // 현재 사용자의 ID를 가져오는 방법을 구현해야 합니다.
@@ -310,7 +278,7 @@ class _ChatListState extends State<ChatList> {
                 FirebaseFirestore.instance
                     .collection('chat')
                     .doc(roomId)
-                    .update({'status': 'D'})
+                    .update({'status': '$user1 D'})
                     .then((value) {
                   Navigator.of(context).pop();
                 });
