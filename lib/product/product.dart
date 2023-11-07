@@ -113,7 +113,7 @@ class _ProductState extends State<Product> {
                 ),
               ),
             ),
-            SizedBox(
+/*            SizedBox(
               height: 150,
               child: Stack(
                 children: [
@@ -121,7 +121,7 @@ class _ProductState extends State<Product> {
                   sliderIndicator(),
                 ],
               ),
-            ),
+            ),*/ //광고 넘어갈 때 마다 오류로 잠시 막아둠
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
@@ -196,6 +196,18 @@ class _ProductState extends State<Product> {
                     final aPrice = a['price'] as int;
                     final bPrice = b['price'] as int;
                     return aPrice.compareTo(bPrice);
+                  });
+                }else if (selectedSort == '평점 높은 순') {
+                  sortedProductList.sort((a, b) {
+                    final aStarAvg = a['starAvg'] as double;
+                    final bStarAvg = b['starAvg'] as double;
+                    return bStarAvg.compareTo(aStarAvg);
+                  });
+                } else if (selectedSort == '후기 많은 순') {
+                  sortedProductList.sort((a, b) {
+                    final aReviewCount = a['reviewCount'] as int;
+                    final bReviewCount = b['reviewCount'] as int;
+                    return bReviewCount.compareTo(aReviewCount);
                   });
                 }
 
@@ -401,10 +413,13 @@ class _ProductState extends State<Product> {
 
     if (reviewCount != 0) {
       averageRating /= reviewCount;
+    } else {
+      return 0.0;
     }
 
     starAvg = averageRating;
     return starAvg;
   }
+
 
 }

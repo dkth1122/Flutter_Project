@@ -5,7 +5,6 @@ import '../firebase_options.dart';
 import '../main.dart';
 import 'adminAd.dart';
 import 'adminBoard.dart';
-import 'adminInquiry.dart';
 import 'adminUser.dart';
 
 void main() async {
@@ -44,7 +43,7 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => HomePage(),
+                  builder: (context) => MyHomePage(),
                 ),
               );
             },
