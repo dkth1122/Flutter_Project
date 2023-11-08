@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:intl/intl.dart';
+import 'package:project_flutter/chat/chatList.dart';
 import 'package:project_flutter/product/productView.dart';
 import 'package:project_flutter/search/search.dart';
 import 'package:project_flutter/bottomBar.dart';
@@ -282,6 +283,22 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       // extendBody: true, // body를 침범하도록 함
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => ChatList()),
+          );
+        },
+        child: Image.asset(
+          'assets/talk.png',
+          width: 80.0, // 이미지의 폭 조절
+          height: 80.0, // 이미지의 높이 조절
+        ), // 이미지 경로를 설정
+        backgroundColor: Colors.transparent, // 배경색을 투명으로 설정
+        elevation: 0.0, // 그림자를 없애는 설정
+      ),
+
       bottomNavigationBar: BottomBar(),
     );
   }

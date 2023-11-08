@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
 import '../product/productView.dart';
+import 'myLikePortfolio.dart';
 
 class CustomerLikeList extends StatefulWidget {
   const CustomerLikeList({super.key});
@@ -227,10 +228,12 @@ class ServiceListView extends StatelessWidget {
 class PortfolioView  extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // TODO: 여기에서 서비스 목록을 가져오는 코드를 구현하세요.
-
-    // 예시로, 목록이 비어있는 경우 "비어 있음" 위젯 반환
-    return ServiceList(); // 이곳에 서비스 목록 위젯을 반환하세요.
+    return Scaffold(
+      body: Container(
+        padding: EdgeInsets.all(10),
+        child: myLikePortfolio()
+      ),
+    );
   }
 }
 

@@ -238,6 +238,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
         'industry': item.industry,
         'portfolioDescription': item.portfolioDescription,
         'hashtags': item.hashtags,
+        'likeCnt' : 0
       });
 
       // 데이터 추가 성공
