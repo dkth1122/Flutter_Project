@@ -26,6 +26,7 @@ class MyProposalView extends StatefulWidget {
 
 class _MyProposalViewState extends State<MyProposalView> {
   get chatUser => null;
+  bool _isDealEnded = false;
 
 
   void _toggleChat(String chatUser) async {
@@ -71,26 +72,6 @@ class _MyProposalViewState extends State<MyProposalView> {
       return chatRoomId;
     }
 
-    void _showPurchaseAlert(BuildContext context) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text('알림'),
-            content: Text('로그인 후 이용 가능한 서비스입니다.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: Text('확인'),
-              ),
-            ],
-          );
-        },
-      );
-    }
-
     //채팅방으로 이동
     void moveToChatRoom(BuildContext context, String chatRoomId) {
       Navigator.of(context).push(MaterialPageRoute(
@@ -128,6 +109,55 @@ class _MyProposalViewState extends State<MyProposalView> {
           MaterialPageRoute(builder: (context) => LoginPage()),
         );
       }
+    });
+  }
+
+  void _showEndDealDialog() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('거래 종료'),
+          content: Text('정말로 거래를 종료하시겠습니까? 종료를 한다면 다시 되돌리지 못합니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // 닫기 버튼
+              },
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                _endDeal(); // 거래 종료 함수 호출
+                Navigator.pop(context); // 닫기 버튼
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _endDeal() {
+    // Firestore에서 해당 proposal 업데이트
+    FirebaseFirestore.instance
+        .collection('proposal')
+        .where('title', isEqualTo: widget.proposalTitle)
+        .get()
+        .then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        FirebaseFirestore.instance
+            .collection('proposal')
+            .doc(doc.id)
+            .update({'delYn': 'Y'});
+      });
+      setState(() {
+        _isDealEnded = true;
+      });
+    }).catchError((error) {
+      print('Error updating document: $error');
+      // 에러 핸들링
     });
   }
 
@@ -180,6 +210,19 @@ class _MyProposalViewState extends State<MyProposalView> {
                 SizedBox(height: 8),
                 Text('예산: ${widget.proposalPrice.toString()}원'),
                 Text('프로젝트 시작일과 종료일은 채팅으로 협의하세요~'),
+                TextButton(
+                  onPressed: () {
+                    _showEndDealDialog();
+                  },
+                  child: Text(
+                    '거래 종료 하기',
+                    style: TextStyle(
+                      color: Colors.red[200],
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
                 Divider(color :Colors.grey),
                 Text(
                   '제안한 전문가 목록',
