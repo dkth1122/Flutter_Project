@@ -48,6 +48,7 @@ class _ProposalListState extends State<ProposalList> {
 
   Widget _listProposal() {
     UserModel userModel = Provider.of<UserModel>(context, listen: false);
+    final userId = userModel.userId;
 
     return StreamBuilder(
       stream: FirebaseFirestore.instance
