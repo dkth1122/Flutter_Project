@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
@@ -42,8 +43,8 @@ class _FaqViewState extends State<FaqView> {
               ),
             ),
             SizedBox(height: 10,),
-            Text('작성일 : ${data['timestamp'].toDate().toString()}'),
-            SizedBox(height: 10,),
+            Text('작성일 : ${DateFormat('yyyy-MM-dd').format(data['timestamp'].toDate())}'),
+            SizedBox(height: 30,),
             Text( '내용 : ${data['content']}',
               style: TextStyle(
                 fontSize: 18,

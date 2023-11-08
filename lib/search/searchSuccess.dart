@@ -226,13 +226,12 @@ class _SearchSuccessState extends State<SearchSuccess> {
                 }).toList();
 
                 if (filteredPortfolios.isEmpty) {
-                  // 검색 결과가 없는 경우, 한 번만 출력하도록 조건 추가
-                  if (index == 1) {
+                  if (index == 0) {
                     return Center(
                       child: Text('검색어가 없습니다'),
                     );
                   }
-                  return Container(); // 나머지 경우에는 아무 내용도 반환하지 않음
+                  return Container();
                 }
 
                 return ListView.builder(
@@ -243,7 +242,6 @@ class _SearchSuccessState extends State<SearchSuccess> {
                     Map<String, dynamic> portfolioData = filteredPortfolios[index].data() as Map<String, dynamic>;
                     return InkWell(
                         onTap: () {
-                          // 필터링된 포트폴리오 중에서 선택한 포트폴리오 데이터를 가져와서 "PortfolioDetailPage"로 이동
                           Map<String, dynamic> selectedPortfolioData = filteredPortfolios[index].data() as Map<String, dynamic>;
                           Navigator.push(
                             context,
