@@ -131,7 +131,9 @@ class _CategoryProductState extends State<CategoryProduct> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  data['pName'],
+                                  data['pName'].length > 7
+                                      ? '${data['pName'].substring(0, 7)}...'
+                                      : data['pName'],
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
                                 Container(

@@ -2,8 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:project_flutter/search/searchPortfolioDetail.dart';
+import '../expert/portfolioDetail.dart';
 import '../firebase_options.dart';
 import '../product/productView.dart';
+import '../subBottomBar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -53,12 +56,15 @@ class _SearchSuccessState extends State<SearchSuccess> {
                 Text("포트폴리오 리스트", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
               ],
             ),
-            Text("포트폴리오 상세정보는 다이어로그로 되어있어서 불러오기가 어려움 ㅠ 현재 하드코딩 되어있어서 완성되면 가져오자"),
             SizedBox(height: 20,),
-            searchListPortFolio(),
+            Container(
+              padding: EdgeInsets.all(10),
+              child: searchListPortFolio(searchText)
+            ),
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 
@@ -142,7 +148,9 @@ class _SearchSuccessState extends State<SearchSuccess> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  data['pName'],
+                                  data['pName'].length > 7
+                                      ? '${data['pName'].substring(0, 7)}...'
+                                      : data['pName'],
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
                                 Container(
@@ -178,122 +186,149 @@ class _SearchSuccessState extends State<SearchSuccess> {
     );
   }
 
-  Widget searchListPortFolio() {
+  Widget searchListPortFolio(String searchText) {
     return StreamBuilder(
-      stream: FirebaseFirestore.instance.collectionGroup("portfolio").snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
-        if (!snap.hasData) {
+      stream: FirebaseFirestore.instance.collection("expert").snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> expertSnap) {
+        if (!expertSnap.hasData) {
           return CircularProgressIndicator();
         }
 
-        final List<DocumentSnapshot> filteredDocs = snap.data!.docs
-            .where((document) {
-          Map<String, dynamic> data = document.data() as Map<String, dynamic>;
-          String title = data['title'];
-          String description = data['portfolioDescription'];
-          return title.contains(widget.searchText) || description.contains(widget.searchText);
-        }).toList();
-
-        if (filteredDocs.isEmpty) {
-          // 포트폴리오 리스트가 없을 때 '상품 리스트 없음'을 출력합니다.
-          return Text('포트폴리오 리스트 없음');
-        }
+        final List<DocumentSnapshot> expertDocs = expertSnap.data!.docs;
 
         return ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: filteredDocs.length,
+          itemCount: expertDocs.length,
           itemBuilder: (context, index) {
-            Map<String, dynamic> data = filteredDocs[index].data() as Map<String, dynamic>;
+            Map<String, dynamic> expertData = expertDocs[index].data() as Map<String, dynamic>;
+            String userId = expertData['userId'];
 
+            return StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection("expert")
+                  .doc(userId)
+                  .collection("portfolio")
+                  .snapshots(),
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> portfolioSnap) {
+                if (!portfolioSnap.hasData) {
+                  return CircularProgressIndicator();
+                }
 
-            return InkWell(
-              onTap: () {
-              },
-              child: Column(
-                children: [
-                  SizedBox(height: 10,),
-                  Container(
-                    height: 100,
-                    padding: EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 0.6,
-                            color: Color.fromRGBO(182, 182, 182, 0.6)
-                        )
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
-                              child: Image.network(
-                                data['thumbnailUrl'],
-                                width: 130,
-                                height: 100,
-                                fit: BoxFit.cover,
+                final List<DocumentSnapshot> portfolioDocs = portfolioSnap.data!.docs;
+
+                // 검색어로 필터링된 포트폴리오만 추출
+                final filteredPortfolios = portfolioDocs.where((portfolioDoc) {
+                  Map<String, dynamic> portfolioData = portfolioDoc.data() as Map<String, dynamic>;
+                  String title = portfolioData['title'];
+                  String description = portfolioData['description'];
+                  return title.contains(searchText) || description.contains(searchText);
+                }).toList();
+
+                if (filteredPortfolios.isEmpty) {
+                  // 검색 결과가 없는 경우, 한 번만 출력하도록 조건 추가
+                  if (index == 1) {
+                    return Center(
+                      child: Text('검색어가 없습니다'),
+                    );
+                  }
+                  return Container(); // 나머지 경우에는 아무 내용도 반환하지 않음
+                }
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: filteredPortfolios.length,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic> portfolioData = filteredPortfolios[index].data() as Map<String, dynamic>;
+                    return InkWell(
+                        onTap: () {
+                          // 필터링된 포트폴리오 중에서 선택한 포트폴리오 데이터를 가져와서 "PortfolioDetailPage"로 이동
+                          Map<String, dynamic> selectedPortfolioData = filteredPortfolios[index].data() as Map<String, dynamic>;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SearchPortfolioDetail(
+                                portfolioItem: selectedPortfolioData,
+                                user: userId,
                               ),
                             ),
-                            SizedBox(width: 10,),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  data['title'],
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                ),
-                                Container(
-                                  width: 110,
-                                  child: Text(
-                                    data['portfolioDescription'].length > 20
-                                        ? '${data['portfolioDescription'].substring(0, 20)}...'
-                                        : data['portfolioDescription'],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
+                          );
+                        },
+                        child: Column(
                           children: [
-                            Text(
-                              '카테고리: ${data['category']}',
-                              style: TextStyle(fontSize: 12),
+                            SizedBox(height: 10,),
+                            Container(
+                              height: 100,
+                              padding: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 0.6,
+                                      color: Color.fromRGBO(182, 182, 182, 0.6)
+                                  )
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
+                                        child: Image.network(
+                                          portfolioData['thumbnailUrl'],
+                                          width: 130,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      SizedBox(width: 10,),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            portfolioData['title'].length > 7
+                                                ? '${portfolioData['title'].substring(0, 7)}...'
+                                                : portfolioData['title'],
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                          ),
+                                          Container(
+                                            width: 110,
+                                            child: Text(
+                                              portfolioData['portfolioDescription'].length > 20
+                                                  ? '${portfolioData['portfolioDescription'].substring(0, 20)}...'
+                                                  : portfolioData['portfolioDescription'],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        '카테고리: ${portfolioData['category']}',
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
                             ),
                           ],
                         )
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                        // Text("Portfolio Title: ${portfolioData['title']}")
+                    );
+                  },
+                );
+              },
             );
-            // return InkWell(
-            //   onTap: () {
-            //     // 포트폴리오를 눌렀을 때 실행할 동작을 여기에 추가할 수 있습니다.
-            //   },
-            //   child: ListTile(
-            //     leading: Image.network(
-            //       data['thumbnailUrl'],
-            //       width: 100,
-            //       height: 100,
-            //       fit: BoxFit.cover,
-            //     ),
-            //     title: Text(data['title']),
-            //     subtitle: Text(
-            //       data['description'].length > 15
-            //           ? '${data['description'].substring(0, 15)}...'
-            //           : data['description'],
-            //     ),
-            //   ),
-            // );
           },
         );
       },
     );
   }
+
+
 }
