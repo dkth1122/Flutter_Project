@@ -22,7 +22,7 @@ class PaymentCompletePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('결제 완료', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('결제 완료'),
         backgroundColor: Color(0xFFFCAF58),
       ),
       body: Center(

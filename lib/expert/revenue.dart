@@ -46,7 +46,9 @@ class _RevenueState extends State<Revenue> {
     fetchcompletedWithdraw();
   }
 
+  //전체 수익
   Future<void> fetchData() async {
+    prices = [];
     final orderCollection = _firestore.collection('orders');
     final orderQuery = await orderCollection.where('seller', isEqualTo: user).get();
     final orderDocs = orderQuery.docs;
@@ -65,24 +67,32 @@ class _RevenueState extends State<Revenue> {
 
   //출금 가능 내역 따로
   Future<void> fetchPrices() async {
-
-    prices2 = []; // 기존 prices2를 초기화
     final orderCollection = _firestore.collection('orders');
-    final orderQuery = await orderCollection.where('seller', isEqualTo: user).where('withdraw', isEqualTo : 'N').get();
+    final orderQuery = await orderCollection.where('seller', isEqualTo: user).get();
     final orderDocs = orderQuery.docs;
 
+    prices2 = []; // 기존 prices2를 초기화
+
     for (QueryDocumentSnapshot orderDoc in orderDocs) {
-      int price2 = orderDoc['price'] as int;
-      prices2.add(price2);
+      String withdrawStatus = orderDoc['withdraw'] as String;
+      if (withdrawStatus == 'N') {
+        int price2 = orderDoc['price'] as int;
+        prices2.add(price2);
+      }
     }
 
-    // prices2 리스트에는 'withdraw' 필드가 'N'인 주문의 가격만 저장
-    availableEarnings = prices2.reduce((a, b) => a + b).toDouble();
+    if (prices2.isNotEmpty) {
+      availableEarnings = prices2.reduce((a, b) => a + b).toDouble();
+    } else {
+      availableEarnings = 0.0; // 빈 리스트일 경우 0으로 설정
+    }
   }
 
-  //출금 완료 내역 따로
+
+
+  //츨금 완료 내역
   Future<void> fetchcompletedWithdraw() async {
-    prices3 = []; // 기존 prices3를 초기화
+    prices3.clear();
     final orderCollection = _firestore.collection('orders');
     final orderQuery = await orderCollection.where('seller', isEqualTo: user).where('withdraw', isEqualTo: 'Y').get();
     final orderDocs = orderQuery.docs;
@@ -189,11 +199,13 @@ class _RevenueState extends State<Revenue> {
                                             'withdraw': 'Y',
                                           });
                                         }
-
-                                        // 다이얼로그 닫기
+                                        //다이어로그 닫기
                                         Navigator.of(context).pop();
 
-                                        // 출금 신청 후 다른 작업 수행
+                                        //새로고침
+                                        await fetchData();
+                                        await fetchPrices();
+                                        await fetchcompletedWithdraw();
                                       },
                                       child: Text('출금 신청'),
                                     ),
@@ -209,14 +221,63 @@ class _RevenueState extends State<Revenue> {
                       ),
                       SizedBox(width: 10),
                       ElevatedButton(
-                        onPressed: () {
-                          // 출금 취소 로직을 추가
+                        onPressed: () async {
+                          if (completedWithdrawals == 0.0) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('출금 취소 가능한 금액이 없습니다.'),
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (context) {
+                                return AlertDialog(
+                                  title: Text('출금 취소 확인'),
+                                  content: Text('출금을 취소하시겠습니까?'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pop(); // 다이얼로그 닫기
+                                      },
+                                      child: Text('취소'),
+                                    ),
+                                    TextButton(
+                                      onPressed: () async {
+                                        // 출금 취소 로직 추가
+                                        QuerySnapshot orderQuery = await _firestore
+                                            .collection('orders')
+                                            .where('seller', isEqualTo: user)
+                                            .where('withdraw', isEqualTo: 'Y')
+                                            .get();
+
+                                        for (QueryDocumentSnapshot orderDoc in orderQuery.docs) {
+                                          await _firestore.collection('orders').doc(orderDoc.id).update({
+                                            'withdraw': 'N',
+                                          });
+                                        }
+                                        // 다이얼로그 닫기
+                                        Navigator.of(context).pop();
+
+                                        //새로고침
+                                        await fetchData();
+                                        await fetchPrices();
+                                        await fetchcompletedWithdraw();
+                                      },
+                                      child: Text('출금 취소'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           primary: Colors.grey,
                         ),
                         child: Text('출금 취소'),
-                      ),
+                      )
                     ],
                   ),
                   Divider(
@@ -257,6 +318,8 @@ class _RevenueState extends State<Revenue> {
                           return '';
                         },
                       ),
+                      rightTitles: SideTitles(showTitles: false),
+                      topTitles: SideTitles(showTitles: false),
                       bottomTitles: SideTitles(
                         showTitles: true,
                         getTextStyles: (context, value) => TextStyle(

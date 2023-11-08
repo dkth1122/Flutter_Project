@@ -200,7 +200,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       child: Row(
         children: [
           ClipRect(
-            //이미지 저작자 https://www.flaticon.com/kr/free-icons/
+            //이미지 저작자 https://www.flaticon.com/kr/free-icons/" title="챗봇 아이콘">챗봇 아이콘  제작자: Freepik - Flaticon</a>
             child: Image.asset(
               'assets/chatbot.png',
               width: 50,
