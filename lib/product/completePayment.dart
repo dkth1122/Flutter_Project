@@ -22,17 +22,18 @@ class PaymentCompletePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('결제 완료'),
+        title: Text('결제 완료', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Color(0xFFFCAF58),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Text('결제가 완료되었습니다.'),
+            Text('결제가 완료되었습니다., style: TextStyle(fontWeight: FontWeight.bold)'),
             SizedBox(height: 20),
-            Text('결제 상태: ${paymentResult['imp_success']}'),
-            Text('주문번호: ${paymentResult['merchant_uid']}'),
-            Text('결제금액: $price'),
+            Text('결제 상태: ${paymentResult['imp_success']}', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('주문번호: ${paymentResult['merchant_uid']}', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('결제금액: $price', style: TextStyle(fontWeight: FontWeight.bold)),
             ElevatedButton(
               onPressed: () async {
 

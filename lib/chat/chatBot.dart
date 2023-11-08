@@ -19,9 +19,9 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
 
   String? selectedResponse;
   List<String> possibleResponses = [
-    '전문가 지금 응답 가능한가요?',
-    '전문가가 야간 응답이 가능한가요?',
-    '전문가는 휴가 중인가요?',
+    '지금 바로 응답이 가능한 상태인가요?',
+    '야간 응답은 가능한가요?',
+    '지금 휴가 중인가요?',
   ];
 
   bool isNightResponseEnabled = false;
@@ -64,7 +64,6 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       }
 
       await _fetchMessageResponse(otherUser);
-      print("상대 유저 ======> $otherUser");
     }
   }
 
@@ -86,7 +85,6 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       flg = !documentSnapshot.exists;
     });
 
-    print("flg 지금 ============> $flg");
     _updateResponse();
   }
 
@@ -103,25 +101,26 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
   String getResponseForQuestion(String question) {
     if (question.contains("야간 응답")) {
       if (isNightResponseEnabled) {
-        return "전문가는 현재 23:00~08:00(KST) 동안 야간 응답이 가능합니다.";
+        return "예, 현재는 야간 응답이 가능합니다. \n 23:00~08:00(KST) 동안 야간 응답을 지원합니다.";
       } else {
-        return "전문가는 현재 야간 응답이 불가능 합니다.";
+        return "죄송합니다, 현재는 야간 응답이 불가능한 시간입니다.";
       }
     } else if (question.contains("휴가 중")) {
       if (isOnVacation) {
-        return "전문가는 ${_formatDate(vacationStartDate)}부터 ${_formatDate(vacationEndDate)}까지 휴가 중입니다.";
+        return "네, 현재 전문가는 휴가 중입니다. \n 휴가는 ${_formatDate(vacationStartDate)}부터 ${_formatDate(vacationEndDate)}까지 \n 계획되어 있습니다.";
       } else {
-        return "현재 전문가는 휴가 중이 아닙니다.";
+        return "아니요, 현재 전문가는 휴가 중이 아닙니다.";
       }
-    } else if (question.contains("응답 가능")) {
+    } else if (question.contains("지금 바로 응답")) {
       if (isResponseEnabled) {
-        return "전문가는 현재 30분 내로 응답 가능합니다.";
+        return "네, 현재는 바로 응답이 가능한 상태입니다. 30분 내에 응답을 드릴 수 있습니다.";
       } else {
-        return "전문가는 현재 30분 내로 응답할 수 없습니다.";
+        return "죄송합니다, 현재는 30분 내에 응답할 수 없는 상태입니다.";
       }
     }
     return "안녕하세요! 무엇을 도와드릴까요?";
   }
+
 
   void _addMessage(String sender, String text) {
     final newMessage = ChatMessage(sender: sender, text: text);
@@ -137,8 +136,8 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
   Widget _buildNoResponseMessage() {
     return Center(
       child: Text(
-        '해당 전문가는 메시지 응답 설정을 하지 않았습니다.',
-        style: TextStyle(fontSize: 16),
+        '해당 유저는 메시지 응답 설정을 하지 않았습니다.',
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
       ),
     );
   }
@@ -147,24 +146,27 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('메시지 응답 페이지'),
+        title: Text('메시지 응답 문의',style: TextStyle(fontWeight: FontWeight.bold),),
         backgroundColor: Color(0xFFFCAF58),
       ),
       body: Column(
         children: [
-          SizedBox(height: 20,),
+          SizedBox(height: 20),
           Expanded(
             child: flg
                 ? _buildNoResponseMessage()
-                : ListView.builder(
+                :ListView.builder(
               itemCount: messages.length,
               itemBuilder: (context, index) {
                 final message = messages[index];
-                return message.sender == "챗봇"
-                    ? _buildBotMessage(message.text)
-                    : _buildUserMessage(message.text);
+                return Container(
+                  margin: EdgeInsets.only(bottom: 16.0), // 말풍선 간 간격을 조절
+                  child: message.sender == "챗봇"
+                      ? _buildBotMessage(message.text)
+                      : _buildUserMessage(message.text),
+                );
               },
-            ),
+            )
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -194,14 +196,23 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
 
   Widget _buildBotMessage(String text) {
     return Container(
-      margin: EdgeInsets.only(bottom: 8.0),
+      margin: EdgeInsets.only(bottom: 8.0, left: 8.0), // 말풍선과 이전 말풍선 사이의 간격 조절
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          ClipRect(
+            //이미지 저작자 https://www.flaticon.com/kr/free-icons/
+            child: Image.asset(
+              'assets/chatbot.png',
+              width: 50,
+              height: 50,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(width: 8.0), // 프로필 사진과 대화 버블 사이의 간격 조절
           Container(
             padding: EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: Color(0xFFFF8C42),
+              color: Colors.amber,
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
                 topRight: Radius.circular(16),
@@ -210,7 +221,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
             ),
             child: Text(
               text,
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -220,23 +231,26 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
 
   Widget _buildUserMessage(String text) {
     return Container(
-      margin: EdgeInsets.only(bottom: 8.0),
+      margin: EdgeInsets.only(bottom: 8.0, right: 8.0),
       child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Container(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Container(
             padding: EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-                color: Color(0xFF4E598C),
-                borderRadius: BorderRadius.only(
+              color: Color(0xFF4E598C),
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-            bottomLeft: Radius.circular(16),
-                ),
+                topRight: Radius.circular(16),
+                bottomLeft: Radius.circular(16),
+              ),
             ),
-              child: Text(text, style: TextStyle(color: Colors.white),),
+            child: Text(
+              text,
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
           ),
-          ],
+        ],
       ),
     );
   }
@@ -255,16 +269,19 @@ class ResponseButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onPressed,
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(
-          isSelected ? Color(0xFFFF9C784) : Colors.grey,
+    return Container(
+      margin: EdgeInsets.only(left: 8, right: 8, bottom: 8),
+      child: TextButton(
+        onPressed: onPressed,
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(
+            isSelected ? Color(0xFFFF8C42) : Colors.grey,
+          ),
         ),
-      ),
-      child: Text(
-        response,
-        style: TextStyle(color: Colors.white),
+        child: Text(
+          response,
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
       ),
     );
   }
