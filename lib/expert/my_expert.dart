@@ -219,7 +219,7 @@ class _MyExpertState extends State<MyExpert> {
                         onPressed: () {
                           Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context)=>SalesManagementPage()));
+                              MaterialPageRoute(builder: (context)=>SalesManagementPage(userId:userId)));
                         },
                         child: Text(
                           '전체보기',

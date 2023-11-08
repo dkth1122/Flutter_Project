@@ -213,7 +213,7 @@ class _MyCustomerState extends State<MyCustomer> {
                   title: Text('구매관리'),
                   trailing: Icon(Icons.arrow_forward_ios_rounded),
                   onTap: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => PurchaseManagementPage()));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => PurchaseManagement(userId:userId)));
                   },
                 ),
                 ListTile(

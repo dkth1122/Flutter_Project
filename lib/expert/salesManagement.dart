@@ -1,22 +1,41 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:project_flutter/product/productView.dart';
 class SalesManagementPage extends StatefulWidget {
-  @override
-  _SalesManagementPageState createState() => _SalesManagementPageState();
-}
-class PurchaseItem {
-  final String title;
-  final String product;
-  final double price;
+  final String userId;
 
-  PurchaseItem({
-    required this.title,
-    required this.product,
+  const SalesManagementPage({required this.userId, Key? key}) : super(key: key);
+  @override
+  _SalesManagementPageState createState() => _SalesManagementPageState(userId:userId);
+}
+class SalesItem {
+  final String pName;
+  final String category;
+  final String imgUrl;
+  final int price;
+  final DateTime timestamp;
+
+
+  SalesItem({
+    required this.pName,
+    required this.category,
+    required this.imgUrl,
     required this.price,
+    required this.timestamp,
   });
 }
 
 class _SalesManagementPageState extends State<SalesManagementPage> {
+  final String userId;
+  String selectedCategory = ""; // 선택한 상품 유형을 저장하는 변수
+  List<SalesItem> salesItems = []; // SalesItem 리스트를 선언
+  int _sortBy = 0;
+
+
+
+  _SalesManagementPageState({required this.userId});
+
+
   List<String> optionsButton1 = [
     'UX기획',
     '웹',
@@ -26,8 +45,15 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
     '트렌드',
     '데이터',
     '기타',];
-  List<String> optionsButton2 = ["전체상태", "진행중", "주문취소", "구매확정"];
+  List<String> optionsButton2 = ["최신순", "가격낮은순", "가격높은순", "좋아요높은순", "조회수높은순"];
 
+
+  Future<void> updateSalesItems(String userId, String categoryFilter) async {
+    List<SalesItem> updatedSalesItems = await SalesList(userId, categoryFilter);
+    setState(() {
+      salesItems = updatedSalesItems;
+    });
+  }
 
   void _showInfoModal(BuildContext context) {
     showModalBottomSheet(
@@ -47,7 +73,7 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
                       Navigator.of(context).pop(); // 모달 바텀 시트 닫기
                     },
                   ),
-                  Text("구매관리 안내", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Text("판매관리 안내", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
               ),
               SizedBox(height: 12),
@@ -71,7 +97,7 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
             return ListTile(
               title: Text(option),
               onTap: () {
-                Navigator.pop(context);
+                applyCategoryFilter(option); // 선택한 상품 유형을 전달하여 함수 호출
               },
             );
           }).toList(),
@@ -79,6 +105,61 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
       },
     );
   }
+
+  void applyCategoryFilter(String option) {
+    setState(() {
+      selectedCategory = option;
+      // print(selectedCategory);
+    });
+    Navigator.pop(context); // 필터 모달 닫기
+  }
+  void showSortOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return ListView(
+          children: optionsButton2.asMap().entries.map((entry) {
+            int index = entry.key;
+            String option = entry.value;
+            return ListTile(
+              title: Text(option),
+              onTap: () {
+                setState(() {
+                  _sortBy = index + 1;
+                });
+                sortSalesItems(); // 정렬 함수 호출
+                Navigator.pop(context); // 모달을 닫습니다.
+              },
+            );
+          }).toList(),
+        );
+      },
+    );
+  }
+
+
+
+  void sortSalesItems() {
+    switch (_sortBy) {
+      case 1: // 가격 낮은순
+        salesItems.sort((a, b) => a.price.compareTo(b.price));
+        break;
+      case 2: // 가격 높은순
+        salesItems.sort((a, b) => b.price.compareTo(a.price));
+        break;
+      case 3: // 최신순
+        salesItems.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        break;
+      default:
+      // 기본 정렬은 최신순
+        salesItems.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+        break;
+    }
+    setState(() {
+
+    });
+  }
+
 
   Widget _filterButton({
     IconData? icon, // Make the icon parameter nullable
@@ -131,29 +212,36 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
     );
   }
 
-  Future<List<PurchaseItem>> fetchPurchaseList() async {
+  Future<List<SalesItem>> SalesList(String userId, String categoryFilter) async {
     try {
-      CollectionReference purchases = FirebaseFirestore.instance.collection("purchases");
-      QuerySnapshot snapshot = await purchases.get();
+      Query query = FirebaseFirestore.instance.collection('product').where('user', isEqualTo: userId);
 
-      List<PurchaseItem> purchaseList = snapshot.docs.map((doc) {
-        return PurchaseItem(
-          title: doc['title'] as String,
-          product: doc['product'] as String,
-          price: doc['price'] as double,
-        );
-      }).toList();
+      if (categoryFilter.isNotEmpty) {
+        query = query.where('category', isEqualTo: categoryFilter);
+      }
 
-      return purchaseList;
+      QuerySnapshot querySnapshot = await query.get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        List<SalesItem> salesList = querySnapshot.docs.map((doc) {
+          return SalesItem(
+            pName: doc['pName'] as String,
+            category: doc['category'] as String,
+            imgUrl: doc['iUrl'] as String,
+            price: doc['price'] as int,
+            timestamp: (doc['sendTime'] as Timestamp).toDate(),
+
+          );
+        }).toList();
+        return salesList;
+      } else {
+        return [];
+      }
     } catch (e) {
-      // Handle any potential errors here
+      print('판매리스트 가져오기 오류: $e');
       return [];
     }
   }
-
-
-
-
 
 
   @override
@@ -208,41 +296,66 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
               SizedBox(width: 10), // 버튼 사이에 간격을 추가합니다
               _filterButton(
                 icon: Icons.arrow_drop_down,
-                text: '주문상태',
+                text: '정렬',
                 onPressed: () {
-                  _showFilterOptions(context, optionsButton2);
+                  showSortOptions(context);
                 },
-              ),
-              SizedBox(width: 10), // 버튼 사이에 간격을 추가합니다
-              _filterButton(
-                  icon: Icons.arrow_drop_down,
-                  text: '주문기간',
-                  onPressed: () async {
-                    showDateRangePickerModal(context);
-                  }
               ),
             ],
           ),
           Expanded(
-            child: ListView(
-              children: [
-                ListTile(
-                  title: Text("주문 1"),
-                  subtitle: Text("상품 1"),
-                  trailing: Text("가격: \$10"),
-                ),
-                ListTile(
-                  title: Text("주문 2"),
-                  subtitle: Text("상품 2"),
-                  trailing: Text("가격: \$20"),
-                ),
-                // Additional order items
-              ],
+            child: FutureBuilder<List<SalesItem>>(
+              future: SalesList(userId, selectedCategory),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('데이터를 불러오는 중 오류가 발생했습니다.'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('데이터가 없습니다.'));
+                } else {
+                  List<SalesItem> filteredSales = snapshot.data!;
+
+                  if (selectedCategory.isNotEmpty) {
+                    filteredSales = filteredSales.where((item) => item.category == selectedCategory).toList();
+                  }
+
+                  return ListView.builder(
+                    itemCount: filteredSales.length,
+                    itemBuilder: (context, index) {
+                      SalesItem salesItem = filteredSales[index]; // 필터링된 데이터를 사용
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(salesItem.pName),
+                            subtitle: Text(salesItem.category),
+                            leading: Image.network(salesItem.imgUrl),
+                            trailing: Text('${salesItem.price.toString()}원'),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => ProductView(
+                                  productName: salesItem.pName,
+                                  price: salesItem.price.toString(),
+                                  imageUrl: salesItem.imgUrl,
+                                )),
+                              );
+                            },
+                          ),
+                          SizedBox(height: 10)
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
             ),
           ),
+
         ],
       ),
     );
   }
+
 
 }

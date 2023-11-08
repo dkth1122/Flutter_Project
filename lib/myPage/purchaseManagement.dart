@@ -1,22 +1,34 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-class PurchaseManagementPage extends StatefulWidget {
+import 'package:project_flutter/myPage/purchaseView.dart';
+class PurchaseManagement extends StatefulWidget {
+  final String userId;
+
+  const PurchaseManagement({required this.userId, Key? key}) : super(key: key);
   @override
-  _PurchaseManagementPageState createState() => _PurchaseManagementPageState();
+  _PurchaseManagementState createState() => _PurchaseManagementState(userId:userId);
 }
 class PurchaseItem {
-  final String title;
-  final String product;
-  final double price;
+  final String orderNo;
+  final String cName;
+  final String productName;
+  // final DateTime timestamp;
+  final int price;
 
   PurchaseItem({
-    required this.title,
-    required this.product,
+    required this.orderNo,
+    required this.cName,
+    required this.productName,
+    // required this.timestamp,
     required this.price,
   });
 }
 
-class _PurchaseManagementPageState extends State<PurchaseManagementPage> {
+class _PurchaseManagementState extends State<PurchaseManagement> {
+  final String userId;
+  String selectedWithdraw = "";
+  String selectedCoupon = "";
+  _PurchaseManagementState({required this.userId});
   List<String> optionsButton1 = [
     'UX기획',
     '웹',
@@ -26,7 +38,8 @@ class _PurchaseManagementPageState extends State<PurchaseManagementPage> {
     '트렌드',
     '데이터',
     '기타',];
-  List<String> optionsButton2 = ["전체상태", "진행중", "주문취소", "구매확정"];
+  List<String> optionsButton3 = ["쿠폰사용", "쿠폰미사용"];
+  List<String> optionsButton4 = ["출금전", "출금완료"];
 
 
   void _showInfoModal(BuildContext context) {
@@ -62,6 +75,7 @@ class _PurchaseManagementPageState extends State<PurchaseManagementPage> {
     );
   }
 
+
   void _showFilterOptions(BuildContext context, List<String> options) {
     showModalBottomSheet(
       context: context,
@@ -71,7 +85,12 @@ class _PurchaseManagementPageState extends State<PurchaseManagementPage> {
             return ListTile(
               title: Text(option),
               onTap: () {
-                Navigator.pop(context);
+                if (optionsButton4.contains(option)) {
+                  applyWithdrawFilter(option); // 선택한 출금여부를 전달하여 함수 호출
+                }
+                if (optionsButton3.contains(option)) {
+                  applyCouponFilter(option); // 선택한 쿠폰여부를 전달하여 함수 호출
+                }
               },
             );
           }).toList(),
@@ -79,6 +98,31 @@ class _PurchaseManagementPageState extends State<PurchaseManagementPage> {
       },
     );
   }
+  void applyWithdrawFilter(String option) {
+    setState(() {
+      if (option == "출금전") {
+        selectedWithdraw = "N";
+      } else if (option == "출금완료") {
+        selectedWithdraw = "Y";
+      } else {
+        selectedWithdraw = ""; // 기본값 또는 다른 상황에 대한 처리
+      }
+    });
+    Navigator.pop(context);
+  }
+void applyCouponFilter(String option) {
+    setState(() {
+      if (option == "쿠폰사용") {
+        selectedCoupon = "Y";
+      } else if (option == "쿠폰미사용") {
+        selectedCoupon = "N";
+      } else {
+        selectedCoupon = ""; // 기본값 또는 다른 상황에 대한 처리
+      }
+    });
+    Navigator.pop(context);
+  }
+
 
   Widget _filterButton({
     IconData? icon, // Make the icon parameter nullable
@@ -97,59 +141,81 @@ class _PurchaseManagementPageState extends State<PurchaseManagementPage> {
     );
   }
 
-  void showDateRangePickerModal(BuildContext context) {
-    DateTimeRange? selectedDateRange; // 모달 다이얼로그 내에서만 사용
 
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Text('날짜 범위 선택'),
-              ElevatedButton(
-                onPressed: () async {
-                  final DateTimeRange? picked = await showDateRangePicker(
-                    context: context,
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2030),
-                  );
+  Widget _listPurchase() {
+    Query query = FirebaseFirestore.instance.collection("orders").where("user", isEqualTo: userId);
 
-                  if (picked != null) {
-                    selectedDateRange = picked; // 모달 다이얼로그 내에서 변수에 선택한 범위 저장
-                  }
-                },
-                child: Text('날짜 범위 선택'),
+    if (selectedWithdraw == "N") {
+      query = query.where("withdraw", isEqualTo: "N");
+    } else if (selectedWithdraw == "Y") {
+      query = query.where("withdraw", isEqualTo: "Y");
+    }
+    if (selectedCoupon == "N") {
+      query = query.where("cName", isEqualTo: "사용하지 않음");
+    } else if (selectedCoupon == "Y") {
+      query = query.where("cName", isNotEqualTo: "사용하지 않음");
+    }
+
+    return StreamBuilder(
+      stream: query.snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
+        if (!snap.hasData) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: snap.data!.docs.length,
+          itemBuilder: (context, index) {
+            DocumentSnapshot doc = snap.data!.docs[index];
+            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+            return ListTile(
+              title: Text('${data['productName']}'),
+              subtitle: Column(
+                children: [
+                  _buildInfoBox("주문번호", data['orderNo']),
+                  _buildInfoBox("사용쿠폰", data['cName']),
+                ],
               ),
-              if (selectedDateRange != null) // 선택한 날짜 범위를 표시
-                Text('선택한 시작 날짜: ${selectedDateRange!.start}\n선택한 종료 날짜: ${selectedDateRange!.end}'),
-            ],
-          ),
+              trailing: Text('${data['price'].toString()}원'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PurchaseView(document: doc)),
+                );
+              },
+            );
+          },
         );
       },
     );
   }
 
-  Future<List<PurchaseItem>> fetchPurchaseList() async {
-    try {
-      CollectionReference purchases = FirebaseFirestore.instance.collection("purchases");
-      QuerySnapshot snapshot = await purchases.get();
-
-      List<PurchaseItem> purchaseList = snapshot.docs.map((doc) {
-        return PurchaseItem(
-          title: doc['title'] as String,
-          product: doc['product'] as String,
-          price: doc['price'] as double,
-        );
-      }).toList();
-
-      return purchaseList;
-    } catch (e) {
-      // Handle any potential errors here
-      return [];
-    }
+  Widget _buildInfoBox(String value, String label) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      child: Row(
+        children: [
+          Text(
+            value,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          Divider(
+            color: Colors.grey, // 선 색상
+            thickness: 1, // 선의 두께
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              fontStyle: FontStyle.italic,
+              color: Colors.grey, // 라벨 텍스트 색상
+            ),
+          ),
+        ],
+      ),
+    );
   }
+
 
 
 
@@ -200,46 +266,22 @@ class _PurchaseManagementPageState extends State<PurchaseManagementPage> {
               children: [
                 _filterButton(
                   icon: Icons.arrow_drop_down,
-                  text: '상품유형',
+                  text: '출금상태',
                   onPressed: () {
-                    _showFilterOptions(context, optionsButton1);
+                    _showFilterOptions(context, optionsButton4);
                   },
                 ),
                 SizedBox(width: 10), // 버튼 사이에 간격을 추가합니다
                 _filterButton(
                   icon: Icons.arrow_drop_down,
-                  text: '주문상태',
+                  text: '쿠폰여부',
                   onPressed: () {
-                    _showFilterOptions(context, optionsButton2);
+                    _showFilterOptions(context, optionsButton3);
                   },
-                ),
-                SizedBox(width: 10), // 버튼 사이에 간격을 추가합니다
-                _filterButton(
-                  icon: Icons.arrow_drop_down,
-                  text: '주문기간',
-                  onPressed: () async {
-                    showDateRangePickerModal(context);
-                  }
                 ),
               ],
             ),
-            Expanded(
-              child: ListView(
-                children: [
-                  ListTile(
-                    title: Text("주문 1"),
-                    subtitle: Text("상품 1"),
-                    trailing: Text("가격: \$10"),
-                  ),
-                  ListTile(
-                    title: Text("주문 2"),
-                    subtitle: Text("상품 2"),
-                    trailing: Text("가격: \$20"),
-                  ),
-                  // Additional order items
-                ],
-              ),
-            ),
+            _listPurchase()
           ],
       ),
     );
