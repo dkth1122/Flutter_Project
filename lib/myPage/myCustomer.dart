@@ -7,6 +7,7 @@ import 'package:project_flutter/myPage/purchaseManagement.dart';
 import 'package:provider/provider.dart';
 import '../join/userModel.dart';
 import '../proposal/myProposalList.dart';
+import '../proposal/myProposalView.dart';
 import 'editProfile.dart';
 
 class MyCustomer extends StatefulWidget {
@@ -50,6 +51,74 @@ class _MyCustomerState extends State<MyCustomer> {
       return null;
     }
   }
+  Widget _MyProposalFirst() {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection("proposal")
+          .where("user", isEqualTo: userId)
+          .limit(1) // 최신 데이터 1개만 가져옴
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
+        if (!snap.hasData) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (snap.data!.docs.isEmpty) {
+          return Text("아직 제안서가 없습니다.");
+        }
+
+        DocumentSnapshot doc = snap.data!.docs.first;
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        return Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.grey, // 원하는 테두리 색상 설정
+            ),
+            borderRadius: BorderRadius.circular(8.0), // 원하는 모서리 둥글기 설정
+          ),
+          child: Column(
+          children: [
+            ListTile(
+              title: Text.rich(
+                TextSpan(
+                  text: "${data["title"]} 받은제안 ${data["accept"].toString()}건",
+                  style: TextStyle(
+                    decoration: data['delYn'] == 'Y' ? TextDecoration.lineThrough : null,
+                  ),
+                ),
+              ),
+              subtitle: Column(
+                children: [
+
+                  Text(data["category"]),
+                  Text(data["content"]),
+                ],
+              ),
+              trailing: Text('예산 ${data["price"].toString()}'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => MyProposalView(
+                      user: widget.userId,
+                      proposalTitle: data["title"],
+                      proposalContent: data["content"],
+                      proposalPrice: data["price"],
+                      proposalDel: data['delYn'],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ],
+          ),
+        );
+      },
+    );
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -131,74 +200,70 @@ class _MyCustomerState extends State<MyCustomer> {
               color: Colors.grey,
               thickness: 5.0,
             ),
+
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    "내 프로젝트",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "내 프로젝트",
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => MyProposalList(userId: userId)),
+                          );
+                        },
+                        child: Text("전체보기",style: TextStyle(color: Color(0xff424242)),),
+                      ),
+                    ],
+                ),
+                  _MyProposalFirst(),
+                  SizedBox(height: 10),
                   Container(
-                    child: Column(
-                      children: [
-                        Text("요구사항을 작성하시고, 딱 맞는 전문가와의 거래를 진행하세요"),
-                        Column(
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context)=>MyProjectProposal()));
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Colors.white),
-                                side: MaterialStateProperty.all(
-                                  BorderSide(
-                                    color: Color(0xff424242),
-                                    width: 0.5,
-                                  ),
-                                ),
-                              ),
-                              child: Text(
-                                "프로젝트 의뢰하기",
-                                style: TextStyle(color: Color(0xff424242)),
-                              ),
-                            ),ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context)=>MyProposalList(userId : userId)));
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Colors.white),
-                                side: MaterialStateProperty.all(
-                                  BorderSide(
-                                    color: Color(0xff424242),
-                                    width: 0.5,
-                                  ),
-                                ),
-                              ),
-                              child: Text(
-                                "내가 제안한 프로젝트 리스트",
-                                style: TextStyle(color: Color(0xff424242)),
-                              ),
-                            ),
-                          ],
+                    margin: EdgeInsets.all(10.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 5,
+                          blurRadius: 7,
+                          offset: Offset(0, 3),
                         ),
                       ],
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    margin: EdgeInsets.all(20.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.0,
-                      ),
-                      borderRadius: BorderRadius.circular(4.0),
+                    child: Column(
+                      children: [
+                        ListTile(
+                          subtitle: Text("요구사항을 작성하시고, 딱 맞는 전문가와의 거래를 진행하세요"),
+                          title: Row(
+                            children: [
+                              Icon(Icons.note_add_outlined),
+                              Text("프로젝트 의뢰하기", style: TextStyle(fontSize: 17),),
+                              SizedBox(width: 10),
+                            ],
+                          ),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => MyProjectProposal()),
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
+
             ),
             Divider(
               color: Colors.grey,
@@ -230,14 +295,6 @@ class _MyCustomerState extends State<MyCustomer> {
                   trailing: Icon(Icons.arrow_forward_ios_rounded),
                   onTap: () {
                     // 세 번째 아이템이 클릭됐을 때 수행할 작업
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.star),
-                  title: Text('네 번째 아이템'),
-                  subtitle: Text('네 번째 아이템 설명'),
-                  onTap: () {
-                    // 네 번째 아이템이 클릭됐을 때 수행할 작업
                   },
                 ),
               ],

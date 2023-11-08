@@ -239,6 +239,11 @@ class _MyProposalViewState extends State<MyProposalView> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                Text("1:1문의를 원하시면 스와이프하세요!",
+                  style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.red,
+                ),),
                 _buildUserList(widget.proposalTitle),
                 SizedBox(height: 20), // 여기에 새로운 위젯 추가
                 // 다른 새로운 위젯 추가
@@ -284,25 +289,41 @@ class _MyProposalViewState extends State<MyProposalView> {
                   if (userSnapshot.hasData) {
                     var user = userSnapshot.data!.docs[0];
                     var uid = user['userId'];
-                    return ListTile(
-                      leading: Container(
-                        width: 50, // 원하는 가로 크기
-                        height: 50, // 원하는 세로 크기
-                        decoration: BoxDecoration(
-                          shape: BoxShape.rectangle, // 사각형 모양으로 설정
-                          image: DecorationImage(
-                            fit: BoxFit.cover,
-                            image: NetworkImage(user['profileImageUrl']),
-                          ),
+                    return Dismissible(
+                      key: UniqueKey(), // 고유한 키로 설정
+                      background: Container(
+                        color:Color(0xFF4E598C), // 스와이프 배경 색상
+                        alignment: Alignment.centerLeft,
+                        padding: EdgeInsets.only(left: 20),
+                        child: Icon(
+                          Icons.chat, // 삭제 아이콘 또는 원하는 내용으로 대체
+                          color: Colors.white,
                         ),
                       ),
-                      title: Text(user['nick']),
-                      subtitle: Text(user['userId']),
-                      trailing: TextButton(
-                        onPressed: () {
-                          _toggleChat(uid);
-                        },
-                        child: Text("1:1문의하기"),
+                      onDismissed: (direction) {
+                        // 아이템 삭제 작업 수행
+                        _toggleChat(uid);
+                      },
+                      child: ListTile(
+                        leading: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: DecorationImage(
+                              fit: BoxFit.cover,
+                              image: NetworkImage(user['profileImageUrl']),
+                            ),
+                          ),
+                        ),
+                        title: Text(user['nick']),
+                        subtitle: Text(user['userId']),
+                        trailing: TextButton(
+                          onPressed: () {
+                            _toggleChat(uid);
+                          },
+                          child: Text("1:1문의하기"),
+                        ),
                       ),
                     );
                   }
@@ -316,6 +337,8 @@ class _MyProposalViewState extends State<MyProposalView> {
       },
     );
   }
+
+
 
 }
 

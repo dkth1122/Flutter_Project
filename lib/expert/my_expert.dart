@@ -26,6 +26,7 @@ class _MyExpertState extends State<MyExpert> {
   late Map<String, dynamic> data;
   String profileImageUrl = '';
 
+
   _MyExpertState({required this.userId});
 
   @override
@@ -53,18 +54,6 @@ class _MyExpertState extends State<MyExpert> {
       return null;
     }
   }
-  Future<int> getProductCount(String userId) async {
-    try {
-      CollectionReference products = FirebaseFirestore.instance.collection('Product');
-      QuerySnapshot querySnapshot = await products.where('userId', isEqualTo: userId).get();
-      int productCount = querySnapshot.size;
-      return productCount;
-    } catch (e) {
-      print('Error retrieving product count: $e');
-      return 0; // 에러 발생 시 0을 반환하거나 다른 에러 처리 방식을 사용할 수 있습니다.
-    }
-  }
-
 
 
   @override
@@ -141,6 +130,12 @@ class _MyExpertState extends State<MyExpert> {
                 borderRadius: BorderRadius.circular(20.0),
               ),
             ),
+            Divider(
+              color: Colors.grey,
+              thickness: 5.0,
+            ),
+            _MyProposalAccept(),
+
             Divider(
               color: Colors.grey,
               thickness: 5.0,
@@ -236,15 +231,27 @@ class _MyExpertState extends State<MyExpert> {
                     '3개월 이내 판매중인 건수:',
                     style: TextStyle(fontSize: 18),
                   ),
-                // int count = await getProductCount(userId);
-                  Text(
-                    '50',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blue, // 파란색 텍스트
-                    ),
+                  FutureBuilder<int>(
+                    future: getProductCount(userId),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        int productCount = snapshot.data ?? 0;
+                        return Text(
+                          '$productCount',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
+                        );
+                      }
+                    },
                   ),
+
                 ],
               ),
             ),
@@ -311,6 +318,21 @@ class _MyExpertState extends State<MyExpert> {
       ),
     );
   }
+
+  Future<int> getProductCount(String userId) async {
+    try {
+      CollectionReference products = FirebaseFirestore.instance.collection('product');
+      QuerySnapshot querySnapshot = await products.where('user', isEqualTo: userId).get();
+      int productCount = querySnapshot.size;
+      return productCount;
+    } catch (e) {
+      print('Error retrieving product count: $e');
+      return 0; // Return a default value (0) when an error occurs.
+    }
+  }
+
+
+
 
   Widget _userInfo() {
     UserModel userModel = Provider.of<UserModel>(context);
@@ -406,5 +428,64 @@ class _MyExpertState extends State<MyExpert> {
         }
       },
     );
+  }
+
+  Widget _MyProposalAccept() {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection("proposal")
+          .where("user", isEqualTo: userId)
+          .limit(1) // 최신 데이터 1개만 가져옴
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
+        if (!snap.hasData) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        if (snap.data!.docs.isEmpty) {
+          return Text("아직 제안서가 없습니다.");
+        }
+
+        DocumentSnapshot doc = snap.data!.docs.first;
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        return Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.grey, // 원하는 테두리 색상 설정
+            ),
+            borderRadius: BorderRadius.circular(8.0), // 원하는 모서리 둥글기 설정
+          ),
+          child: Column(
+            children: [
+              ListTile(
+                title: Text.rich(
+                  TextSpan(
+                    text: "${data["title"]} 받은제안 ${data["accept"].toString()}건",
+                    style: TextStyle(
+                      decoration: data['delYn'] == 'Y' ? TextDecoration.lineThrough : null,
+                    ),
+                  ),
+                ),
+                subtitle: Column(
+                  children: [
+
+                    Text(data["category"]),
+                    Text(data["content"]),
+                  ],
+                ),
+                trailing: Text('예산 ${data["price"].toString()}'),
+                onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context)=>ProposalList()));
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
   }
 }
