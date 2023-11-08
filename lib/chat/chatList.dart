@@ -167,11 +167,11 @@ class _ChatListState extends State<ChatList> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CircleAvatar(
+/*                          CircleAvatar(
                             radius: 30,
                             // Add profile image here
                             backgroundImage: AssetImage(url),
-                          ),
+                          ),*/
                           SizedBox(width: 16),
                           Expanded(
                             child: Column(
@@ -263,30 +263,30 @@ class _ChatListState extends State<ChatList> {
       context: context,
       builder: (context) {
         return AlertDialog(
-            title: Text('채팅방 나가기'),
-            content: Text('정말로 이 채팅방을 나가시겠습니까?'),
-            actions: [
+          title: Text('채팅방 나가기'),
+          content: Text('정말로 이 채팅방을 나가시겠습니까?'),
+          actions: [
             TextButton(
-            onPressed: () {
-          // "status" 필드를 "D"로 설정하여 채팅방 비활성화
-          FirebaseFirestore.instance
-              .collection('chat')
-              .doc(roomId)
-              .update({'status': '$user1 D'})
-              .then((value) {
-            Navigator.of(context).pop();
-          });
-        },
-        child: Text('나가기'),
-        ),
-        TextButton(
-        onPressed: () {
-        Navigator.of(context).pop();
-        },
-        child: Text('취소'),)
-      ],
+              onPressed: () {
+                // "status" 필드를 "D"로 설정하여 채팅방 비활성화
+                FirebaseFirestore.instance
+                    .collection('chat')
+                    .doc(roomId)
+                    .update({'status': '$user1 D'})
+                    .then((value) {
+                  Navigator.of(context).pop();
+                });
+              },
+              child: Text('나가기'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('취소'),)
+          ],
+        );
+      },
     );
-  },
-  );
-}
+  }
 }
