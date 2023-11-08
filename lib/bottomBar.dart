@@ -108,10 +108,7 @@ class _CircularDialogState extends State<CircularDialog> {
                           InkWell(
                             onTap: () {
 
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => MyHomePage()),
-                              );
+                              Navigator.of(context).pop();
                             },
                             child: Image.asset(
                               'assets/logo.png',

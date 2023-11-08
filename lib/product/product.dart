@@ -8,6 +8,16 @@ import 'package:project_flutter/product/productAdd.dart';
 import 'package:project_flutter/product/productView.dart';
 import 'package:intl/intl.dart';
 
+import '../firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(MyApp());
+}
+
 class Product extends StatefulWidget {
   @override
   State<Product> createState() => _ProductState();
@@ -16,6 +26,13 @@ class Product extends StatefulWidget {
 class _ProductState extends State<Product> {
   int selectedCategoryIndex = -1;
   late Stream<QuerySnapshot>? productStream = null;
+  Stream<QuerySnapshot> getStream() {
+    if (productStream != null) {
+      return productStream!;
+    } else {
+      return Stream<QuerySnapshot>.empty();
+    }
+  }
   final CarouselController _controller = CarouselController();
   List<String> imageBanner = ['assets/banner1.webp','assets/banner2.webp','assets/banner3.webp','assets/banner4.webp','assets/banner5.webp'];
   int _current = 0;
@@ -38,8 +55,6 @@ class _ProductState extends State<Product> {
     '기본 순',
     '조회수 높은 순',
     '최신 등록 순',
-    '평점 높은 순',
-    '후기 많은 순',
     '가격 높은 순',
     '가격 낮은 순',
   ];
@@ -113,15 +128,16 @@ class _ProductState extends State<Product> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 150,
-              child: Stack(
-                children: [
-                  sliderWidget(),
-                  sliderIndicator(),
-                ],
-              ),
-            ),
+            //배너움직일때마다 재로딩됨 ㅡ,.ㅡ
+            //  SizedBox(
+            //   height: 150,
+            //   child: Stack(
+            //     children: [
+            //       sliderWidget(),
+            //       sliderIndicator(),
+            //     ],
+            //   ),
+            // ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
@@ -146,7 +162,7 @@ class _ProductState extends State<Product> {
               ),
             ),
             StreamBuilder<QuerySnapshot>(
-              stream: productStream!,
+              stream: getStream(),
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   return Text('Error: ${snapshot.error}');
@@ -197,18 +213,6 @@ class _ProductState extends State<Product> {
                     final bPrice = b['price'] as int;
                     return aPrice.compareTo(bPrice);
                   });
-                }else if (selectedSort == '평점 높은 순') {
-                  sortedProductList.sort((a, b) {
-                    final aStarAvg = a['starAvg'] as double? ?? 0.0;
-                    final bStarAvg = b['starAvg'] as double? ?? 0.0;
-                    return bStarAvg.compareTo(aStarAvg);
-                  });
-                } else if (selectedSort == '후기 많은 순') {
-                  sortedProductList.sort((a, b) {
-                    final aReviewCount = a['reviewCount'] as int? ?? 0;
-                    final bReviewCount = b['reviewCount'] as int? ?? 0;
-                    return bReviewCount.compareTo(aReviewCount);
-                  });
                 }
 
                 return GridView.builder(
@@ -246,83 +250,83 @@ class _ProductState extends State<Product> {
                                     productName: productName,
                                     price: price.toString(),
                                     imageUrl: imageUrl,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        width: 150,
-                        height: 100,
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey, width: 1.0),
-                        ),
-                        child: Stack(
-                          children: [
-                            Image.network(
-                              imageUrl,
-                              width: double.infinity,
-                              height: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                padding: EdgeInsets.all(8),
-                                color: Colors.black.withOpacity(0.5),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => ProductView(
-                                              productName: productName,
-                                              price: formattedPrice,
-                                              imageUrl: imageUrl,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Text(
-                                        '$productName (★$starAvg)',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ),
-                                    GestureDetector(
-                                      onTap: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => ProductView(
-                                              productName: productName,
-                                              price: formattedPrice,
-                                              imageUrl: imageUrl,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Text(
-                                        '$formattedPrice 원',
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 10,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                  ),
                                 ),
+                              );
+                            },
+                            child: Container(
+                              width: 150,
+                              height: 100,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey, width: 1.0),
+                              ),
+                              child: Stack(
+                                children: [
+                                  Image.network(
+                                    imageUrl,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                    fit: BoxFit.cover,
+                                  ),
+                                  Positioned(
+                                    bottom: 0,
+                                    left: 0,
+                                    right: 0,
+                                    child: Container(
+                                      padding: EdgeInsets.all(8),
+                                      color: Colors.black.withOpacity(0.8),
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => ProductView(
+                                                    productName: productName,
+                                                    price: formattedPrice,
+                                                    imageUrl: imageUrl,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Text(
+                                              '$productName (★$starAvg)',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => ProductView(
+                                                    productName: productName,
+                                                    price: formattedPrice,
+                                                    imageUrl: imageUrl,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Text(
+                                              '$formattedPrice 원',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                          ],
-                        ),
-                      ),
                           );
                         }
                       },
@@ -413,19 +417,37 @@ class _ProductState extends State<Product> {
 
     if (reviewCount != 0) {
       averageRating /= reviewCount;
+    } else {
+      return 0.0;
     }
 
     starAvg = averageRating;
     return starAvg;
   }
+  Future<double> getAverageRating2(String productName) async {
+    double averageRating = 0.0;
+    double reviewCount = 0.0;
 
-  Future<int> getReviewCount(String productName) async {
-    final querySnapshot = await FirebaseFirestore.instance
+    await FirebaseFirestore.instance
         .collection('review')
         .where('pName', isEqualTo: productName)
-        .get();
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        final star = doc['star'].toDouble();
+        averageRating += star;
+        reviewCount++;
+      });
+    });
 
-    return querySnapshot.docs.length;
+    if (reviewCount != 0) {
+      averageRating /= reviewCount;
+    } else {
+      return 0.0;
+    }
+
+    starAvg = averageRating;
+    return starAvg;
   }
 
 
