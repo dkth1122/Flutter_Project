@@ -26,6 +26,7 @@ class _PortfolioState extends State<Portfolio> {
   late List<PortfolioItem> portfolioItems = [];
   String user = "";
   late PortfolioItem item;
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -44,7 +45,8 @@ class _PortfolioState extends State<Portfolio> {
 
   Future<void> fetchPortfolioItems() async {
     try {
-      QuerySnapshot expertSnapshot = await expertCollection.get();
+      QuerySnapshot expertSnapshot = await expertCollection.where('userId', isEqualTo: user).get();
+      List<PortfolioItem> loadedItems = [];
 
       for (QueryDocumentSnapshot expertDoc in expertSnapshot.docs) {
         QuerySnapshot portfolioSnapshot = await expertDoc.reference.collection('portfolio').get();
@@ -61,19 +63,24 @@ class _PortfolioState extends State<Portfolio> {
               data['thumbnailUrl'],
               data['category'],
             );
-            setState(() {
-              portfolioItems.add(item);
-            });
+            loadedItems.add(item);
           } else {
             print('포트폴리오 항목 데이터가 올바르지 않습니다.');
           }
         }
       }
+
+      setState(() {
+        portfolioItems = loadedItems;
+        isLoading = false;
+      });
     } catch (e) {
       print('포트폴리오 항목 가져오기 오류: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -81,10 +88,10 @@ class _PortfolioState extends State<Portfolio> {
       appBar: AppBar(
         title: Text(
           '포트폴리오',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Color(0xFF4E598C),
-          actions: <Widget>[
+        actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),
             onPressed: () {
@@ -95,31 +102,42 @@ class _PortfolioState extends State<Portfolio> {
       ),
       body: Container(
         padding: EdgeInsets.all(10),
-        child: ListView.builder(
+        child: isLoading
+            ? Center(
+          child: CircularProgressIndicator(), // 로딩 스피너 표시
+        )
+            : portfolioItems.isEmpty
+            ? Center(
+          child: Text(
+            '등록하신 포트폴리오가 없습니다.',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        )
+            : ListView.builder(
           itemCount: portfolioItems.length,
           itemBuilder: (context, index) {
             final item = portfolioItems[index];
             return InkWell(
               onTap: () {
                 print(user);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PortfolioDetailPage(portfolioItem : item, user: user),
-                        ),
-                      );
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PortfolioDetailPage(portfolioItem: item, user: user),
+                  ),
+                );
               },
               child: Column(
                 children: [
-                  SizedBox(height: 10,),
+                  SizedBox(height: 10),
                   Container(
                     height: 100,
                     padding: EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 0.6,
-                            color: Color.fromRGBO(182, 182, 182, 0.6)
-                        )
+                      border: Border.all(
+                        width: 0.6,
+                        color: Color.fromRGBO(182, 182, 182, 0.6),
+                      ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -127,7 +145,7 @@ class _PortfolioState extends State<Portfolio> {
                         Row(
                           children: [
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
+                              borderRadius: BorderRadius.circular(10.0),
                               child: Image.network(
                                 item.thumbnailUrl,
                                 width: 130,
@@ -135,7 +153,7 @@ class _PortfolioState extends State<Portfolio> {
                                 fit: BoxFit.cover,
                               ),
                             ),
-                            SizedBox(width: 10,),
+                            SizedBox(width: 10),
                             Column(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -164,42 +182,16 @@ class _PortfolioState extends State<Portfolio> {
                               style: TextStyle(fontSize: 12),
                             ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
             );
-
-            // return Card(
-            //   child: ListTile(
-            //     leading: Image.network(
-            //       item.thumbnailUrl,
-            //       width: 100,
-            //       height: 100,
-            //     ),
-            //     title: Text(
-            //       item.title,
-            //       style: TextStyle(fontSize: 18),
-            //     ),
-            //     subtitle: Text(item.description),
-            //     onTap: () {
-            //       Navigator.push(
-            //         context,
-            //         MaterialPageRoute(
-            //           builder: (context) => PortfolioDetailPage(portfolioItem : item, user: user),
-            //         ),
-            //       );
-            //     },
-            //   ),
-            // );
           },
         ),
       ),
     );
   }
-
-
-
 }

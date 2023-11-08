@@ -65,6 +65,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
 
 
 
+
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController imageUrlController = TextEditingController();
@@ -138,6 +139,13 @@ class _AddPortfolioState extends State<AddPortfolio> {
       });
     }
   }
+  void _addUser() async {
+    CollectionReference userId = FirebaseFirestore.instance.collection('expert');
+    await userId.doc(user).set({
+      'userId' : user
+    });
+  }
+
 
   // 이미지 선택 메서드
   void _selectSubImage(BuildContext context) async {
@@ -470,37 +478,46 @@ class _AddPortfolioState extends State<AddPortfolio> {
               SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: () {
-                  final portfolioItem = PortfolioItem(
-                    title: titleController.text,
-                    description: descriptionController.text,
-                    thumbnailUrl: thumbImagePath ?? "",
-                    category: selectedCategory,
-                    startDate: startDate,
-                    endDate: endDate,
-                    customer: customer,
-                    industry: industry,
-                    portfolioDescription: portfolioDescription,
-                    hashtags: selectedHashtags,
-                  );
-
-                  if (user != "없음") {
-                    addPortfolioToFirestore(portfolioItem, user);
-                    setState(() {
-                      portfolioItems.add(portfolioItem);
-                    });
+                  if (startDate == null || endDate == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('포트폴리오가 등록되었습니다.'),
+                        content: Text('시작 날짜와 끝 날짜를 선택하세요.'),
                       ),
                     );
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => Portfolio()));
                   } else {
-                    // 사용자가 로그인하지 않은 경우의 처리
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('로그인이 필요한 서비스입니다.'),
-                      ),
+                    _addUser();
+                    final portfolioItem = PortfolioItem(
+                      title: titleController.text,
+                      description: descriptionController.text,
+                      thumbnailUrl: thumbImagePath ?? "",
+                      category: selectedCategory,
+                      startDate: startDate,
+                      endDate: endDate,
+                      customer: customer,
+                      industry: industry,
+                      portfolioDescription: portfolioDescription,
+                      hashtags: selectedHashtags,
                     );
+
+                    if (user != "없음") {
+                      addPortfolioToFirestore(portfolioItem, user);
+                      setState(() {
+                        portfolioItems.add(portfolioItem);
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('포트폴리오가 등록되었습니다.'),
+                        ),
+                      );
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => Portfolio()));
+                    } else {
+                      // 사용자가 로그인하지 않은 경우의 처리
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('로그인이 필요한 서비스입니다.'),
+                        ),
+                      );
+                    }
                   }
                 },
                 child: Text('포트폴리오 등록'),
@@ -508,6 +525,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
                   primary: Color(0xFF4E598C),
                 ),
               ),
+
               SizedBox(height: 16.0),
                 ListView.builder(
                   shrinkWrap: true,

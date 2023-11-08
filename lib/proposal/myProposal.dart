@@ -53,6 +53,7 @@ class _MyProjectProposalState extends State<MyProjectProposal> {
         'sendTime': FieldValue.serverTimestamp(),
         'accept' : 0,//제안을 좋다고 표시한 횟수
         'cnt': 0,//조회수
+        'delYn' : 'N',
       });
 
       _title.clear();
@@ -135,7 +136,7 @@ class _MyProjectProposalState extends State<MyProjectProposal> {
                     _price.clear();
                   } else {
                     int price = int.parse(value);
-                    if (price <= 1 || price > 100000000) {
+                    if (price < 0 || price > 100000000) {
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {

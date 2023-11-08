@@ -14,12 +14,20 @@ class MyProposalList extends StatefulWidget {
 
 class _MyProposalListState extends State<MyProposalList> {
 
+  Future<int> getCount(String title) async {
+    QuerySnapshot snapshot = await FirebaseFirestore.instance
+        .collection('accept')
+        .where('aName', isEqualTo: title)
+        .get();
+
+    return snapshot.size;
+  }
+
   Widget _listMyProposal() {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("proposal")
           .where("user", isEqualTo: widget.userId)
-          // .orderBy("sendTime", descending: true)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
         if (!snap.hasData) {
@@ -30,22 +38,64 @@ class _MyProposalListState extends State<MyProposalList> {
           itemCount: snap.data!.docs.length,
           itemBuilder: (context, index) {
             DocumentSnapshot doc = snap.data!.docs[index];
-            Map<String, dynamic> data =
-            doc.data() as Map<String, dynamic>;
-            return ListTile(
-                title: Text(data["title"]),
-              subtitle: Text(data["content"]),
-              trailing: Text(data["price"].toString()),
-              onTap: (){
-                  Navigator.push(context,  MaterialPageRoute(
-                      builder: (context) => MyProposalView(
-                        user : widget.userId,
-                        proposalTitle: data["title"],
-                        proposalContent: data["content"],
-                        proposalPrice: data["price"],
+            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+            String title = data["title"];
+            return FutureBuilder(
+              future: getCount(title),
+              builder: (BuildContext context, AsyncSnapshot<int> countSnapshot) {
+                if (countSnapshot.connectionState == ConnectionState.waiting) {
+                  return ListTile(
+                    title: Text("$title (로딩 중...)"),
+                    subtitle: Text(data["content"]),
+                    trailing: Text(data["price"].toString()),
+                    onTap: (){
+                      Navigator.push(context,  MaterialPageRoute(
+                        builder: (context) => MyProposalView(
+                          user : widget.userId,
+                          proposalTitle: data["title"],
+                          proposalContent: data["content"],
+                          proposalPrice: data["price"],
+                          proposalDel: data['delYn'],
+                        ),
+                      ),
+                      );
+                    },
+                  );
+                } else {
+                  int count = countSnapshot.data ?? 0;
+                  return ListTile(
+                    title: Text.rich(
+                      TextSpan(
+                        text: title,
+                        style: TextStyle(
+                          decoration: data['delYn'] == 'Y' ? TextDecoration.lineThrough : null,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: " ($count)",
+                            style: TextStyle(
+                              decoration: data['delYn'] == 'Y' ? TextDecoration.lineThrough : null,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
+                      subtitle: Text(data["content"]),
+                      trailing: Text(data["price"].toString()),
+                      onTap: (){
+                        Navigator.push(context,  MaterialPageRoute(
+                          builder: (context) => MyProposalView(
+                            user : widget.userId,
+                            proposalTitle: data["title"],
+                            proposalContent: data["content"],
+                            proposalPrice: data["price"],
+                            proposalDel: data['delYn'],
+                          ),
+                        ),
+                        );
+                      },
                   );
+                }
               },
             );
           },
@@ -53,6 +103,7 @@ class _MyProposalListState extends State<MyProposalList> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

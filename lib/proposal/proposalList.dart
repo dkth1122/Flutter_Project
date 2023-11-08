@@ -53,8 +53,9 @@ class _ProposalListState extends State<ProposalList> {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("proposal")
-          .orderBy("user")
           .where("user", isNotEqualTo: userId)
+          /*.where("delYn", isEqualTo: 'N')*/
+          .orderBy("user")
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
         if (!snap.hasData) {

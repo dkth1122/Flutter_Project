@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class QuestionAnswerView extends StatefulWidget {
   final DocumentSnapshot document;
@@ -36,7 +37,7 @@ class _QuestionAnswerViewState extends State<QuestionAnswerView> {
       appBar: AppBar(title: Text("${data['user']}문의 답변하기"),backgroundColor: Color(0xFFFF8C42),),
       body: Container(
         padding: EdgeInsets.all(10),
-        child: Container(
+        child: SingleChildScrollView(
           child: Column(
             children: [
               Row(
@@ -49,7 +50,13 @@ class _QuestionAnswerViewState extends State<QuestionAnswerView> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  Text('작성일 : ${data['timestamp'].toDate().toString()}'),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text('작성일 : ${DateFormat('yyyy-MM-dd').format(data['timestamp'].toDate())}'),
+                      Text('시간 : ${DateFormat('HH:mm:ss').format(data['timestamp'].toDate())}'),
+                    ],
+                  ),
                 ],
               ),
               SizedBox(height: 10,),
@@ -90,7 +97,7 @@ class _QuestionAnswerViewState extends State<QuestionAnswerView> {
                 ),
               ),
               SizedBox(height: 10,),
-              Expanded(child: _listComments())
+              _listComments()
             ],
           ),
         ),
@@ -110,6 +117,8 @@ class _QuestionAnswerViewState extends State<QuestionAnswerView> {
           return Center(child: CircularProgressIndicator());
         }
         return ListView.builder(
+          physics: NeverScrollableScrollPhysics(), // 스크롤 금지
+          shrinkWrap: true,
           itemCount: snap.data!.docs.length,
           itemBuilder: (context, index) {
             DocumentSnapshot doc = snap.data!.docs[index];
