@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
@@ -133,10 +134,10 @@ class _RevenueState extends State<Revenue> {
         backgroundColor: Color(0xFFFCAF58),
         elevation: 0,
         title: Text(
-          '수익관리',
+          '수익 관리',
           style: TextStyle(
-            color: Colors.black,
-            fontSize: 24.0,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
@@ -162,7 +163,7 @@ class _RevenueState extends State<Revenue> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
-                        child: Text('출금 신청'),
+                        child: Text('출금 신청',style: TextStyle(fontWeight: FontWeight.bold),),
                         onPressed: () async {
                           if (availableEarnings == 0.0) {
                             // 출금 가능 수익이 0인 경우 스낵바 표시
@@ -177,14 +178,14 @@ class _RevenueState extends State<Revenue> {
                               context: context,
                               builder: (context) {
                                 return AlertDialog(
-                                  title: Text('출금 신청 확인'),
+                                  title: Text('출금 신청 확인',style: TextStyle(fontWeight: FontWeight.bold),),
                                   content: Text('출금을 신청하시겠습니까?'),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop(); // 다이얼로그 닫기
                                       },
-                                      child: Text('취소'),
+                                      child: Text('취소',style: TextStyle(fontWeight: FontWeight.bold),),
                                     ),
                                     TextButton(
                                       onPressed: () async {
@@ -199,6 +200,15 @@ class _RevenueState extends State<Revenue> {
                                             'withdraw': 'Y',
                                           });
                                         }
+
+                                        // 스낵바 표시
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('출금 신청이 완료되었습니다.', style: TextStyle(fontWeight: FontWeight.bold)),
+                                            duration: Duration(seconds: 3), // 스낵바 표시 시간
+                                          ),
+                                        );
+
                                         //다이어로그 닫기
                                         Navigator.of(context).pop();
 
@@ -207,7 +217,7 @@ class _RevenueState extends State<Revenue> {
                                         await fetchPrices();
                                         await fetchcompletedWithdraw();
                                       },
-                                      child: Text('출금 신청'),
+                                      child: Text('출금 신청',style: TextStyle(fontWeight: FontWeight.bold),),
                                     ),
                                   ],
                                 );
@@ -225,7 +235,7 @@ class _RevenueState extends State<Revenue> {
                           if (completedWithdrawals == 0.0) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('출금 취소 가능한 금액이 없습니다.'),
+                                content: Text('출금 취소 가능한 금액이 없습니다.',style: TextStyle(fontWeight: FontWeight.bold),),
                                 duration: Duration(seconds: 3),
                               ),
                             );
@@ -234,14 +244,14 @@ class _RevenueState extends State<Revenue> {
                               context: context,
                               builder: (context) {
                                 return AlertDialog(
-                                  title: Text('출금 취소 확인'),
+                                  title: Text('출금 취소 확인',style: TextStyle(fontWeight: FontWeight.bold),),
                                   content: Text('출금을 취소하시겠습니까?'),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop(); // 다이얼로그 닫기
                                       },
-                                      child: Text('취소'),
+                                      child: Text('취소',style: TextStyle(fontWeight: FontWeight.bold),),
                                     ),
                                     TextButton(
                                       onPressed: () async {
@@ -257,15 +267,25 @@ class _RevenueState extends State<Revenue> {
                                             'withdraw': 'N',
                                           });
                                         }
+
+                                        // 스낵바 표시
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('출금 취소 신청이 완료되었습니다.', style: TextStyle(fontWeight: FontWeight.bold)),
+                                            duration: Duration(seconds: 3), // 스낵바 표시 시간
+                                          ),
+                                        );
+
                                         // 다이얼로그 닫기
                                         Navigator.of(context).pop();
+
 
                                         //새로고침
                                         await fetchData();
                                         await fetchPrices();
                                         await fetchcompletedWithdraw();
                                       },
-                                      child: Text('출금 취소'),
+                                      child: Text('출금 취소',style: TextStyle(fontWeight: FontWeight.bold),),
                                     ),
                                   ],
                                 );
@@ -276,7 +296,7 @@ class _RevenueState extends State<Revenue> {
                         style: ElevatedButton.styleFrom(
                           primary: Colors.grey,
                         ),
-                        child: Text('출금 취소'),
+                        child: Text('출금 취소', style: TextStyle(fontWeight: FontWeight.bold),),
                       )
                     ],
                   ),
@@ -313,10 +333,19 @@ class _RevenueState extends State<Revenue> {
                         ),
                         getTitles: (value) {
                           if (value % 500 == 0) {
-                            return value.toInt().toString();
+                            // 만원 단위로 변환
+                            if(value > 9999){
+                              int valueInThousands = (value ~/ 10000);
+                              return '$valueInThousands 만';
+                            }else{
+                              //천단위로 콤마
+                              final formatter = NumberFormat.decimalPattern('en_KR');
+                              return formatter.format(value.toInt());
+                            }
                           }
                           return '';
                         },
+                        reservedSize: 30,
                       ),
                       rightTitles: SideTitles(showTitles: false),
                       topTitles: SideTitles(showTitles: false),
