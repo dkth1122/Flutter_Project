@@ -11,6 +11,7 @@ class MyProposalView extends StatefulWidget {
   final String proposalTitle;
   final String proposalContent;
   final int proposalPrice;
+  final String proposalDel;
 
 
   const MyProposalView({
@@ -18,6 +19,7 @@ class MyProposalView extends StatefulWidget {
     required this.proposalTitle,
     required this.proposalContent,
     required this.proposalPrice,
+    required this.proposalDel,
   });
 
   @override
@@ -197,6 +199,8 @@ class _MyProposalViewState extends State<MyProposalView> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
+                    decoration: widget.proposalDel == 'Y' ? TextDecoration.lineThrough : null,
+                    color: widget.proposalDel == 'Y'? Colors.grey : Colors.black,
                   ),
                 ),
                 Divider(),
@@ -205,6 +209,8 @@ class _MyProposalViewState extends State<MyProposalView> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
+                    decoration: widget.proposalDel == 'Y' ? TextDecoration.lineThrough : null,
+                    color: widget.proposalDel == 'Y' ? Colors.grey : Colors.black,
                   ),
                 ),
                 SizedBox(height: 8),
@@ -212,10 +218,12 @@ class _MyProposalViewState extends State<MyProposalView> {
                 Text('프로젝트 시작일과 종료일은 채팅으로 협의하세요~'),
                 TextButton(
                   onPressed: () {
-                    _showEndDealDialog();
+                    if (widget.proposalDel != 'Y') {
+                      _showEndDealDialog();
+                    }
                   },
                   child: Text(
-                    '거래 종료 하기',
+                    widget.proposalDel == 'Y' ? '거래 종료됨' : '거래종료하기',
                     style: TextStyle(
                       color: Colors.red[200],
                       fontSize: 15,

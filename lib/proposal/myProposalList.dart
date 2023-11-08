@@ -55,6 +55,7 @@ class _MyProposalListState extends State<MyProposalList> {
                           proposalTitle: data["title"],
                           proposalContent: data["content"],
                           proposalPrice: data["price"],
+                          proposalDel: data['delYn'],
                         ),
                       ),
                       );
@@ -63,7 +64,22 @@ class _MyProposalListState extends State<MyProposalList> {
                 } else {
                   int count = countSnapshot.data ?? 0;
                   return ListTile(
-                      title: Text("$title ($count)"),
+                    title: Text.rich(
+                      TextSpan(
+                        text: title,
+                        style: TextStyle(
+                          decoration: data['delYn'] == 'Y' ? TextDecoration.lineThrough : null,
+                        ),
+                        children: [
+                          TextSpan(
+                            text: " ($count)",
+                            style: TextStyle(
+                              decoration: data['delYn'] == 'Y' ? TextDecoration.lineThrough : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                       subtitle: Text(data["content"]),
                       trailing: Text(data["price"].toString()),
                       onTap: (){
@@ -73,6 +89,7 @@ class _MyProposalListState extends State<MyProposalList> {
                             proposalTitle: data["title"],
                             proposalContent: data["content"],
                             proposalPrice: data["price"],
+                            proposalDel: data['delYn'],
                           ),
                         ),
                         );
