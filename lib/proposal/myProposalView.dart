@@ -1,5 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../chat/chat.dart';
+import '../join/login_email.dart';
+import '../join/userModel.dart';
 
 class MyProposalView extends StatefulWidget {
   final String user;
@@ -20,6 +25,112 @@ class MyProposalView extends StatefulWidget {
 }
 
 class _MyProposalViewState extends State<MyProposalView> {
+  get chatUser => null;
+
+
+  void _toggleChat(String chatUser) async {
+    UserModel userModel = Provider.of<UserModel>(context, listen: false);
+
+    String user = userModel.isLogin ? userModel.userId! : "없음";
+    print("채팅유저 ===> $chatUser");
+
+    if (!userModel.isLogin) {
+      _showLoginAlert(context);
+      return;
+    }
+
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+
+    // user1과 user2 중에서 큰 값을 선택하여 user1에 할당
+    String user1 = chatUser.compareTo(um.userId.toString()) > 0 ? chatUser : um.userId.toString();
+    String user2 = chatUser.compareTo(um.userId.toString()) > 0 ? um.userId.toString() : chatUser;
+
+    // Firestore 데이터베이스에 채팅방을 생성하는 함수
+    Future<void> createChatRoom(String roomId, String user1, String user2) async {
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      CollectionReference chatRoomsCollection = firestore.collection("chat");
+      String roomId = '$user1' + '_' + '$user2';
+
+      // 채팅방 ID를 사용하여 Firestore에 채팅방을 추가
+      await chatRoomsCollection.doc(roomId).set({
+        'user1': user1,
+        'user2': user2,
+        'roomId' : roomId, // 채팅방 생성 일시
+      });
+    }
+
+    // 두 사용자 간의 채팅방 ID 확인 및 생성
+    String getOrCreateChatRoomId(String user1, String user2) {
+      String chatRoomId = '$user1' + '_' + '$user2';
+      // Firestore에서 채팅방 ID를 확인하고, 존재하지 않으면 생성
+      bool chatRoomExists = false; // Firestore에서 채팅방 존재 여부 확인하는 로직;
+      if (!chatRoomExists) {
+        // 채팅방이 없다면 생성
+        createChatRoom(chatRoomId, user1, user2);
+      }
+      return chatRoomId;
+    }
+
+    void _showPurchaseAlert(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('알림'),
+            content: Text('로그인 후 이용 가능한 서비스입니다.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('확인'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    //채팅방으로 이동
+    void moveToChatRoom(BuildContext context, String chatRoomId) {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => ChatApp(roomId: chatRoomId),
+      ));
+    }
+
+    //메소드 실행
+    String chatRoomId = getOrCreateChatRoomId(user1, user2);
+    moveToChatRoom(context, chatRoomId);
+  }
+
+  void _showLoginAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('알림'),
+          content: Text('로그인 후 이용 가능한 서비스입니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
+    ).then((value) {
+      if (value != null && value is bool && value) {
+        // 로그인 페이지로 이동하는 코드 작성
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,6 +232,7 @@ class _MyProposalViewState extends State<MyProposalView> {
                   }
                   if (userSnapshot.hasData) {
                     var user = userSnapshot.data!.docs[0];
+                    var uid = user['userId'];
                     return ListTile(
                       leading: Container(
                         width: 50, // 원하는 가로 크기
@@ -137,9 +249,9 @@ class _MyProposalViewState extends State<MyProposalView> {
                       subtitle: Text(user['userId']),
                       trailing: TextButton(
                         onPressed: () {
-                          // 1:1 문의하기 기능
+                          _toggleChat(uid);
                         },
-                        child: Text('1:1 문의하기'),
+                        child: Text("1:1문의하기"),
                       ),
                     );
                   }
@@ -155,3 +267,4 @@ class _MyProposalViewState extends State<MyProposalView> {
   }
 
 }
+
