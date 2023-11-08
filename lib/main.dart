@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:intl/intl.dart';
 import 'package:project_flutter/product/productView.dart';
 import 'package:project_flutter/search/search.dart';
 import 'package:project_flutter/bottomBar.dart';
@@ -122,7 +123,6 @@ class _MyHomePageState extends State<MyHomePage> {
   int _current2 = 0;
   final CarouselController _controller = CarouselController();
   // 1초에 한번씩 로딩되는 문제를 해결하기 위해 밖으로 뺏음
-  // 현재는 가격 낮은 순으로 정렬했지만 cnt가 추가되면 조회수 높은 순으로 할 예정
   final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").orderBy("cnt", descending: true).limit(4).snapshots();
   final Stream<QuerySnapshot> productStream2 = FirebaseFirestore.instance.collection("product")
       .where("likeCnt", isGreaterThanOrEqualTo: 1)
@@ -579,13 +579,14 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           ],
                         ),
+
                         ListTile(
                           title: Text(
                             data['pDetail'].length > 15
                                 ? '${data['pDetail'].substring(0, 15)}...'
                                 : data['pDetail'],
                           ),
-                          subtitle: Text("가격 : ${data['price']}"),
+                          subtitle: Text("가격 : ${NumberFormat('#,###').format(data['price'])}원"),
                         ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
