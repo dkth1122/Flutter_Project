@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class MyProposalView extends StatefulWidget {
@@ -68,7 +69,17 @@ class _MyProposalViewState extends State<MyProposalView> {
                 SizedBox(height: 8),
                 Text('예산: ${widget.proposalPrice.toString()}원'),
                 Text('프로젝트 시작일과 종료일은 채팅으로 협의하세요~'),
-                // 다른 프로젝트 세부 정보 추가
+                Divider(color :Colors.grey),
+                Text(
+                  '제안한 전문가 목록',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                _buildUserList(widget.proposalTitle),
+                SizedBox(height: 20), // 여기에 새로운 위젯 추가
+                // 다른 새로운 위젯 추가
               ],
             ),
           ),
@@ -76,4 +87,71 @@ class _MyProposalViewState extends State<MyProposalView> {
       ),
     );
   }
+
+  Widget _buildUserList(String proposalTitle) {
+    return FutureBuilder(
+      future: FirebaseFirestore.instance
+          .collection('accept')
+          .where('aName', isEqualTo: proposalTitle)
+          .get(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        }
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        }
+        if (snapshot.hasData) {
+          return ListView.builder(
+            shrinkWrap: true,
+            itemCount: snapshot.data!.docs.length,
+            itemBuilder: (context, index) {
+              var uid = snapshot.data!.docs[index]['uId'];
+              return FutureBuilder(
+                future: FirebaseFirestore.instance
+                    .collection('userList')
+                    .where('userId', isEqualTo: uid)
+                    .get(),
+                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> userSnapshot) {
+                  if (userSnapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  }
+                  if (userSnapshot.hasError) {
+                    return Text('Error: ${userSnapshot.error}');
+                  }
+                  if (userSnapshot.hasData) {
+                    var user = userSnapshot.data!.docs[0];
+                    return ListTile(
+                      leading: Container(
+                        width: 50, // 원하는 가로 크기
+                        height: 50, // 원하는 세로 크기
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle, // 사각형 모양으로 설정
+                          image: DecorationImage(
+                            fit: BoxFit.cover,
+                            image: NetworkImage(user['profileImageUrl']),
+                          ),
+                        ),
+                      ),
+                      title: Text(user['nick']),
+                      subtitle: Text(user['userId']),
+                      trailing: TextButton(
+                        onPressed: () {
+                          // 1:1 문의하기 기능
+                        },
+                        child: Text('1:1 문의하기'),
+                      ),
+                    );
+                  }
+                  return SizedBox(); // Placeholder for future state
+                },
+              );
+            },
+          );
+        }
+        return SizedBox(); // Placeholder for future state
+      },
+    );
+  }
+
 }
