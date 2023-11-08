@@ -48,13 +48,12 @@ class _ProposalListState extends State<ProposalList> {
 
   Widget _listProposal() {
     UserModel userModel = Provider.of<UserModel>(context, listen: false);
-    final userId = userModel.userId;
 
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("proposal")
-          /*.where("delYn", isEqualTo: 'N')*/
-          .where("user", isNotEqualTo: userId)
+          .where("delYn", isEqualTo: 'N')
+          .where("user", isNotEqualTo: userModel.userId)
           .orderBy("user")
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
