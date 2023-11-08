@@ -40,14 +40,6 @@ class _ChatListState extends State<ChatList> {
         title: Row(
           children: [
             Text("채팅 목록"),
-            TextButton(onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => AdForm(),
-                ),
-              );
-            }, child: Text("이동"))
           ],
         ),
         backgroundColor: Color(0xFFFCAF58),
@@ -87,11 +79,19 @@ class _ChatListState extends State<ChatList> {
             final data = document.data() as Map<String, dynamic>;
             final String? user1Value = data['user1'] as String?;
             final String? user2Value = data['user2'] as String?;
-            // 사용자 ID에 따라 필터링하려면 다음과 같이 조건을 추가하십시오.
+            final String? status = data['status'] as String?;
+
+            // 사용자 ID에 따라 필터링
             if (user1Value != user1 && user2Value != user1) {
-              // 사용자1과 일치하지 않는 경우 또는 사용자2와 일치하지 않는 경우 이 채팅방을 건너뜁니다.
+              // 사용자1과 일치하지 않는 경우 또는 사용자2와 일치하지 않는 경우 이 채팅방을 건너뜀
               return Container();
             }
+
+            if (status == '$user1 D') {
+              // 상태가 "D"인 채팅방은 건너뛰기
+              return Container();
+            }
+
             final chatTitle = (user1Value != null && user1Value == user1)
                 ? '$user2Value 님과의 채팅'
                 : '$user1Value 님과의 채팅';
@@ -269,31 +269,30 @@ class _ChatListState extends State<ChatList> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text('채팅방 나가기'),
-          content: Text('정말로 이 채팅방을 나가시겠습니까?'),
-          actions: [
+            title: Text('채팅방 나가기'),
+            content: Text('정말로 이 채팅방을 나가시겠습니까?'),
+            actions: [
             TextButton(
-              onPressed: () {
-                // "status" 필드를 "D"로 설정하여 채팅방 비활성화
-                FirebaseFirestore.instance
-                    .collection('chat')
-                    .doc(roomId)
-                    .update({'status': '$user1 D'})
-                    .then((value) {
-                  Navigator.of(context).pop();
-                });
-              },
-              child: Text('나가기'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('취소'),
-            ),
-          ],
-        );
-      },
+            onPressed: () {
+          // "status" 필드를 "D"로 설정하여 채팅방 비활성화
+          FirebaseFirestore.instance
+              .collection('chat')
+              .doc(roomId)
+              .update({'status': '$user1 D'})
+              .then((value) {
+            Navigator.of(context).pop();
+          });
+        },
+        child: Text('나가기'),
+        ),
+        TextButton(
+        onPressed: () {
+        Navigator.of(context).pop();
+        },
+        child: Text('취소'),)
+      ],
     );
-  }
+  },
+  );
+}
 }
