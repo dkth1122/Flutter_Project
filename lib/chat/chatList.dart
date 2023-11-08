@@ -20,6 +20,12 @@ class _ChatListState extends State<ChatList> {
   //마지막 메시지 시간
   String timeFormat = "";
 
+  //내가 아닌 유저
+  String otherUser = "";
+
+  //이미지
+  String url = "assets/profile.png";
+
   @override
   void initState() {
     super.initState();
@@ -108,23 +114,11 @@ class _ChatListState extends State<ChatList> {
                   .get(),
               builder: (context, AsyncSnapshot<QuerySnapshot> lastMessageSnapshot) {
                 if (lastMessageSnapshot.connectionState == ConnectionState.waiting) {
-                  return ListTile(
-                    title: Text(chatTitle),
-                    subtitle: Text('로딩중'),
-                    leading: CircleAvatar(
-                      backgroundImage: AssetImage('assets/dog1.PNG'),
-                    ),
-                  );
+                  return Center(child: CircularProgressIndicator());
                 }
 
                 if (lastMessageSnapshot.hasError) {
-                  return ListTile(
-                    title: Text(chatTitle),
-                    subtitle: Text('로드 실패.'),
-                    leading: CircleAvatar(
-                      backgroundImage: AssetImage('assets/dog1.PNG'),
-                    ),
-                  );
+                  return Center(child: CircularProgressIndicator());
                 }
 
                 String lastMessageText = 'No last message';
@@ -135,14 +129,13 @@ class _ChatListState extends State<ChatList> {
                   lastMessageText = lastMessageData['text'] as String? ?? 'No last message';
                   final String? lastMessageImageUrl = lastMessageData['imageUrl'] as String?;
 
-                  if (lastMessageImageUrl != null && lastMessageImageUrl.isNotEmpty) {
-                    trailingWidget = Image.network(lastMessageImageUrl, width: 40, height: 40);
+                  if (lastMessageImageUrl != null && lastMessageImageUrl!.isNotEmpty) {
+                    trailingWidget = Image.network(lastMessageImageUrl!, width: 40, height: 40);
                   }
                   // sendTime을 표시하기 위한 코드 수정
                   final lastMessageTime = lastMessageData['sendTime'] as Timestamp?;
                   final messageDateTime = lastMessageTime?.toDate();
                   timeFormat = DateFormat.jm().format(messageDateTime!);
-
                 }
 
                 return Card(
@@ -154,6 +147,7 @@ class _ChatListState extends State<ChatList> {
                   ),
                   child: InkWell(
                     onTap: () async {
+                      // Firestore 데이터를 가져올 때 사용자 데이터를 초기화
                       await Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -176,7 +170,7 @@ class _ChatListState extends State<ChatList> {
                           CircleAvatar(
                             radius: 30,
                             // Add profile image here
-                            backgroundImage: AssetImage('assets/dog1.PNG'),
+                            backgroundImage: AssetImage(url),
                           ),
                           SizedBox(width: 16),
                           Expanded(
