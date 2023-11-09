@@ -34,48 +34,74 @@ class _CategoryProductState extends State<CategoryProduct> {
   @override
   Widget build(BuildContext context) {
     String sendText = widget.sendText;
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Text(
-          '카테고리',
-          style: TextStyle(
-            color: Color(0xff424242),
-            fontWeight: FontWeight.bold,
+    return MaterialApp(
+      theme: ThemeData(
+        fontFamily: 'Pretendard',
+      ),
+      home: DefaultTabController(
+        length: 2, // 탭의 수 (여기서는 2개)
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              '${sendText} 목록',
+              style: TextStyle(color:Color(0xff424242), fontWeight: FontWeight.bold),
+            ),
+            centerTitle: true,
+            elevation: 1.0,
+            backgroundColor: Colors.white,
+            iconTheme: IconThemeData(color: Color(0xff424242)),
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+            bottom: TabBar(
+              tabs: [
+                Tab(
+                  text: '서비스',
+                ),
+                Tab(
+                  text: '포트폴리오',
+                ),
+              ],
+              labelColor:Color(0xFFFF8C42), // 선택된 탭의 텍스트 컬러
+              unselectedLabelColor: Color(0xff424242), // 선택되지 않은 탭의 텍스트 컬러
+              indicator: BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Color(0xFFFF8C42), // 밑줄의 색상을 변경하려면 여기에서 지정
+                    width: 3.0, // 밑줄의 두께를 조절할 수 있습니다.
+                  ),
+                ),
+              ),
+              labelStyle: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
-        ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          color: Color(0xff424242),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: 10,),
-            Text(
-              "$sendText 카테고리",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10,),
-            Text("서비스"),
-            Container(
-                padding: EdgeInsets.all(10),
-                child: _categoryProductList(sendText)
-            ),
-            Text("포트폴리오"),
-            Container(
-                padding: EdgeInsets.all(10),
-                child: _categoryPortfolioList(sendText)
-            ),
-          ],
+          body: TabBarView(
+            children: [
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _categoryProductList(sendText)
+                  ],
+                ),
+              ),
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _categoryPortfolioList(sendText)
+                  ],
+                ),
+              ),
+            ],
+          ),
+          bottomNavigationBar: SubBottomBar(),
+
         ),
       ),
-      bottomNavigationBar: SubBottomBar(),
+
+
     );
   }
 

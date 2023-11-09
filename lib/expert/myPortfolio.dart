@@ -86,11 +86,19 @@ class _PortfolioState extends State<Portfolio> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
         title: Text(
-          '포트폴리오',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          '나의 포트폴리오',
+          style: TextStyle(color: Color(0xff424242), fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Color(0xFF4E598C),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.add),

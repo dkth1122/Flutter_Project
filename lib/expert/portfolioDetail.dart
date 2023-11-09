@@ -115,7 +115,13 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SizedBox(height: 10),
-                    Text('작성자 : ${widget.user}', style: TextStyle(fontSize: 18)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('작성자 : ${widget.user}', style: TextStyle(fontSize: 18)),
+                        Text('조회수 : ${data['cnt']}', style: TextStyle(fontSize: 14)),
+                      ],
+                    ),
                     SizedBox(height: 10),
                     Text('카테고리 > ${data['category']}', style: TextStyle(fontSize: 16)),
                     SizedBox(height: 10),

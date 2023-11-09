@@ -55,7 +55,13 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SizedBox(height: 10),
-                    Text('작성자 : ${widget.user}', style: TextStyle(fontSize: 18)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('작성자 : ${widget.user}', style: TextStyle(fontSize: 18)),
+                        Text('조회수 : ${widget.portfolioItem['cnt']}', style: TextStyle(fontSize: 14)),
+                      ],
+                    ),
                     SizedBox(height: 10),
                     Text('카테고리 > ${widget.portfolioItem['category']}', style: TextStyle(fontSize: 16)),
                     SizedBox(height: 10),
@@ -179,16 +185,21 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
     // 'portfolio' 서브컬렉션의 문서들을 가져옵니다.
     firestore.collection('expert').doc(documentId).collection('portfolio').get().then((querySnapshot) {
       querySnapshot.docs.forEach((doc) {
-        // 각 문서의 'cnt' 필드를 1 증가시킵니다.
-        int currentCount = doc['cnt'];
-        int updatedCount = currentCount + 1;
+        String title = doc['title'];
 
-        // 'cnt' 필드를 업데이트합니다.
-        doc.reference.update({
-          'cnt': updatedCount,
-        });
+        if (title == widget.portfolioItem['title']) {
+          if (doc.data().containsKey('cnt')) {
+            int currentCount = doc['cnt'];
+            int updatedCount = currentCount + 1;
+
+            doc.reference.update({
+              'cnt': updatedCount,
+            });
+          }
+        }
       });
     });
   }
+
 
 }
