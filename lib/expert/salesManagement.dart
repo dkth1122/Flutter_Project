@@ -253,15 +253,6 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
                 elevation: 16, // 드롭다운 메뉴의 elevation
                 dropdownColor: Colors.white, // 드롭다운 메뉴의 배경색다운 메뉴의 배경색
                 underline: Container(),
-                decoration: InputDecoration( // 드롭다운 버튼의 데코레이션 설정
-                  contentPadding: EdgeInsets.symmetric(horizontal: 10), // 내용 영역의 패딩 설정
-                  filled: true, // 배경 색상 채우기
-                  fillColor: Colors.white, // 배경 색상
-                  border: OutlineInputBorder( // 라운드된 테두리 설정
-                    borderRadius: BorderRadius.circular(10), // 원하는 라운드된 테두리 반지름 설정
-                    borderSide: BorderSide(color: Colors.orange, width: 2), // 테두리 색상과 두께 설정
-                  ),
-                ),
               ),
             ],
           ),
