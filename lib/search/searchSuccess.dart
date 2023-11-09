@@ -112,6 +112,7 @@ class _SearchSuccessState extends State<SearchSuccess> {
                       productName: productName,
                       price: formattedPrice,
                       imageUrl: imageUrl,
+                      category: document['category'],
                     ),
                   ),
                 );

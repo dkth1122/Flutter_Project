@@ -472,6 +472,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       productName: data['pName'],
                       price: data['price'].toString(),
                       imageUrl: data['iUrl'],
+                      category: data['category'],
                     ),
                   ),
                 );
@@ -620,6 +621,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       productName: data['pName'],
                       price: data['price'].toString(),
                       imageUrl: data['iUrl'],
+                      category: data['category'],
                     ),
                   ),
                 );

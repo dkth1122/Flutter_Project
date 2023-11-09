@@ -113,6 +113,7 @@ class _CategoryProductState extends State<CategoryProduct> {
                       productName: productName,
                       price: formattedPrice,
                       imageUrl: imageUrl,
+                      category: document['category'] as String,
                     ),
                   ),
                 );

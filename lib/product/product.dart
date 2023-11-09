@@ -259,6 +259,7 @@ class _ProductState extends State<Product> {
                                     productName: productName,
                                     price: price.toString(),
                                     imageUrl: imageUrl,
+                                    category: document['category'] as String,
                                   ),
                                 ),
                               );
@@ -296,6 +297,7 @@ class _ProductState extends State<Product> {
                                                     productName: productName,
                                                     price: formattedPrice,
                                                     imageUrl: imageUrl,
+                                                    category: document['category'] as String,
                                                   ),
                                                 ),
                                               );
@@ -317,6 +319,7 @@ class _ProductState extends State<Product> {
                                                     productName: productName,
                                                     price: formattedPrice,
                                                     imageUrl: imageUrl,
+                                                    category: document['category'] as String ,
                                                   ),
                                                 ),
                                               );

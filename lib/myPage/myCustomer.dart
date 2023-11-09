@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/expert/my_expert.dart';
 import 'package:project_flutter/main.dart';
+import 'package:project_flutter/myPage/myCoupon.dart';
 import 'package:project_flutter/proposal/myProposal.dart';
 import 'package:project_flutter/myPage/purchaseManagement.dart';
 import 'package:project_flutter/subBottomBar.dart';
@@ -237,15 +238,29 @@ class _MyCustomerState extends State<MyCustomer> {
                 ],
               ),
             ),
-          Container(
-              margin: EdgeInsets.fromLTRB(10, 0, 10, 5),
-              width: double.infinity,
-              height: 100,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(20.0),
+          InkWell(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => MyCoupon()));
+            },
+            child: Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("5장", style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),),
+                  SizedBox(height: 5,),
+                  Divider(),
+                  Text("할인 쿠폰", style: TextStyle(fontSize:18, color: Colors.grey, fontWeight: FontWeight.bold),)
+                ],
               ),
-            ),
+                margin: EdgeInsets.fromLTRB(10, 0, 10, 5),
+                width: double.infinity,
+                height: 100,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+              ),
+          ),
             Divider(
               color: Colors.grey,
               thickness: 5.0,

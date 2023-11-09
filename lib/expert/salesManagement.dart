@@ -309,6 +309,7 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
                                   productName: salesItem.pName,
                                   price: salesItem.price.toString(),
                                   imageUrl: salesItem.imgUrl,
+                                  category: salesItem.category,
                                 )),
                               );
                             },

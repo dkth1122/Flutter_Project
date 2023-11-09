@@ -202,6 +202,7 @@ class ServiceListView extends StatelessWidget {
         int price = productPrices[index];
         String iUrl = productUrls[index];
         String pName = likeData[index]['pName'];
+        String category = likeData[index]['category'];
         return ListTile(
           leading:Image.network(
               iUrl, width: 100,),
@@ -215,6 +216,7 @@ class ServiceListView extends StatelessWidget {
                   productName: pName,
                   price: price.toString(),
                   imageUrl: iUrl,
+                  category: '',
                 ),
               ),
             );
