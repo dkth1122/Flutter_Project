@@ -10,6 +10,7 @@ import '../join/userModel.dart';
 import '../myPage/editProfile.dart';
 import '../proposal/myProposalList.dart';
 import '../proposal/proposalList.dart';
+import '../subBottomBar.dart';
 import 'messageResponse.dart';
 import 'myPortfolio.dart';
 
@@ -147,28 +148,23 @@ class _MyExpertState extends State<MyExpert> {
       appBar: AppBar(
         title: Text(
           "마이페이지",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Color(0xff424242), fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Color(0xFF4E598C),
+        backgroundColor: Colors.white,
         elevation: 1.0,
         iconTheme: IconThemeData(color: Colors.white),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
+          color: Color(0xff424242),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         actions: [
-          TextButton(
-            child: Text(
-              "계정 설정",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+          IconButton(
+          color: Color(0xFFFF8C42),
+            icon: Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
                 context,
@@ -239,7 +235,7 @@ class _MyExpertState extends State<MyExpert> {
                   Container(
                     child: Column(
                       children: [
-                        Text("작업가능한 프로젝트를 확인하시고 금액을 제안해 주세용."),
+                        Text("작업 가능한 프로젝트를 확인하시고 금액을 제안해 주세요."),
                         Column(
                           children: [
                             ElevatedButton(
@@ -314,7 +310,7 @@ class _MyExpertState extends State<MyExpert> {
                   ),
                   SizedBox(height: 10),
                   Text(
-                    '3개월 이내 판매중인 건수:',
+                    '3개월 이내 판매 중인 건수:',
                     style: TextStyle(fontSize: 18),
                   ),
                   FutureBuilder<int>(
@@ -409,6 +405,7 @@ class _MyExpertState extends State<MyExpert> {
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 
@@ -501,17 +498,11 @@ class _MyExpertState extends State<MyExpert> {
                   );
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.white),
-                  side: MaterialStateProperty.all(
-                    BorderSide(
-                      color: Color(0xff424242),
-                      width: 0.5,
-                    ),
-                  ),
+                  backgroundColor: MaterialStateProperty.all(Color(0xFFFF8C42)),
                 ),
                 child: Text(
                   '의뢰인으로 전환',
-                  style: TextStyle(color: Color(0xff424242)),
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
