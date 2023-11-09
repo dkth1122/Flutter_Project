@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:project_flutter/subBottomBar.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
@@ -51,6 +52,7 @@ class _AllPortfolioListState extends State<AllPortfolioList> {
 
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
   Widget searchListPortFolio() {
@@ -293,6 +295,7 @@ class _AllPortfolioListState extends State<AllPortfolioList> {
           },
         );
       },
+
     );
   }
 }

@@ -197,10 +197,10 @@ class _MyLikeListListState extends State<MyLikeList> {
 class ServiceListView extends StatelessWidget {
   final List<int> productPrices;
   final List<String> productUrls;
-  final List<String> category;
+  final List<String> categorys;
   final List<Map<String, dynamic>> likeData;
 
-  ServiceListView(this.productPrices, this.productUrls, this.category, this.likeData);
+  ServiceListView(this.productPrices, this.productUrls, this.categorys, this.likeData);
 
   @override
   Widget build(BuildContext context) {
@@ -210,23 +210,35 @@ class ServiceListView extends StatelessWidget {
         int price = productPrices[index];
         String iUrl = productUrls[index];
         String pName = likeData[index]['pName'];
-        return ListTile(
-          leading:Image.network(
-              iUrl, width: 100,),
-          title: Text(pName),
-          subtitle:Text(' $price 원'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProductView(
-                  productName: pName,
-                  price: price.toString(),
-                  imageUrl: iUrl,
+        String category = categorys[index];
+        return Container(
+          height: 100,
+          padding: EdgeInsets.all(5),
+          decoration: BoxDecoration(
+              border: Border.all(
+                  width: 0.6,
+                  color: Color.fromRGBO(182, 182, 182, 0.6)
+              )
+          ),
+          child: ListTile(
+            leading:Image.network(
+                iUrl, width: 100,),
+            title: Text(pName,style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+            subtitle:Text(' $price 원'),
+            trailing: Text(category),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ProductView(
+                    productName: pName,
+                    price: price.toString(),
+                    imageUrl: iUrl,
+                  ),
                 ),
-              ),
-            );
-          }
+              );
+            }
+          ),
         );
       },
     );

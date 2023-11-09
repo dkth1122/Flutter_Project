@@ -115,12 +115,12 @@ class _ProposalViewState extends State<ProposalView> {
       appBar: AppBar(
         title: Text(
           '${widget.proposer}의 프로젝트',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color:Color(0xff424242), fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor:Color(0xFF4E598C),
         elevation: 1.0,
-        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Color(0xff424242)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
