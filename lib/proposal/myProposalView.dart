@@ -169,12 +169,12 @@ class _MyProposalViewState extends State<MyProposalView> {
       appBar: AppBar(
         title: Text(
           widget.proposalTitle,
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Color(0xff424242), fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Color(0xFFFCAF58),
+        backgroundColor: Colors.white,
         elevation: 1.0,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Color(0xff424242),),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -215,6 +215,7 @@ class _MyProposalViewState extends State<MyProposalView> {
                 ),
                 SizedBox(height: 8),
                 Text('예산: ${widget.proposalPrice.toString()}원'),
+                SizedBox(height: 8),
                 Text('프로젝트 시작일과 종료일은 채팅으로 협의하세요~'),
                 TextButton(
                   onPressed: () {
@@ -292,7 +293,7 @@ class _MyProposalViewState extends State<MyProposalView> {
                     return Dismissible(
                       key: UniqueKey(), // 고유한 키로 설정
                       background: Container(
-                        color:Color(0xFF4E598C), // 스와이프 배경 색상
+                        color:Color(0xFFFF8C42), // 스와이프 배경 색상
                         alignment: Alignment.centerLeft,
                         padding: EdgeInsets.only(left: 20),
                         child: Icon(
@@ -329,7 +330,7 @@ class _MyProposalViewState extends State<MyProposalView> {
                           onPressed: () {
                             _toggleChat(uid);
                           },
-                          child: Text("1:1문의하기"),
+                          child: Text("1:1문의하기>>", style: TextStyle(color: Color(0xFFFF8C42), fontWeight: FontWeight.bold),),
                         ),
                       ),
                     );

@@ -146,12 +146,12 @@ class _MyProposalListState extends State<MyProposalList> {
       appBar: AppBar(
         title: Text(
           "내가 의뢰한 프로젝트",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Color(0xff424242), fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Color(0xFFFCAF58),
+        backgroundColor: Colors.white,
         elevation: 1.0,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Color(0xff424242),),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -165,7 +165,7 @@ class _MyProposalListState extends State<MyProposalList> {
                     context,
                     MaterialPageRoute(builder: (context) => MyProjectProposal()));
               },
-              child: Text("의뢰하기"))
+              child: Text("의뢰하기", style: TextStyle(color:Color(0xFFFF8C42) ),))
         ],
       ),
       body: SingleChildScrollView(
