@@ -45,7 +45,7 @@ class _ChatListState extends State<ChatList> {
       appBar: AppBar(
         title: Row(
           children: [
-            Text("채팅 목록"),
+            Text("채팅 목록", style: TextStyle(fontWeight: FontWeight.bold),),
           ],
         ),
         backgroundColor: Color(0xFFFCAF58),

@@ -80,7 +80,7 @@
     Widget build(BuildContext context) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Chat App', textAlign: TextAlign.center, style: TextStyle(color: Colors.white)),
+          title: Text('Chat App', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           backgroundColor: Color(0xFFFCAF58),
           actions: <Widget>[
             IconButton(

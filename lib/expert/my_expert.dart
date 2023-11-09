@@ -26,6 +26,14 @@ class _MyExpertState extends State<MyExpert> {
   late Map<String, dynamic> data;
   String profileImageUrl = '';
 
+  //등급용
+  String user = '';
+  String expertRating = 'New'; // 기본 등급
+  int documentCount = 0;
+  num totalAmount = 0;
+
+  String rating = "";
+
 
   _MyExpertState({required this.userId});
 
@@ -33,6 +41,20 @@ class _MyExpertState extends State<MyExpert> {
   void initState() {
     super.initState();
     loadExpertProfileImageUrl(); // 프로필 이미지 URL을 로드
+
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+
+    if (um.isLogin) {
+      user = um.userId!;
+      calculateExpertRating(user).then((rating) {
+        setState(() {
+          expertRating = rating;
+        });
+      });
+    } else {
+      user = '없음';
+      print('로그인 X');
+    }
   }
 
   void loadExpertProfileImageUrl() async {
@@ -55,6 +77,68 @@ class _MyExpertState extends State<MyExpert> {
     }
   }
 
+  //등급 출력용
+  Future<String> calculateExpertRating(String userId) async {
+    // Firebase.initializeApp()를 호출하지 않고 이미 초기화되었다고 가정하고 진행
+    final firestore = FirebaseFirestore.instance;
+
+    // Calculate the total order amount for the user
+    QuerySnapshot querySnapshot = await firestore
+        .collection('orders')
+        .where('seller', isEqualTo: userId)
+        .get();
+
+    for (QueryDocumentSnapshot document in querySnapshot.docs) {
+      totalAmount += document['price'];
+    }
+
+    //문서가 총 몇개 있는지
+    documentCount = querySnapshot.size;
+
+    // Determine the expert rating based on the total order amount
+    rating = 'New 🌱';
+
+    if (documentCount >= 1 || totalAmount >= 5000) {
+      setState(() {
+        rating = 'LEVEL 1 🍀';
+      });
+    }
+
+    if (documentCount >= 15 || totalAmount >= 5000000) {
+      setState(() {
+        rating = 'LEVEL 2 🌷';
+      });
+    }
+
+    if (documentCount >= 100 || totalAmount >= 20000000) {
+      setState(() {
+        rating = 'LEVEL 3 🌺';
+      });
+    }
+
+    if (documentCount >= 300 || totalAmount >= 80000000) {
+      setState(() {
+        rating = 'MASTER 💐';
+      });
+    }
+
+    DocumentReference userDocumentRef = firestore.collection('rating').doc(userId);
+
+    if (userDocumentRef != null) {
+      // 이미 해당 사용자의 문서가 존재하는 경우, "set"을 사용하여 업데이트
+      userDocumentRef.set({
+        'user': userId,
+        'rating': rating,
+      });
+    } else {
+      // 해당 사용자의 문서가 없는 경우, "add"를 사용하여 새로운 문서 추가
+      firestore.collection('rating').add({
+        'user': userId,
+        'rating': rating,
+      });
+    }
+    return rating;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +212,15 @@ class _MyExpertState extends State<MyExpert> {
               decoration: BoxDecoration(
                 color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(20.0),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("내 등급", style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),),
+                  SizedBox(height: 5,),
+                  Divider(),
+                  Text("$rating", style: TextStyle(fontSize:18, color: Colors.grey, fontWeight: FontWeight.bold),)
+                ],
               ),
             ),
             Divider(

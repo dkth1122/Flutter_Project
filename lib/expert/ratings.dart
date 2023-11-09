@@ -72,7 +72,7 @@ class _ExpertRatingState extends State<ExpertRating> {
       });
     } else {
       user = '없음';
-      print('로그인X');
+      print('로그인 X');
     }
   }
 
@@ -94,29 +94,29 @@ class _ExpertRatingState extends State<ExpertRating> {
     documentCount = querySnapshot.size;
 
     // Determine the expert rating based on the total order amount
-    String rating = 'New';
+    String rating = 'New 🌱';
 
     if (documentCount >= 1 || totalAmount >= 5000) {
       setState(() {
-        rating = 'LEVEL 1';
+        rating = 'LEVEL 1 🍀';
       });
     }
 
     if (documentCount >= 15 || totalAmount >= 5000000) {
       setState(() {
-        rating = 'LEVEL 2';
+        rating = 'LEVEL 2 🌷';
       });
     }
 
     if (documentCount >= 100 || totalAmount >= 20000000) {
       setState(() {
-        rating = 'LEVEL 3';
+        rating = 'LEVEL 3 🌺';
       });
     }
 
     if (documentCount >= 300 || totalAmount >= 80000000) {
       setState(() {
-        rating = 'MASTER';
+        rating = 'MASTER 💐';
       });
     }
 
