@@ -148,7 +148,7 @@ class _ExpertRatingState extends State<ExpertRating> {
     return Scaffold(
       appBar: AppBar(
         title: Text('전문가 등급', style: TextStyle(fontWeight: FontWeight.bold),),
-        backgroundColor: Color(0xFFFCAF58),
+        backgroundColor: Color(0xFF4E598C),
       ),
       body: SingleChildScrollView(
         child: Column(

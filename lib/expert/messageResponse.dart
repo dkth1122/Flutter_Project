@@ -109,7 +109,7 @@ class _MessageResponsenState extends State<MessageResponse> {
     return Scaffold(
       appBar: AppBar(
         title: Text('휴가 설정', style: TextStyle(fontWeight: FontWeight.bold),),
-        backgroundColor: Color(0xFFFCAF58),
+        backgroundColor: Color(0xFF4E598C),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.save),
@@ -188,7 +188,7 @@ class _MessageResponsenState extends State<MessageResponse> {
       onChanged: (bool newValue) {
         toggleSetting(label);
       },
-      activeColor: Color(0xFFFF8C42),
+      activeColor: Color(0xFF4E598C),
     );
   }
 }

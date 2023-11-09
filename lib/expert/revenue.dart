@@ -131,7 +131,7 @@ class _RevenueState extends State<Revenue> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFFFCAF58),
+        backgroundColor: Color(0xFF4E598C),
         elevation: 0,
         title: Text(
           '수익 관리',
