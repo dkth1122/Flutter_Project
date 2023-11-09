@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
+import '../product/productView.dart';
 import '../subBottomBar.dart';
 import 'myLikePortfolio.dart';
 
@@ -79,7 +80,7 @@ class _MyLikeListListState extends State<MyLikeList> {
 
       List<int> prices = [];
       List<String> urls = [];
-      List<String> category = [];
+      List<String> categorys = [];
 
       for (Map<String, dynamic> data in data) {
         Map<String, dynamic> productInfo = await getProductInfo(data['pName']);
@@ -88,14 +89,14 @@ class _MyLikeListListState extends State<MyLikeList> {
         String _category = productInfo['category'] as String;
         prices.add(price);
         urls.add(iUrl);
-        category.add(_category);
+        categorys.add(_category);
       }
 
       setState(() {
         likeData = data;
         productPrices = prices;
         productUrls = urls;
-        category = category;
+        category = categorys;
       });
     }else{
       print("에러 발생 ==> 확인");
@@ -214,19 +215,18 @@ class ServiceListView extends StatelessWidget {
               iUrl, width: 100,),
           title: Text(pName),
           subtitle:Text(' $price 원'),
-          // onTap: () {
-          //   Navigator.push(
-          //     context,
-          //     MaterialPageRoute(
-          //       builder: (context) => ProductView(
-          //         productName: pName,
-          //         price: price.toString(),
-          //         imageUrl: iUrl,
-          //         category: '',
-          //       ),
-          //     ),
-          //   );
-          // }
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProductView(
+                  productName: pName,
+                  price: price.toString(),
+                  imageUrl: iUrl,
+                ),
+              ),
+            );
+          }
         );
       },
     );
