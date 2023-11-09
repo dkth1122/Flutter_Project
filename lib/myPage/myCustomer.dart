@@ -73,51 +73,101 @@ class _MyCustomerState extends State<MyCustomer> {
         return Container(
           decoration: BoxDecoration(
             border: Border.all(
-              color: Colors.grey, // 원하는 테두리 색상 설정
+              color: Color(0xff424242), // 원하는 테두리 색상 설정
             ),
             borderRadius: BorderRadius.circular(8.0), // 원하는 모서리 둥글기 설정
           ),
           child: Column(
-          children: [
-            ListTile(
-              title: Text.rich(
-                TextSpan(
-                  text: "${data["title"]} 받은제안 ${data["accept"].toString()}건",
-                  style: TextStyle(
-                    decoration: data['delYn'] == 'Y' ? TextDecoration.lineThrough : null,
-                  ),
-                ),
-              ),
-              subtitle: Column(
-                children: [
-
-                  Text(data["category"]),
-                  Text(data["content"]),
-                ],
-              ),
-              trailing: Text('예산 ${data["price"].toString()}'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => MyProposalView(
-                      user: widget.userId,
-                      proposalTitle: data["title"],
-                      proposalContent: data["content"],
-                      proposalPrice: data["price"],
-                      proposalDel: data['delYn'],
+            children: [
+              SizedBox(height: 10,),
+              ListTile(
+                title: Text.rich(
+                  TextSpan(
+                    text: "${data["title"]}",
+                    style: TextStyle(
+                      fontSize: 24, // 큰 글자 크기
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF424242), // 색상 설정
+                      decoration: data['delYn'] == 'Y' ? TextDecoration.lineThrough : null,
                     ),
                   ),
-                );
-              },
-            ),
-          ],
+                ),
+                subtitle: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+
+                  children: [
+                    SizedBox(height: 5,),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "받은 제안 수: ${data["accept"].toString()}건", // 큰 글자 크기
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xff424242), // 글자 색상 설정
+                            decoration: TextDecoration.underline, // 밑줄 추가
+                            decorationColor: Color(0xFFFF9C784), // 밑줄 색상 설정
+                          ),
+                        ),
+
+                        Text(
+                          "예산: ${data["price"].toString()}", // 큰 글자 크기
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFFFCAF58), // 색상 설정
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      data["category"],
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.white, // 색상 설정
+                      ),
+                    ),
+                    Text(
+                      data["content"],
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey, // 색상 설정
+                      ),
+                    ),
+                    SizedBox(height: 5,)
+                  ],
+                ),
+                trailing: Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: Color(0xFF424242), // 화살표 아이콘의 색상 설정
+                  size: 32, // 아이콘의 크기 설정
+                ),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => MyProposalView(
+                        user: widget.userId,
+                        proposalTitle: data["title"],
+                        proposalContent: data["content"],
+                        proposalPrice: data["price"],
+                        proposalDel: data['delYn'],
+                      ),
+                    ),
+                  );
+                },
+              )
+
+            ],
           ),
         );
       },
     );
-
   }
+
+
 
 
   @override
@@ -220,7 +270,7 @@ class _MyCustomerState extends State<MyCustomer> {
                             MaterialPageRoute(builder: (context) => MyProposalList(userId: userId)),
                           );
                         },
-                        child: Text("전체보기",style: TextStyle(color: Color(0xff424242)),),
+                        child: Text("전체보기",style: TextStyle(color: Color(0xff424242), fontSize: 18),),
                       ),
                     ],
                 ),
@@ -247,7 +297,14 @@ class _MyCustomerState extends State<MyCustomer> {
                           title: Row(
                             children: [
                               Icon(Icons.note_add_outlined),
-                              Text("프로젝트 의뢰하기", style: TextStyle(fontSize: 17),),
+                              Text(
+                                "프로젝트 의뢰하기",
+                                style: TextStyle(
+                                  fontSize: 18,  // 텍스트 크기 늘리기
+                                  fontWeight: FontWeight.bold,  // 글꼴 두껍게 설정
+                                  color: Color(0xff424242),  // 원하는 색상으로 설정
+                                ),
+                              ),
                               SizedBox(width: 10),
                             ],
                           ),

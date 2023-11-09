@@ -132,13 +132,22 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
       icon: Icon(icon ?? Icons.arrow_drop_down),
       label: Text(text ?? "기본 텍스트"),
       style: ButtonStyle(
-        side: MaterialStateProperty.all(BorderSide(width: 1.0, color:Color(0xFFFF8C42))),
-        backgroundColor: MaterialStateProperty.all(Color(0xFFFF8C42) ),
-        foregroundColor: MaterialStateProperty.all(Colors.white),
+        backgroundColor: MaterialStateProperty.all(Colors.white), // 배경색: 하얏트 (흰색)
+        foregroundColor: MaterialStateProperty.all(Color(0xff424242)), // 글자색: 진한 회색
+        overlayColor: MaterialStateProperty.all(Colors.orange), // 버튼 누를 때 밑줄 색상: 오렌지
+        shape: MaterialStateProperty.all(
+          RoundedRectangleBorder(
+            side: BorderSide(color: Colors.orange, width: 1), // 밑줄 색상 및 두께
+            borderRadius: BorderRadius.zero, // 여기서는 테두리를 사용하지 않음
+          ),
+        ),
       ),
       onPressed: onPressed,
     );
   }
+
+
+
 
   Future<List<SalesItem>> SalesList(String userId, String categoryFilter) async {
     try {

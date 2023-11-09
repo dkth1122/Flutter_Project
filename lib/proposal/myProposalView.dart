@@ -300,10 +300,17 @@ class _MyProposalViewState extends State<MyProposalView> {
                           color: Colors.white,
                         ),
                       ),
+
                       onDismissed: (direction) {
-                        // 아이템 삭제 작업 수행
-                        _toggleChat(uid);
+                        if (direction == DismissDirection.endToStart) {
+                          // 스와이프 방향이 오른쪽에서 왼쪽으로 이동할 때만 수행
+                          setState(() {
+                            _toggleChat(uid);
+
+                          });
+                        }
                       },
+                      direction: DismissDirection.endToStart, // 오른쪽에서 왼쪽으로 스와이프 비활성화
                       child: ListTile(
                         leading: Container(
                           width: 50,

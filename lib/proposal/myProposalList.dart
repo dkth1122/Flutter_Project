@@ -6,6 +6,7 @@ import 'myProposalView.dart';
 
 class MyProposalList extends StatefulWidget {
   final String userId;
+
   const MyProposalList({required this.userId, Key? key}) : super(key: key);
 
   @override
@@ -13,7 +14,6 @@ class MyProposalList extends StatefulWidget {
 }
 
 class _MyProposalListState extends State<MyProposalList> {
-
   Future<int> getCount(String title) async {
     QuerySnapshot snapshot = await FirebaseFirestore.instance
         .collection('accept')
@@ -22,6 +22,91 @@ class _MyProposalListState extends State<MyProposalList> {
 
     return snapshot.size;
   }
+
+  Widget _customListTile({required String title, required content, required price, required String delYn}) {
+    final Color tileBackgroundColor = delYn =='Y' ? Colors.grey[300]! : Colors.white;
+    final Color titleColor = delYn =='Y' ? Colors.grey : Colors.black;
+    final Color priceColor = delYn =='Y' ? Colors.grey : Colors.black;
+
+    return InkWell(
+      onTap: () {
+        Navigator.push(context,  MaterialPageRoute(
+          builder: (context) => MyProposalView(
+            user: widget.userId,
+            proposalTitle: title,
+            proposalContent: content,
+            proposalPrice: price,
+            proposalDel: delYn,
+          ),
+        ));
+      },
+      child: Container(
+        height: 100,
+        margin: EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: tileBackgroundColor, // 배경색 설정
+          borderRadius: BorderRadius.circular(10), // 보더 둥글게 설정
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: Offset(0, 3), // 그림자 효과
+            ),
+          ],
+
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: titleColor, // 타이틀 텍스트 색상 설정
+                      ),
+                    ),
+                    Text(
+                      content,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: titleColor, // 서브타이틀 텍스트 색상 설정
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.arrow_drop_down,
+                    size: 24,
+                    color: priceColor, // 가격 텍스트 색상 설정
+                  ),
+                  Text(
+                    price.toString(),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: priceColor, // 가격 텍스트 색상 설정
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
 
   Widget _listMyProposal() {
     return StreamBuilder(
@@ -40,70 +125,20 @@ class _MyProposalListState extends State<MyProposalList> {
             DocumentSnapshot doc = snap.data!.docs[index];
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
             String title = data["title"];
-            return FutureBuilder(
-              future: getCount(title),
-              builder: (BuildContext context, AsyncSnapshot<int> countSnapshot) {
-                if (countSnapshot.connectionState == ConnectionState.waiting) {
-                  return ListTile(
-                    title: Text("$title (로딩 중...)"),
-                    subtitle: Text(data["content"]),
-                    trailing: Text(data["price"].toString()),
-                    onTap: (){
-                      Navigator.push(context,  MaterialPageRoute(
-                        builder: (context) => MyProposalView(
-                          user : widget.userId,
-                          proposalTitle: data["title"],
-                          proposalContent: data["content"],
-                          proposalPrice: data["price"],
-                          proposalDel: data['delYn'],
-                        ),
-                      ),
-                      );
-                    },
-                  );
-                } else {
-                  int count = countSnapshot.data ?? 0;
-                  return ListTile(
-                    title: Text.rich(
-                      TextSpan(
-                        text: title,
-                        style: TextStyle(
-                          decoration: data['delYn'] == 'Y' ? TextDecoration.lineThrough : null,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: " ($count)",
-                            style: TextStyle(
-                              decoration: data['delYn'] == 'Y' ? TextDecoration.lineThrough : null,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                      subtitle: Text(data["content"]),
-                      trailing: Text(data["price"].toString()),
-                      onTap: (){
-                        Navigator.push(context,  MaterialPageRoute(
-                          builder: (context) => MyProposalView(
-                            user : widget.userId,
-                            proposalTitle: data["title"],
-                            proposalContent: data["content"],
-                            proposalPrice: data["price"],
-                            proposalDel: data['delYn'],
-                          ),
-                        ),
-                        );
-                      },
-                  );
-                }
-              },
+            String delYn = data['delYn'];
+
+            return _customListTile(
+              title: title,
+              content: data["content"],
+              price: data["price"],
+              delYn: delYn,
             );
           },
+
         );
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -125,10 +160,10 @@ class _MyProposalListState extends State<MyProposalList> {
         ),
         actions: [
           TextButton(
-              onPressed:(){
+              onPressed: () {
                 Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context)=>MyProjectProposal()));
+                    MaterialPageRoute(builder: (context) => MyProjectProposal()));
               },
               child: Text("의뢰하기"))
         ],
@@ -136,7 +171,7 @@ class _MyProposalListState extends State<MyProposalList> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _listMyProposal()
+            _listMyProposal(),
           ],
         ),
       ),
