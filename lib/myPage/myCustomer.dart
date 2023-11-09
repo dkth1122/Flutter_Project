@@ -195,15 +195,9 @@ class _MyCustomerState extends State<MyCustomer> {
           },
         ),
         actions: [
-          TextButton(
-            child: Text(
-              "계정 설정",
-              style: TextStyle(
-                color : Color(0xff424242),
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+          IconButton(
+            color: Color(0xFFFF8C42),
+            icon: Icon(Icons.settings),
             onPressed: () {
               Navigator.push(
                 context,
@@ -246,10 +240,10 @@ class _MyCustomerState extends State<MyCustomer> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("5장", style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),),
+                  Text("할인 쿠폰", style: TextStyle(fontSize:18, color: Colors.grey, fontWeight: FontWeight.bold),),
                   SizedBox(height: 5,),
                   Divider(),
-                  Text("할인 쿠폰", style: TextStyle(fontSize:18, color: Colors.grey, fontWeight: FontWeight.bold),)
+                  Text("5장", style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold, color: Color(0xff424242)),),
                 ],
               ),
                 margin: EdgeInsets.fromLTRB(10, 0, 10, 5),
@@ -446,17 +440,11 @@ class _MyCustomerState extends State<MyCustomer> {
                   );
                 },
                 style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all(Colors.white),
-                  side: MaterialStateProperty.all(
-                    BorderSide(
-                      color: Color(0xff424242),
-                      width: 0.5,
-                    ),
-                  ),
+                  backgroundColor: MaterialStateProperty.all(Color(0xFFFF8C42)),
                 ),
                 child: Text(
                   '전문가로 전환',
-                  style: TextStyle(color: Color(0xff424242)),
+                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
                 ),
               ),
             ],

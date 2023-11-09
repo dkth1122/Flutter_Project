@@ -213,10 +213,10 @@ class _MyExpertState extends State<MyExpert> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("내 등급", style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),),
+                  Text("내 등급", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey,),),
                   SizedBox(height: 5,),
-                  Divider(),
-                  Text("$rating", style: TextStyle(fontSize:18, color: Colors.grey, fontWeight: FontWeight.bold),)
+                  Divider(thickness: 1,),
+                  Text("$rating", style: TextStyle(fontSize:23, fontWeight: FontWeight.bold, color: Color(0xff424242)),)
                 ],
               ),
             ),
