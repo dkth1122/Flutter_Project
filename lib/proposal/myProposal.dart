@@ -69,13 +69,13 @@ class _MyProjectProposalState extends State<MyProjectProposal> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "프로젝트 의뢰(제안)",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          "프로젝트 의뢰",
+          style: TextStyle(color: Color(0xff424242), fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Color(0xFFFCAF58),
+        backgroundColor: Colors.white,
         elevation: 1.0,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Color(0xff424242),),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -85,7 +85,7 @@ class _MyProjectProposalState extends State<MyProjectProposal> {
         actions: [
           TextButton(
               onPressed:_addProposal,
-              child: Text("의뢰하기"))
+              child: Text("의뢰하기", style: (TextStyle(color: Color(0xFFFF8C42),fontSize: 15)),))
         ],
       ),
       body: SingleChildScrollView(
@@ -94,6 +94,12 @@ class _MyProjectProposalState extends State<MyProjectProposal> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Row(
+                children: [
+                  Icon(Icons.check),
+                  Text("전문가에게 의뢰할 프로젝트를 적어주세요."),
+                ],
+              ),
               SizedBox(height: 10),
               TextField(
                 controller: _title,
