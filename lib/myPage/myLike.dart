@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
-import '../product/productView.dart';
 import '../subBottomBar.dart';
 import 'myLikePortfolio.dart';
 
@@ -21,6 +20,7 @@ class _MyLikeListListState extends State<MyLikeList> {
   List<Map<String, dynamic>> likeData = [];
   List<int> productPrices = [];
   List<String> productUrls = []; // 이미지 URL을 저장하는 목록
+  List<String> category = [];
   String selectedFilter = "전체";
   List<String> optionsButton1 = [
     '전체',
@@ -69,6 +69,7 @@ class _MyLikeListListState extends State<MyLikeList> {
       // 선택한 필터에 따라 필터링
       query = query.where("category", isEqualTo: selectedFilter);
     }
+
     QuerySnapshot querySnapshot = await query.get();
 
     if (querySnapshot.docs.isNotEmpty) {
@@ -78,22 +79,29 @@ class _MyLikeListListState extends State<MyLikeList> {
 
       List<int> prices = [];
       List<String> urls = [];
+      List<String> category = [];
 
       for (Map<String, dynamic> data in data) {
         Map<String, dynamic> productInfo = await getProductInfo(data['pName']);
         int price = productInfo['price'] as int;
         String iUrl = productInfo['iUrl'] as String;
+        String _category = productInfo['category'] as String;
         prices.add(price);
         urls.add(iUrl);
+        category.add(_category);
       }
 
       setState(() {
         likeData = data;
         productPrices = prices;
         productUrls = urls;
+        category = category;
       });
+    }else{
+      print("에러 발생 ==> 확인");
     }
   }
+
 
   Future<Map<String, dynamic>> getProductInfo(String pName) async {
     QuerySnapshot querySnapshot = await FirebaseFirestore.instance
@@ -106,10 +114,11 @@ class _MyLikeListListState extends State<MyLikeList> {
       querySnapshot.docs[0].data() as Map<String, dynamic>;
       int price = productData['price'] as int;
       String iUrl = productData['iUrl'] as String;
-      return {'price': price, 'iUrl': iUrl};
+      String category = productData['category'] as String;
+      return {'price': price, 'iUrl': iUrl , 'category': category};
     }
 
-    return {'price': 0, 'iUrl': ''};
+    return {'price': 0, 'iUrl': '', 'category': ''};
   }
 
 
@@ -170,7 +179,7 @@ class _MyLikeListListState extends State<MyLikeList> {
           ),
           body: TabBarView(
             children: [
-              ServiceListView(productPrices, productUrls, likeData),
+              ServiceListView(productPrices, productUrls, category, likeData),
               PortfolioView()
             ],
           ),
@@ -187,9 +196,10 @@ class _MyLikeListListState extends State<MyLikeList> {
 class ServiceListView extends StatelessWidget {
   final List<int> productPrices;
   final List<String> productUrls;
+  final List<String> category;
   final List<Map<String, dynamic>> likeData;
 
-  ServiceListView(this.productPrices, this.productUrls, this.likeData);
+  ServiceListView(this.productPrices, this.productUrls, this.category, this.likeData);
 
   @override
   Widget build(BuildContext context) {
@@ -199,25 +209,24 @@ class ServiceListView extends StatelessWidget {
         int price = productPrices[index];
         String iUrl = productUrls[index];
         String pName = likeData[index]['pName'];
-        String category = likeData[index]['category'];
         return ListTile(
           leading:Image.network(
               iUrl, width: 100,),
           title: Text(pName),
           subtitle:Text(' $price 원'),
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ProductView(
-                  productName: pName,
-                  price: price.toString(),
-                  imageUrl: iUrl,
-                  category: '',
-                ),
-              ),
-            );
-          }
+          // onTap: () {
+          //   Navigator.push(
+          //     context,
+          //     MaterialPageRoute(
+          //       builder: (context) => ProductView(
+          //         productName: pName,
+          //         price: price.toString(),
+          //         imageUrl: iUrl,
+          //         category: '',
+          //       ),
+          //     ),
+          //   );
+          // }
         );
       },
     );

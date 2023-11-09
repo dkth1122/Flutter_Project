@@ -14,13 +14,11 @@ class ProductView extends StatefulWidget {
   final String productName;
   final String price;
   final String imageUrl;
-  final String category;
 
   const ProductView({
     required this.productName,
     required this.price,
     required this.imageUrl,
-    required this.category,
   });
 
   @override
