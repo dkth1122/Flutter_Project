@@ -155,6 +155,7 @@ class _CircularDialogState extends State<CircularDialog> {
               },
               icon: Icon(
                 icon,
+                color: Color(0xff424242),
               ),
             ),
             InkWell(
