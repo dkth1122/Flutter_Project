@@ -108,14 +108,22 @@ class _MessageResponsenState extends State<MessageResponse> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('휴가 설정', style: TextStyle(fontWeight: FontWeight.bold),),
-        backgroundColor: Color(0xFF4E598C),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: () => saveSettingsToFirestore(),
+        backgroundColor: Colors.white10,
+        elevation: 0,
+        title: Text(
+          '메시지 응답 설정',
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
           ),
-        ],
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -127,21 +135,21 @@ class _MessageResponsenState extends State<MessageResponse> {
                   ListTile(
                     title: Text(
                       '시작일: ${DateFormat('yyyy-MM-dd').format(vacationStartDate ?? DateTime.now())}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff424242)),
                     ),
                     trailing: IconButton(
                       onPressed: () => selectDate(context, '시작일'),
-                      icon: Icon(Icons.calendar_month),
+                      icon: Icon(Icons.calendar_month, color: Color(0xFFFF8C42),),
                     ),
                   ),
                   ListTile(
                     title: Text(
                       '종료일: ${DateFormat('yyyy-MM-dd').format(vacationEndDate ?? DateTime.now())}',
-                      style: TextStyle(fontWeight: FontWeight.bold),
+                      style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff424242)),
                     ),
                     trailing: IconButton(
                       onPressed: () => selectDate(context, '종료일'),
-                      icon: Icon(Icons.calendar_month),
+                      icon: Icon(Icons.calendar_month, color: Color(0xFFFF8C42),),
                     ),
                   ),
                   Text(
@@ -159,7 +167,7 @@ class _MessageResponsenState extends State<MessageResponse> {
             ListTile(
               title: Text(
                 '지금 상담 가능',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff424242)),
               ),
               subtitle: Text('의뢰인의 문의 메시지에 최대 30분 이내로 응답 가능'),
               trailing: buildSwitch('30분 이내 응답 가능', isResponseEnabled),
@@ -168,10 +176,11 @@ class _MessageResponsenState extends State<MessageResponse> {
               color: Colors.grey,
               height: 1.0,
             ),
+            SizedBox(height: 10,),
             ListTile(
               title: Text(
                 '야간 응답 가능',
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff424242)),
               ),
               subtitle: Text('23:00~08:00(KST)까지 의뢰인의 문의 메시지에 응답 가능'),
               trailing: buildSwitch('야간 응답', isNightResponseEnabled),
@@ -188,7 +197,7 @@ class _MessageResponsenState extends State<MessageResponse> {
       onChanged: (bool newValue) {
         toggleSetting(label);
       },
-      activeColor: Color(0xFF4E598C),
+      activeColor: Color(0xFFFF8C42),
     );
   }
 }

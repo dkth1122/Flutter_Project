@@ -147,8 +147,22 @@ class _ExpertRatingState extends State<ExpertRating> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('전문가 등급', style: TextStyle(fontWeight: FontWeight.bold),),
-        backgroundColor: Color(0xFF4E598C),
+        backgroundColor: Colors.white10,
+        elevation: 0,
+        title: Text(
+          '전문가 등급',
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -156,10 +170,9 @@ class _ExpertRatingState extends State<ExpertRating> {
             Padding(
               padding: const EdgeInsets.only(top: 30),
               child: Container(
-                margin: EdgeInsets.only(left: 10, right: 10),
+                margin: EdgeInsets.only(left: 25, right: 25),
                 padding: EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: Colors.amber, // 배경색 설정
                   borderRadius: BorderRadius.circular(16.0), // 네모 모양 및 모서리 둥글게 설정
                 ),
                 child: Column(
@@ -170,7 +183,7 @@ class _ExpertRatingState extends State<ExpertRating> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white, // 글자 색상 설정
+                        color: Color(0xff424242), // 글자 색상 설정
                       ),
                     ),
                     SizedBox(height: 12),
@@ -178,7 +191,7 @@ class _ExpertRatingState extends State<ExpertRating> {
                       '전문가 등급: $expertRating',
                       style: TextStyle(
                         fontSize: 15,
-                        color: Colors.white70,
+                        color: Colors.grey,
                         fontWeight: FontWeight.bold// 글자 색상 설정
                       ),
                     ),
@@ -190,61 +203,64 @@ class _ExpertRatingState extends State<ExpertRating> {
                         SizedBox(width: 3), // 아이콘과 텍스트 간 간격 조절
                         Text('판매건수: $documentCount', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
                         SizedBox(width: 12),
-                        Icon(Icons.money, size: 16, color: Colors.green), // 판매금액 아이콘
+                        Icon(Icons.monetization_on, size: 16, color: Color(0xFFFF8C42)), // 판매금액 아이콘
                         SizedBox(width: 3), // 아이콘과 텍스트 간 간격 조절
-                        Text('판매금액: $displayTotalAmount', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                        Text('판매금액: $displayTotalAmount', style: TextStyle(color: Color(0xFFFF8C42), fontWeight: FontWeight.bold)),
                       ],
                     )
                   ],
                 ),
               ),
             ),
+            SizedBox(height: 20,),
             Container(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                children: <Widget>[
-                  Text(
-                    '등급별 조건',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                ],
+              child: Container(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      '등급별 조건',
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xff424242)),
+                    ),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount: expertRatingData.length,
+                      itemBuilder: (context, index) {
+                        final data = expertRatingData[index];
+                        return Container(
+                          margin: EdgeInsets.all(8.0),
+                          padding: EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[300], // 배경색 설정
+                            borderRadius: BorderRadius.circular(16.0), // 네모 모양 및 모서리 둥글게 설정
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                '등급: ${data.level}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Color(0xff424242), // 글자 색상 설정
+                                ),
+                              ),
+                              Text(
+                                '조건: ${data.conditions}',
+                                style: TextStyle(
+                                  color: Color(0xff424242), // 글자 색상 설정
+                                ),
+                              ),
+                              // 나머지 등급별 조건에 따른 내용 추가
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
               ),
-            ),
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: expertRatingData.length,
-              itemBuilder: (context, index) {
-                final data = expertRatingData[index];
-                return Container(
-                  margin: EdgeInsets.all(8.0),
-                  padding: EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Colors.blue, // 배경색 설정
-                    borderRadius: BorderRadius.circular(16.0), // 네모 모양 및 모서리 둥글게 설정
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text(
-                        '등급: ${data.level}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Colors.white, // 글자 색상 설정
-                        ),
-                      ),
-                      Text(
-                        '조건: ${data.conditions}',
-                        style: TextStyle(
-                          color: Colors.white, // 글자 색상 설정
-                        ),
-                      ),
-                      // 나머지 등급별 조건에 따른 내용 추가
-                    ],
-                  ),
-                );
-              },
             ),
           ],
         ),

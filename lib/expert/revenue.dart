@@ -131,14 +131,21 @@ class _RevenueState extends State<Revenue> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xFF4E598C),
+        backgroundColor: Colors.white10,
         elevation: 0,
         title: Text(
           '수익 관리',
           style: TextStyle(
-            color: Colors.white,
+            color: Color(0xff424242),
             fontWeight: FontWeight.bold,
           ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
       ),
       body: Padding(
@@ -163,7 +170,7 @@ class _RevenueState extends State<Revenue> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ElevatedButton(
-                        child: Text('출금 신청',style: TextStyle(fontWeight: FontWeight.bold),),
+                        child: Text('출금 신청',style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
                         onPressed: () async {
                           if (availableEarnings == 0.0) {
                             // 출금 가능 수익이 0인 경우 스낵바 표시
@@ -178,14 +185,14 @@ class _RevenueState extends State<Revenue> {
                               context: context,
                               builder: (context) {
                                 return AlertDialog(
-                                  title: Text('출금 신청 확인',style: TextStyle(fontWeight: FontWeight.bold),),
+                                  title: Text('출금 신청 확인',style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff424242)),),
                                   content: Text('출금을 신청하시겠습니까?'),
                                   actions: [
                                     TextButton(
                                       onPressed: () {
                                         Navigator.of(context).pop(); // 다이얼로그 닫기
                                       },
-                                      child: Text('취소',style: TextStyle(fontWeight: FontWeight.bold),),
+                                      child: Text('취소',style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff424242)),),
                                     ),
                                     TextButton(
                                       onPressed: () async {
@@ -226,7 +233,8 @@ class _RevenueState extends State<Revenue> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.amber,
+                          primary: Color(0xFFFF8C42)
+                          ,
                         ),
                       ),
                       SizedBox(width: 10),
@@ -327,7 +335,7 @@ class _RevenueState extends State<Revenue> {
                       leftTitles: SideTitles(
                         showTitles: true,
                         getTextStyles: (context, value) => TextStyle(
-                          color: Colors.black,
+                          color: Color(0xff424242),
                           fontWeight: FontWeight.bold,
                           fontSize: 10,
                         ),
@@ -352,7 +360,7 @@ class _RevenueState extends State<Revenue> {
                       bottomTitles: SideTitles(
                         showTitles: true,
                         getTextStyles: (context, value) => TextStyle(
-                          color: Colors.black,
+                          color: Color(0xff424242),
                           fontWeight: FontWeight.bold,
                           fontSize: 10,
                         ),
@@ -385,7 +393,7 @@ class _RevenueState extends State<Revenue> {
                           BarChartRodData(
                             y: earnings[index],
                             width: 16,
-                            colors: [Colors.amber],
+                            colors: [Color(0xFFFF8C42)],
                           ),
                         ],
                       ),
@@ -409,6 +417,7 @@ class _RevenueState extends State<Revenue> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
+            color: Color(0xff424242),
           ),
         ),
         Text(
@@ -416,6 +425,7 @@ class _RevenueState extends State<Revenue> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
+            color: Color(0xff424242),
           ),
         ),
       ],

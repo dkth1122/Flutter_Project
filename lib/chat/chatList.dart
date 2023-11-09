@@ -35,6 +35,7 @@ class _ChatListState extends State<ChatList> {
       user1 = um.userId!;
     } else {
       user1 = "없음";
+      print("로그인 안됨");
     }
   }
 
@@ -42,12 +43,22 @@ class _ChatListState extends State<ChatList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Text("채팅 목록", style: TextStyle(fontWeight: FontWeight.bold),),
-          ],
+        backgroundColor: Colors.white10,
+        elevation: 0,
+        title: Text(
+          '대화 목록',
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        backgroundColor: Color(0xFFFCAF58),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Center(
         child: Padding(
@@ -98,8 +109,8 @@ class _ChatListState extends State<ChatList> {
             }
 
             final chatTitle = (user1Value != null && user1Value == user1)
-                ? '$user2Value 님과의 채팅'
-                : '$user1Value 님과의 채팅';
+                ? '$user2Value 님과의 대화'
+                : '$user1Value 님과의 대화';
 
             final String roomName = document.id;
 
@@ -129,7 +140,7 @@ class _ChatListState extends State<ChatList> {
                   final String? lastMessageImageUrl = lastMessageData['imageUrl'] as String?;
 
                   if (lastMessageImageUrl != null && lastMessageImageUrl!.isNotEmpty) {
-                    trailingWidget = Image.network(lastMessageImageUrl!, width: 40, height: 40);
+                    lastMessageText = "이미지를 보냈습니다.";
                   }
                   // sendTime을 표시하기 위한 코드 수정
                   final lastMessageTime = lastMessageData['sendTime'] as Timestamp?;
@@ -166,11 +177,11 @@ class _ChatListState extends State<ChatList> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-/*                          CircleAvatar(
+                          CircleAvatar(
                             radius: 30,
                             // Add profile image here
                             backgroundImage: AssetImage(url),
-                          ),*/
+                          ),
                           SizedBox(width: 16),
                           Expanded(
                             child: Column(
@@ -182,7 +193,7 @@ class _ChatListState extends State<ChatList> {
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                                    color: Color(0xff424242),
                                   ),
                                 ),
                                 SizedBox(height: 4),
@@ -204,6 +215,7 @@ class _ChatListState extends State<ChatList> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   color: Colors.grey,
+                                  fontWeight: FontWeight.bold
                                 ),
                               ),
                               SizedBox(height: 8),
