@@ -129,7 +129,7 @@ class _ProductState extends State<Product> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: selectedCategoryIndex == index ? Colors.grey : Color(0xFFFCAF58),
+                      primary: selectedCategoryIndex == index ? Colors.orange : Color(0xFFFCAF58),
                       minimumSize: Size(double.infinity, 90),
                     ),
                     child: Text(categories[index]),
