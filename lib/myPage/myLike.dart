@@ -139,11 +139,8 @@ class _MyLikeListListState extends State<MyLikeList> {
               },
             ),
             actions: [
-              TextButton(
-                child: Text(
-                  "필터",
-                  style: TextStyle(fontSize: 17, color:Color(0xff424242),fontWeight: FontWeight.bold),
-                ),
+              IconButton(
+                icon: Icon(Icons.filter_list, color:Color(0xFFFF8C42)),
                 onPressed: () {
                   _showFilterOptions(context, optionsButton1);
                 },
