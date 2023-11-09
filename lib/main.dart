@@ -183,6 +183,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       );
                     },
                     icon: Icon(Icons.admin_panel_settings),
+                    color: Color(0xff424242),
                   ),
               ],
             ),
