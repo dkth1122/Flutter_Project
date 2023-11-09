@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/myPage/purchaseView.dart';
+import 'package:project_flutter/subBottomBar.dart';
 class PurchaseManagement extends StatefulWidget {
   final String userId;
 
@@ -186,7 +187,7 @@ void applyCouponFilter(String option) {
                   children: [
                     SizedBox(height: 5,),
                     _buildInfoBox("주문번호 ", data['orderNo']),
-                    _buildInfoBox("사용쿠폰 ", data['cName']),
+                    _buildInfoBox("사용쿠폰 ", data['cName']=data['cName']=="사용하지 않음"?" -":data['cName'] ),
                   ],
                 ),
                 trailing: Text(
@@ -247,12 +248,12 @@ void applyCouponFilter(String option) {
         appBar: AppBar(
           title: Text(
             "구매관리",
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Color(0xff424242), fontWeight: FontWeight.bold),
           ),
           centerTitle: true,
-          backgroundColor: Color(0xFFFCAF58),
+          backgroundColor: Colors.white,
           elevation: 1.0,
-          iconTheme: IconThemeData(color: Colors.white),
+          iconTheme: IconThemeData(color: Color(0xff424242),),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
@@ -303,6 +304,7 @@ void applyCouponFilter(String option) {
             _listPurchase()
           ],
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:project_flutter/subBottomBar.dart';
 class PurchaseView extends StatefulWidget {
   final DocumentSnapshot document;
   PurchaseView({required this.document});
@@ -20,12 +21,12 @@ class _PurchaseViewState extends State<PurchaseView> {
       appBar: AppBar(
         title: Text(
           "구매 내역",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Color(0xff424242), fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Color(0xFF4E598C),
+        backgroundColor: Colors.white,
         elevation: 1.0,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Color(0xff424242),),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -55,6 +56,7 @@ class _PurchaseViewState extends State<PurchaseView> {
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 }
@@ -77,7 +79,7 @@ class InfoBox extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 18,
-              color: Color(0xFFFF9C784),
+              color: Color(0xFFFF8C42),
               fontWeight: FontWeight.bold,
             ),
           ),

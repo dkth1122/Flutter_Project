@@ -125,12 +125,12 @@ class _MyLikeListListState extends State<MyLikeList> {
           appBar: AppBar(
             title: Text(
               '찜 목록',
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              style: TextStyle(color:Color(0xff424242), fontWeight: FontWeight.bold),
             ),
             centerTitle: true,
-            backgroundColor: Color(0xFFFCAF58), // 배경색 변경
             elevation: 1.0,
-            iconTheme: IconThemeData(color: Colors.white),
+            backgroundColor: Colors.white,
+            iconTheme: IconThemeData(color: Color(0xff424242)),
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: () {
@@ -141,7 +141,7 @@ class _MyLikeListListState extends State<MyLikeList> {
               TextButton(
                 child: Text(
                   "필터",
-                  style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 17, color:Color(0xff424242),fontWeight: FontWeight.bold),
                 ),
                 onPressed: () {
                   _showFilterOptions(context, optionsButton1);
@@ -157,12 +157,12 @@ class _MyLikeListListState extends State<MyLikeList> {
                   text: '포트폴리오',
                 ),
               ],
-              labelColor: Color(0xFF4E598C), // 선택된 탭의 텍스트 컬러
-              unselectedLabelColor: Colors.white, // 선택되지 않은 탭의 텍스트 컬러
+              labelColor:Color(0xFFFF8C42), // 선택된 탭의 텍스트 컬러
+              unselectedLabelColor: Color(0xff424242), // 선택되지 않은 탭의 텍스트 컬러
               indicator: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: Color(0xFF4E598C), // 밑줄의 색상을 변경하려면 여기에서 지정
+                    color: Color(0xFFFF8C42), // 밑줄의 색상을 변경하려면 여기에서 지정
                     width: 3.0, // 밑줄의 두께를 조절할 수 있습니다.
                   ),
                 ),

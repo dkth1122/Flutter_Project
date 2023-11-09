@@ -187,71 +187,92 @@ class _MyProposalViewState extends State<MyProposalView> {
           }, icon: Icon(Icons.share)),
         ],
       ),
-      body: ListView(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '제목: ${widget.proposalTitle}',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    decoration: widget.proposalDel == 'Y' ? TextDecoration.lineThrough : null,
-                    color: widget.proposalDel == 'Y'? Colors.grey : Colors.black,
-                  ),
-                ),
-                Divider(),
-                Text(
-                  '설명: ${widget.proposalContent}',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    decoration: widget.proposalDel == 'Y' ? TextDecoration.lineThrough : null,
-                    color: widget.proposalDel == 'Y' ? Colors.grey : Colors.black,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text('예산: ${widget.proposalPrice.toString()}원'),
-                SizedBox(height: 8),
-                Text('프로젝트 시작일과 종료일은 채팅으로 협의하세요~'),
-                TextButton(
-                  onPressed: () {
-                    if (widget.proposalDel != 'Y') {
-                      _showEndDealDialog();
-                    }
-                  },
-                  child: Text(
-                    widget.proposalDel == 'Y' ? '거래 종료됨' : '거래종료하기',
+      body: Container(
+        margin: EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white, // 배경색 설정
+          borderRadius: BorderRadius.circular(10), // 보더 둥글게 설정
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: Offset(0, 3), // 그림자 효과
+            ),
+          ],
+          border: Border.all(
+            color: Color(0xFFFF8C42), // 보더 컬러 설정
+          ),
+
+        ),
+        child: ListView(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '제목: ${widget.proposalTitle}',
                     style: TextStyle(
-                      color: Colors.red[200],
-                      fontSize: 15,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      decoration: widget.proposalDel == 'Y' ? TextDecoration.lineThrough : null,
+                      color: widget.proposalDel == 'Y'? Colors.grey : Colors.black,
+                    ),
+                  ),
+                  Divider(),
+                  Text(
+                    '설명: ${widget.proposalContent}',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      decoration: widget.proposalDel == 'Y' ? TextDecoration.lineThrough : null,
+                      color: widget.proposalDel == 'Y' ? Colors.grey : Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text('예산: ${widget.proposalPrice.toString()}원'),
+                  SizedBox(height: 8),
+                  Text('프로젝트 시작일과 종료일은 채팅으로 협의하세요~'),
+                  TextButton(
+                    onPressed: () {
+                      if (widget.proposalDel != 'Y') {
+                        _showEndDealDialog();
+                      }
+                    },
+                    child: Text(
+                      widget.proposalDel == 'Y' ? '거래 종료됨' : '거래종료하기',
+                      style: TextStyle(
+                        color: Colors.red[200],
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Divider(color :Colors.grey),
+                  Text(
+                    '제안한 전문가 목록',
+                    style: TextStyle(
+                      fontSize: 20,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-                Divider(color :Colors.grey),
-                Text(
-                  '제안한 전문가 목록',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text("1:1문의를 원하시면 스와이프하세요!",
-                  style: TextStyle(
-                  fontSize: 15,
-                  color: Colors.red,
-                ),),
-                _buildUserList(widget.proposalTitle),
-                SizedBox(height: 20), // 여기에 새로운 위젯 추가
-                // 다른 새로운 위젯 추가
-              ],
+                  SizedBox(height: 8),
+                  Text("1:1문의를 원하시면 스와이프하세요!",
+                    style: TextStyle(
+                    fontSize: 15,
+                    color: Colors.red,
+                  ),),
+                  _buildUserList(widget.proposalTitle),
+                  SizedBox(height: 20), // 여기에 새로운 위젯 추가
+                  // 다른 새로운 위젯 추가
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

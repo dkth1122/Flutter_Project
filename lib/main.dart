@@ -200,12 +200,12 @@ class _MyHomePageState extends State<MyHomePage> {
                     contentPadding: EdgeInsets.fromLTRB(10, 5, 5, 5),
 
                     hintText: "검색어를 입력하세요",
-                    suffixIcon: Icon(Icons.search),
+                    suffixIcon: Icon(Icons.search, color:Color(0xff424242),),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
                     filled: true,
-                    fillColor: Color.fromRGBO(227, 227, 227, 0.7019607843137254),
+                    fillColor: Colors.white,
                   ),
                   onTap: () {
                     Navigator.push(

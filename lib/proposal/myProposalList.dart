@@ -23,7 +23,7 @@ class _MyProposalListState extends State<MyProposalList> {
     return snapshot.size;
   }
 
-  Widget _customListTile({required String title, required content, required price, required String delYn}) {
+  Widget _customListTile({required String title,required String category, required content, required price, required String delYn}) {
     final Color tileBackgroundColor = delYn =='Y' ? Colors.grey[300]! : Colors.white;
     final Color titleColor = delYn =='Y' ? Colors.grey : Colors.black;
     final Color priceColor = delYn =='Y' ? Colors.grey : Colors.black;
@@ -41,7 +41,7 @@ class _MyProposalListState extends State<MyProposalList> {
         ));
       },
       child: Container(
-        height: 100,
+        height: 120,
         margin: EdgeInsets.all(16),
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -55,6 +55,9 @@ class _MyProposalListState extends State<MyProposalList> {
               offset: Offset(0, 3), // 그림자 효과
             ),
           ],
+          border: Border.all(
+            color: Color(0xFFFF8C42), // 보더 컬러 설정
+          ),
 
         ),
         child: Padding(
@@ -69,11 +72,21 @@ class _MyProposalListState extends State<MyProposalList> {
                     Text(
                       title,
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: titleColor, // 타이틀 텍스트 색상 설정
                       ),
                     ),
+                    SizedBox(height: 8,),
+                    Text(
+                      category,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey, // 타이틀 텍스트 색상 설정
+                      ),
+                    ),
+                    SizedBox(height: 8,),
                     Text(
                       content,
                       style: TextStyle(
@@ -124,14 +137,13 @@ class _MyProposalListState extends State<MyProposalList> {
           itemBuilder: (context, index) {
             DocumentSnapshot doc = snap.data!.docs[index];
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-            String title = data["title"];
-            String delYn = data['delYn'];
 
             return _customListTile(
-              title: title,
+              title: data["title"],
+              category: data["category"],
               content: data["content"],
               price: data["price"],
-              delYn: delYn,
+              delYn: data["title"],
             );
           },
 

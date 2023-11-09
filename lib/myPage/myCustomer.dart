@@ -260,7 +260,7 @@ class _MyCustomerState extends State<MyCustomer> {
                     children: [
                       Text(
                         "내 프로젝트",
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 24),
                       ),
                       TextButton(
                         onPressed: () {

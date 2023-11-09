@@ -59,9 +59,16 @@ class _MyProjectProposalState extends State<MyProjectProposal> {
       _title.clear();
       _content.clear();
       _price.clear();
+      // 의뢰가 성공적으로 추가되면 스낵바를 표시
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('의뢰가 성공적으로 완료되었습니다.'),
+        ),
+      );
     } else {
       print("내용을 입력해주세요.");
     }
+
   }
 
   @override
