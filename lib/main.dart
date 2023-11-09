@@ -36,9 +36,16 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primaryColor: Color(0xFF4E598C),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.white, // 여기서 색상을 흰색으로 설정
+        ),
+        primaryColor: Colors.white,
         hintColor: Color(0xff424242),
         fontFamily: 'Pretendard',
+        iconTheme: IconThemeData(
+          color: Color(0xff424242), // 아이콘 색상 설정
+          size: 24, // 아이콘 크기 설정
+        ),
         textTheme: TextTheme(
           bodyLarge: TextStyle(color: Colors.black, fontSize: 16),
         ),
@@ -47,14 +54,14 @@ class MyApp extends StatelessWidget {
             color: Colors.black, // 레이블 텍스트의 색상
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0),
+            borderSide: BorderSide(color: Color(0xFFFF8C42), width: 2.0),
             borderRadius: BorderRadius.circular(10.0),
           ),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0),
+            borderSide: BorderSide(color: Color(0xFFFF8C42), width: 2.0),
             borderRadius: BorderRadius.circular(10.0),
           ),
-          // 여기에 필요한 다른 스타일을 추가할 수 있습니다.
+
         ),
       ),
 
@@ -178,7 +185,6 @@ class _MyHomePageState extends State<MyHomePage> {
                     icon: Icon(Icons.admin_panel_settings),
                   ),
               ],
-              backgroundColor: Color(0xFFFCAF58),
             ),
           ];
         },

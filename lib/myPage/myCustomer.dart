@@ -176,12 +176,11 @@ class _MyCustomerState extends State<MyCustomer> {
       appBar: AppBar(
         title: Text(
           "마이페이지",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color:Color(0xff424242), fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Color(0xFFFCAF58),
         elevation: 1.0,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Color(0xff424242)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -198,7 +197,7 @@ class _MyCustomerState extends State<MyCustomer> {
             child: Text(
               "계정 설정",
               style: TextStyle(
-                color: Colors.white,
+                color : Color(0xff424242),
                 fontSize: 17,
                 fontWeight: FontWeight.bold,
               ),
