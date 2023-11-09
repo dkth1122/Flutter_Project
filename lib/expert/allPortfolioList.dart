@@ -25,7 +25,24 @@ class _AllPortfolioListState extends State<AllPortfolioList> {
       sessionId = "";
     }
     return Scaffold(
-      appBar: AppBar(title: Text("포트폴리오 리스트"),),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          '포트폴리오',
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [

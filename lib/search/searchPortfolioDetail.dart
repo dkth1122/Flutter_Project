@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SearchPortfolioDetail extends StatefulWidget {
   final Map<String, dynamic> portfolioItem;
@@ -13,8 +14,13 @@ class SearchPortfolioDetail extends StatefulWidget {
 
 class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    updatePortfolioCollection(widget.user);
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -26,7 +32,7 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
             flexibleSpace: FlexibleSpaceBar(
               background: GestureDetector(
                 onTap: () {
-
+                  // 이미지 클릭 시 추가 동작 수행
                 },
                 child: Image.network(
                   widget.portfolioItem['thumbnailUrl'],
@@ -69,7 +75,6 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
                         ),
                       ],
                     ),
-
                     SizedBox(height: 10),
                     Divider(
                       height: 20,
@@ -99,7 +104,7 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
                   ],
                 ),
               )
-            ])
+            ]),
           ),
           SliverGrid(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -138,6 +143,7 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
       ),
     );
   }
+
   _showImageDialog(String imageUrl) {
     showDialog(
       context: context,
@@ -155,16 +161,34 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
           ),
           actions: [
             ElevatedButton(
-                onPressed: (){
-                  Navigator.of(context).pop();
-                },
-                child: Text("닫기")
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text("닫기"),
             )
           ],
         );
       },
     );
   }
+
+  void updatePortfolioCollection(String user) {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    String documentId = user; // 'your_document_id'를 실제 문서 ID로 대체
+
+    // 'portfolio' 서브컬렉션의 문서들을 가져옵니다.
+    firestore.collection('expert').doc(documentId).collection('portfolio').get().then((querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        // 각 문서의 'cnt' 필드를 1 증가시킵니다.
+        int currentCount = doc['cnt'];
+        int updatedCount = currentCount + 1;
+
+        // 'cnt' 필드를 업데이트합니다.
+        doc.reference.update({
+          'cnt': updatedCount,
+        });
+      });
+    });
+  }
+
 }
-
-

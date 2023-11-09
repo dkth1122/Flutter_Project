@@ -64,13 +64,13 @@ class _CategoryProductState extends State<CategoryProduct> {
             SizedBox(height: 10,),
             Text("서비스"),
             Container(
-              padding: EdgeInsets.all(10),
-              child: _categoryProductList(sendText)
+                padding: EdgeInsets.all(10),
+                child: _categoryProductList(sendText)
             ),
             Text("포트폴리오"),
             Container(
-              padding: EdgeInsets.all(10),
-              child: _categoryPortfolioList(sendText)
+                padding: EdgeInsets.all(10),
+                child: _categoryPortfolioList(sendText)
             ),
           ],
         ),
@@ -113,7 +113,6 @@ class _CategoryProductState extends State<CategoryProduct> {
                       productName: productName,
                       price: formattedPrice,
                       imageUrl: imageUrl,
-                      category: document['category'] as String,
                     ),
                   ),
                 );
