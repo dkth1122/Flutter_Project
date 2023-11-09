@@ -34,33 +34,95 @@ class _CategoryProductState extends State<CategoryProduct> {
   Widget build(BuildContext context) {
     String sendText = widget.sendText;
     return Scaffold(
-      appBar: AppBar(title: Text("카테고리 상품"),backgroundColor: Color(0xFFFCAF58),),
-      body: Column(
-        children: [
-          SizedBox(height: 10,),
-          Text(
-            "$sendText 카테고리",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10,),
-          SizedBox(
-            height: 150,
-            child: Stack(
-              children: [
-                sliderWidget(),
-                sliderIndicator(),
-              ],
+      appBar: AppBar(title: Text("카테고리"),backgroundColor: Color(0xFFFCAF58),),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 10,),
+            Text(
+              "$sendText 카테고리",
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-          ),
-          Expanded(
-            child: Container(
+            SizedBox(height: 10,),
+            SizedBox(
+              height: 150,
+              child: Stack(
+                children: [
+                  sliderWidget(),
+                  sliderIndicator(),
+                ],
+              ),
+            ),
+            Text("서비스"),
+            Container(
               padding: EdgeInsets.all(10),
               child: _categoryList(sendText)
-            )
-          )
-        ],
+            ),
+            Text("포트폴리오"),
+            Container(
+              padding: EdgeInsets.all(10),
+              child: _categoryPortfolioList(sendText)
+            ),
+          ],
+        ),
       ),
       bottomNavigationBar: SubBottomBar(),
+    );
+  }
+  // 광고 슬라이더
+  Widget sliderWidget() {
+    return CarouselSlider(
+      carouselController: _controller,
+      items: imageBanner.map(
+            (imagePath) {
+          return Builder(
+            builder: (context) {
+              return SizedBox(
+                width: MediaQuery.of(context).size.width,
+                child: Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                ),
+              );
+            },
+          );
+        },
+      ).toList(),
+      options: CarouselOptions(
+        height: 150,
+        viewportFraction: 1.0,
+        autoPlay: true,
+        autoPlayInterval: const Duration(seconds: 2),
+        onPageChanged: (index, reason) {
+          setState(() {
+            _current = index;
+          });
+        },
+      ),
+    );
+  }
+  Widget sliderIndicator() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: imageBanner.asMap().entries.map((entry) {
+          return GestureDetector(
+            onTap: () => _controller.animateToPage(entry.key),
+            child: Container(
+              width: 12,
+              height: 12,
+              margin:
+              const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color:
+                Colors.white.withOpacity(_current == entry.key ? 0.9 : 0.4),
+              ),
+            ),
+          );
+        }).toList(),
+      ),
     );
   }
   Widget _categoryList(String sendText) {
@@ -77,6 +139,8 @@ class _CategoryProductState extends State<CategoryProduct> {
         final List<DocumentSnapshot> filteredDocs = snap.data!.docs;
 
         return ListView.builder(
+          physics: NeverScrollableScrollPhysics(), // 스크롤 금지
+          shrinkWrap: true,
           itemCount: filteredDocs.length,
           itemBuilder: (context, index) {
             Map<String, dynamic> data = filteredDocs[index].data() as Map<String, dynamic>;
@@ -168,60 +232,49 @@ class _CategoryProductState extends State<CategoryProduct> {
       },
     );
   }
-  Widget sliderWidget() {
-    return CarouselSlider(
-      carouselController: _controller,
-      items: imageBanner.map(
-            (imagePath) {
-          return Builder(
-            builder: (context) {
-              return SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                ),
-              );
-            },
-          );
-        },
-      ).toList(),
-      options: CarouselOptions(
-        height: 150,
-        viewportFraction: 1.0,
-        autoPlay: true,
-        autoPlayInterval: const Duration(seconds: 2),
-        onPageChanged: (index, reason) {
-          setState(() {
-            _current = index;
-          });
-        },
-      ),
-    );
-  }
+  Widget _categoryPortfolioList(String sendText) {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance.collection('expert').snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+        final List<DocumentSnapshot> experts = snapshot.data!.docs;
 
-  Widget sliderIndicator() {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: imageBanner.asMap().entries.map((entry) {
-          return GestureDetector(
-            onTap: () => _controller.animateToPage(entry.key),
-            child: Container(
-              width: 12,
-              height: 12,
-              margin:
-              const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color:
-                Colors.white.withOpacity(_current == entry.key ? 0.9 : 0.4),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
+        return ListView.builder(
+          physics: NeverScrollableScrollPhysics(), // 스크롤 금지
+          shrinkWrap: true,
+          itemCount: experts.length,
+          itemBuilder: (context, index) {
+            final expertData = experts[index].data() as Map<String, dynamic>;
+            final userId = expertData['userId'].toString();
+
+            return StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('expert')
+                  .doc(userId)
+                  .collection('portfolio')
+                  .where("category", isEqualTo: sendText)
+                  .snapshots(),
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+                final List<DocumentSnapshot> portfolioDocs = snapshot.data!.docs;
+
+                return Column(
+                  children: portfolioDocs.map((portfolioDoc) {
+                    final title = portfolioDoc.get('title').toString();
+                    return ListTile(
+                      title: Text('User ID: $userId, Portfolio Title: $title'),
+                    );
+                  }).toList(),
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
