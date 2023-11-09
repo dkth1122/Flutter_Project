@@ -276,7 +276,7 @@ class _ProductState extends State<Product> {
                                     right: 0,
                                     child: Container(
                                       padding: EdgeInsets.all(8),
-                                      color: Colors.black.withOpacity(0.8),
+                                      color: Colors.black.withOpacity(0.4),
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [

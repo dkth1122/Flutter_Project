@@ -51,22 +51,19 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
         ],
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Align(
-                alignment: Alignment.center,
-                child: Text(
-                  '오늘도 파이팅!',
-                  textAlign: TextAlign.center,
-                ),
-              ),
-            ],
+          Padding(
+            padding: EdgeInsets.symmetric(vertical: 20.0),
+            child: Text(
+              '오늘도 파이팅!',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton(
                 onPressed: () {
@@ -111,3 +108,4 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
     );
   }
 }
+
