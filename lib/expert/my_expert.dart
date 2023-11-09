@@ -228,13 +228,6 @@ class _MyExpertState extends State<MyExpert> {
               color: Colors.grey,
               thickness: 5.0,
             ),
-            _MyProposalAccept(),
-
-            Divider(
-              color: Colors.grey,
-              thickness: 5.0,
-            ),
-
             Padding(
               padding: const EdgeInsets.all(10.0),
               child: Column(
@@ -528,64 +521,5 @@ class _MyExpertState extends State<MyExpert> {
         }
       },
     );
-  }
-
-  Widget _MyProposalAccept() {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection("proposal")
-          .where("user", isEqualTo: userId)
-          .limit(1) // 최신 데이터 1개만 가져옴
-          .snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
-        if (!snap.hasData) {
-          return Center(child: CircularProgressIndicator());
-        }
-
-        if (snap.data!.docs.isEmpty) {
-          return Text("아직 제안서가 없습니다.");
-        }
-
-        DocumentSnapshot doc = snap.data!.docs.first;
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-        return Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.grey, // 원하는 테두리 색상 설정
-            ),
-            borderRadius: BorderRadius.circular(8.0), // 원하는 모서리 둥글기 설정
-          ),
-          child: Column(
-            children: [
-              ListTile(
-                title: Text.rich(
-                  TextSpan(
-                    text: "${data["title"]} 받은제안 ${data["accept"].toString()}건",
-                    style: TextStyle(
-                      decoration: data['delYn'] == 'Y' ? TextDecoration.lineThrough : null,
-                    ),
-                  ),
-                ),
-                subtitle: Column(
-                  children: [
-
-                    Text(data["category"]),
-                    Text(data["content"]),
-                  ],
-                ),
-                trailing: Text('예산 ${data["price"].toString()}'),
-                onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context)=>ProposalList()));
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-
   }
 }
