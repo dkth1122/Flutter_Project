@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../expert/ad_form.dart';
 import '../join/userModel.dart';
+import '../subBottomBar.dart';
 import 'chat.dart';
 import 'chatBot.dart';
 
@@ -71,6 +72,7 @@ class _ChatListState extends State<ChatList> {
           ),
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 

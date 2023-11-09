@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 import '../join/userModel.dart';
+import '../subBottomBar.dart';
 
 class ExpertRatingData {
   final String level;
@@ -265,6 +266,7 @@ class _ExpertRatingState extends State<ExpertRating> {
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 }

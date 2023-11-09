@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
+import '../subBottomBar.dart';
 
 class MessageResponse extends StatefulWidget {
   @override
@@ -188,6 +189,7 @@ class _MessageResponsenState extends State<MessageResponse> {
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 

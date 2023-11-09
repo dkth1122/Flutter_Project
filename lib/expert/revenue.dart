@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
+import '../subBottomBar.dart';
 
 class Revenue extends StatefulWidget {
   @override
@@ -405,6 +406,7 @@ class _RevenueState extends State<Revenue> {
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 
