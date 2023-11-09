@@ -58,8 +58,6 @@ class _AdminUserState extends State<AdminUser> {
                   icon: Icon(Icons.search),
                   onPressed: () {
                     String searchKeyword = searchUser.text.trim();
-                    print(searchKeyword);
-                    print('검색어: $searchKeyword');
                     setState(() {
                       userListStream = FirebaseFirestore.instance.collection('userList')
                           .where('userId', isGreaterThanOrEqualTo: searchKeyword)

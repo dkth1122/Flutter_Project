@@ -137,8 +137,11 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
         overlayColor: MaterialStateProperty.all(Colors.orange), // 버튼 누를 때 밑줄 색상: 오렌지
         shape: MaterialStateProperty.all(
           RoundedRectangleBorder(
-            side: BorderSide(color: Colors.orange, width: 1), // 밑줄 색상 및 두께
-            borderRadius: BorderRadius.zero, // 여기서는 테두리를 사용하지 않음
+            side: BorderSide(
+              color: Colors.black, // 아래쪽 선의 색상 설정
+              width: 1.0, // 아래쪽 선의 너비 설정
+            ),
+            borderRadius: BorderRadius.circular(8), // 버튼의 둥근 모서리 설정
           ),
         ),
       ),
@@ -187,12 +190,12 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
       appBar: AppBar(
         title: Text(
           "판매관리",
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color:Color(0xff424242), fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Color(0xFF4E598C),
         elevation: 1.0,
-        iconTheme: IconThemeData(color: Colors.white),
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Color(0xff424242)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -248,11 +251,17 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
                 icon: Icon(Icons.arrow_drop_down, color: Colors.white), // 드롭다운 화살표 아이콘
                 iconSize: 24, // 아이콘 크기
                 elevation: 16, // 드롭다운 메뉴의 elevation
-                underline: Container(
-                  height: 2, // 드롭다운 버튼 하단의 밑줄 높이
-                  color: Colors.orange, // 밑줄 색상
-                ),
                 dropdownColor: Colors.white, // 드롭다운 메뉴의 배경색다운 메뉴의 배경색
+                underline: Container(),
+                decoration: InputDecoration( // 드롭다운 버튼의 데코레이션 설정
+                  contentPadding: EdgeInsets.symmetric(horizontal: 10), // 내용 영역의 패딩 설정
+                  filled: true, // 배경 색상 채우기
+                  fillColor: Colors.white, // 배경 색상
+                  border: OutlineInputBorder( // 라운드된 테두리 설정
+                    borderRadius: BorderRadius.circular(10), // 원하는 라운드된 테두리 반지름 설정
+                    borderSide: BorderSide(color: Colors.orange, width: 2), // 테두리 색상과 두께 설정
+                  ),
+                ),
               ),
             ],
           ),
@@ -326,6 +335,7 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
 
         ],
       ),
+      bottomNavigationBar: BottomAppBar(),
     );
   }
 

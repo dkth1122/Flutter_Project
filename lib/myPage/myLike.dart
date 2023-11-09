@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
 import '../product/productView.dart';
+import '../subBottomBar.dart';
 import 'myLikePortfolio.dart';
 
 class MyLikeList extends StatefulWidget {
@@ -176,6 +177,8 @@ class _MyLikeListListState extends State<MyLikeList> {
               PortfolioView()
             ],
           ),
+          bottomNavigationBar: SubBottomBar(),
+
         ),
       ),
 

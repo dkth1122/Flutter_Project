@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:project_flutter/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:project_flutter/myPage/alertControl.dart';
+import 'package:project_flutter/subBottomBar.dart';
 import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 import '../join/userModel.dart';
@@ -530,6 +531,7 @@ class _EditProfileState extends State<EditProfile> {
             ],
           ),
         ),
+        bottomNavigationBar: SubBottomBar(),
       ),
     );
   }

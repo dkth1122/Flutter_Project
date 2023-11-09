@@ -4,6 +4,7 @@ import 'package:project_flutter/expert/my_expert.dart';
 import 'package:project_flutter/main.dart';
 import 'package:project_flutter/proposal/myProposal.dart';
 import 'package:project_flutter/myPage/purchaseManagement.dart';
+import 'package:project_flutter/subBottomBar.dart';
 import 'package:provider/provider.dart';
 import '../join/userModel.dart';
 import '../proposal/myProposalList.dart';
@@ -358,6 +359,7 @@ class _MyCustomerState extends State<MyCustomer> {
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 
