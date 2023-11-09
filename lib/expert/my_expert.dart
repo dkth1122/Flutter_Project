@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:project_flutter/chat/chatList.dart';
 import 'package:project_flutter/expert/ratings.dart';
 import 'package:project_flutter/expert/revenue.dart';
 import 'package:project_flutter/expert/salesManagement.dart';
@@ -394,7 +395,7 @@ class _MyExpertState extends State<MyExpert> {
                     },
                   ),
                   ListTile(
-                    leading: Icon(Icons.message), // 아이콘 추가
+                    leading: Icon(Icons.question_answer), // 아이콘 추가
                     title: Text(
                       '메시지 응답 관리',
                     ),
@@ -403,6 +404,13 @@ class _MyExpertState extends State<MyExpert> {
                           .push(MaterialPageRoute(builder: (context) => MessageResponse()));
                     },
                   ),
+                  ListTile(
+                    leading: Icon(Icons.chat_outlined),
+                    title: Text("나의 채팅"),
+                    onTap: (){
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChatList()));
+                    },
+                  )
                 ],
               ),
             ),

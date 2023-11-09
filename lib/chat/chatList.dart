@@ -35,7 +35,6 @@ class _ChatListState extends State<ChatList> {
       user1 = um.userId!;
     } else {
       user1 = "없음";
-      print("로그인 안됨");
     }
   }
 
