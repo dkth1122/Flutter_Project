@@ -70,7 +70,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
   TextEditingController descriptionController = TextEditingController();
   TextEditingController imageUrlController = TextEditingController();
 
-  String selectedCategory = "UX 기획";
+  String selectedCategory = "UX기획";
   List<String> selectedHashtags = []; // 선택한 해시태그 목록
 
   // 이미지 선택 상태 변수
@@ -89,7 +89,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
   String portfolioDescription = "";
 
   Map<String, List<String>> categoryHashtags = {
-    "UX 기획": ["#기획∙스토리보드", "#기타 기획"],
+    "UX기획": ["#기획∙스토리보드", "#기타 기획"],
     "웹": [
       "#홈페이지",
       "#홈페이지(웹빌더·CMS)",
@@ -618,10 +618,10 @@ class _AddPortfolioState extends State<AddPortfolio> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               ListTile(
-                title: Text("UX 기획"),
+                title: Text("UX기획"),
                 onTap: () {
                   setState(() {
-                    selectedCategory = "UX 기획";
+                    selectedCategory = "UX기획";
                   });
                   Navigator.of(context).pop();
                 },

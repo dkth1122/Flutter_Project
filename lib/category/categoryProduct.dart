@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../firebase_options.dart';
 import '../product/productView.dart';
+import '../search/searchPortfolioDetail.dart';
 import '../subBottomBar.dart';
 
 
@@ -34,7 +35,24 @@ class _CategoryProductState extends State<CategoryProduct> {
   Widget build(BuildContext context) {
     String sendText = widget.sendText;
     return Scaffold(
-      appBar: AppBar(title: Text("카테고리"),backgroundColor: Color(0xFFFCAF58),),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          '카테고리',
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -44,19 +62,10 @@ class _CategoryProductState extends State<CategoryProduct> {
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 10,),
-            SizedBox(
-              height: 150,
-              child: Stack(
-                children: [
-                  sliderWidget(),
-                  sliderIndicator(),
-                ],
-              ),
-            ),
             Text("서비스"),
             Container(
               padding: EdgeInsets.all(10),
-              child: _categoryList(sendText)
+              child: _categoryProductList(sendText)
             ),
             Text("포트폴리오"),
             Container(
@@ -69,63 +78,8 @@ class _CategoryProductState extends State<CategoryProduct> {
       bottomNavigationBar: SubBottomBar(),
     );
   }
-  // 광고 슬라이더
-  Widget sliderWidget() {
-    return CarouselSlider(
-      carouselController: _controller,
-      items: imageBanner.map(
-            (imagePath) {
-          return Builder(
-            builder: (context) {
-              return SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                ),
-              );
-            },
-          );
-        },
-      ).toList(),
-      options: CarouselOptions(
-        height: 150,
-        viewportFraction: 1.0,
-        autoPlay: true,
-        autoPlayInterval: const Duration(seconds: 2),
-        onPageChanged: (index, reason) {
-          setState(() {
-            _current = index;
-          });
-        },
-      ),
-    );
-  }
-  Widget sliderIndicator() {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: imageBanner.asMap().entries.map((entry) {
-          return GestureDetector(
-            onTap: () => _controller.animateToPage(entry.key),
-            child: Container(
-              width: 12,
-              height: 12,
-              margin:
-              const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color:
-                Colors.white.withOpacity(_current == entry.key ? 0.9 : 0.4),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-  Widget _categoryList(String sendText) {
+
+  Widget _categoryProductList(String sendText) {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("product")
@@ -262,13 +216,89 @@ class _CategoryProductState extends State<CategoryProduct> {
                 }
                 final List<DocumentSnapshot> portfolioDocs = snapshot.data!.docs;
 
-                return Column(
-                  children: portfolioDocs.map((portfolioDoc) {
-                    final title = portfolioDoc.get('title').toString();
-                    return ListTile(
-                      title: Text('User ID: $userId, Portfolio Title: $title'),
-                    );
-                  }).toList(),
+                return ListView.builder(
+                    physics: NeverScrollableScrollPhysics(), // 스크롤 금지
+                    shrinkWrap: true,
+                    itemCount: portfolioDocs.length,
+                    itemBuilder: (context, index){
+                      Map<String, dynamic> data = portfolioDocs[index].data() as Map<String, dynamic>;
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SearchPortfolioDetail(
+                                portfolioItem: data,
+                                user: userId,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            SizedBox(height: 10,),
+                            Container(
+                              height: 100,
+                              padding: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 0.6,
+                                      color: Color.fromRGBO(182, 182, 182, 0.6)
+                                  )
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
+                                        child: Image.network(
+                                          data['thumbnailUrl'],
+                                          width: 130,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      SizedBox(width: 10,),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            data['title'].length > 7
+                                                ? '${data['title'].substring(0, 7)}...'
+                                                : data['title'],
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                          ),
+                                          Container(
+                                            width: 110,
+                                            child: Text(
+                                              data['description'].length > 20
+                                                  ? '${data['description'].substring(0, 20)}...'
+                                                  : data['description'],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        '조회수: ${data['cnt'].toString()}',
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
                 );
               },
             );
