@@ -100,32 +100,34 @@ class _ProductState extends State<Product> {
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
-              child: Container(
-                child: Row(
-                  children: List.generate(categories.length, (index) {
-                    return Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            if (selectedCategoryIndex == index) {
-                              selectedCategory = '전체'; // 카테고리 선택 해제
-                              selectedCategoryIndex = -1; // 선택된 카테고리 인덱스 초기화
-                            } else {
-                              selectedCategory = categories[index]; // 선택한 카테고리로 업데이트
-                              selectedCategoryIndex = index; // 선택한 카테고리 인덱스로 업데이트
-                            }
-                          });
-                        },
-                        style: ElevatedButton.styleFrom(
-                          primary: selectedCategoryIndex == index ? Color(0xFFFCAF58) : Color(0xFF4E598C),
-                          minimumSize: Size(double.infinity, 90),
-                        ),
-                        child: Text(categories[index]),
-                      ),
-                    );
-                  }),
-                ),
+              padding: const EdgeInsets.all(5),
+              child: GridView.count(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                crossAxisCount: 4,
+                mainAxisSpacing: 3, // 세로 방향 간격 설정
+                crossAxisSpacing: 1, // 가로 방향 간격 설정
+                childAspectRatio: 2 / 1, // 각 그리드 아이템의 가로 세로 비율 설정
+                children: List.generate(categories.length, (index) {
+                  return ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        if (selectedCategoryIndex == index) {
+                          selectedCategory = '전체'; // 카테고리 선택 해제
+                          selectedCategoryIndex = -1; // 선택된 카테고리 인덱스 초기화
+                        } else {
+                          selectedCategory = categories[index]; // 선택한 카테고리로 업데이트
+                          selectedCategoryIndex = index; // 선택한 카테고리 인덱스로 업데이트
+                        }
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: selectedCategoryIndex == index ? Color(0xFFFCAF58) : Color(0xFF4E598C),
+                      minimumSize: Size(double.infinity, 90),
+                    ),
+                    child: Text(categories[index]),
+                  );
+                }),
               ),
             ),
             //배너움직일때마다 재로딩됨 ㅡ,.ㅡ
@@ -292,7 +294,7 @@ class _ProductState extends State<Product> {
                                               );
                                             },
                                             child: Text(
-                                              '$productName (★$starAvg)',
+                                              '$productName (★${starAvg.toStringAsFixed(1)})',
                                               style: const TextStyle(
                                                 color: Colors.white,
                                                 fontSize: 12,
