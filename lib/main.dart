@@ -7,6 +7,7 @@ import 'package:project_flutter/chat/chatList.dart';
 import 'package:project_flutter/product/productView.dart';
 import 'package:project_flutter/search/search.dart';
 import 'package:project_flutter/bottomBar.dart';
+import 'package:project_flutter/search/searchPortfolioDetail.dart';
 import 'package:project_flutter/tutorial.dart';
 import 'package:provider/provider.dart';
 import 'admin/adminDomain.dart';
@@ -279,6 +280,26 @@ class _MyHomePageState extends State<MyHomePage> {
                     Container(
                         padding: EdgeInsets.all(10),
                         child: _cntProduct()
+                    ),
+                    SizedBox(height: 10,),
+                    // 가장 많이 본 서비스 제목
+                    Row(
+                      children: [
+                        SizedBox(width: 20,),
+                        Text(
+                          "가장 많이 본 포트폴리오",
+                          style: TextStyle(
+                              fontSize: 24,
+                              fontFamily: 'Pretendard',
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ],
+                    ),
+                    // 가장 많이 본 포트폴리오
+                    Container(
+                        padding: EdgeInsets.fromLTRB(10, 0, 10, 10),
+                        child: _cntPortFolio()
                     ),
                     SizedBox(height: 20,),
 
@@ -721,6 +742,135 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             );
           }).toList(),
+        );
+      },
+    );
+  }
+
+  Widget _cntPortFolio() {
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance.collection("expert").snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> expertSnap) {
+        if (!expertSnap.hasData) {
+          return CircularProgressIndicator();
+        }
+
+        final List<DocumentSnapshot> expertDocs = expertSnap.data!.docs;
+
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: expertDocs.length,
+          itemBuilder: (context, index) {
+            Map<String, dynamic> expertData = expertDocs[index].data() as Map<String, dynamic>;
+            String uId = expertData['userId'];
+
+            return StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection("expert")
+                  .doc(uId)
+                  .collection("portfolio")
+                  .orderBy('cnt', descending: true)  // 'cnt' 필드를 기준으로 내림차순으로 정렬
+                  .limit(4)
+                  .snapshots(),
+              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> portfolioSnap) {
+                if (!portfolioSnap.hasData) {
+                  return CircularProgressIndicator();
+                }
+
+                final List<DocumentSnapshot> portfolioDocs = portfolioSnap.data!.docs;
+
+                final filteredPortfolios = List.from(portfolioDocs);
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: filteredPortfolios.length,
+                  itemBuilder: (context, index) {
+                    Map<String, dynamic> portfolioData = filteredPortfolios[index].data() as Map<String, dynamic>;
+                    return InkWell(
+                        onTap: () {
+                          Map<String, dynamic> selectedPortfolioData = filteredPortfolios[index].data() as Map<String, dynamic>;
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SearchPortfolioDetail(
+                                portfolioItem: selectedPortfolioData,
+                                user: uId,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Column(
+                          children: [
+                            Container(
+                              height: 100,
+                              padding: EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 0.6,
+                                      color: Color.fromRGBO(182, 182, 182, 0.6)
+                                  )
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
+                                        child: Image.network(
+                                          portfolioData['thumbnailUrl'],
+                                          width: 130,
+                                          height: 100,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      SizedBox(width: 10,),
+                                      Column(
+                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            portfolioData['title'].length > 7
+                                                ? '${portfolioData['title'].substring(0, 7)}...'
+                                                : portfolioData['title'],
+                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                          ),
+                                          Container(
+                                            width: 110,
+                                            child: Text(
+                                              portfolioData['portfolioDescription'].length > 20
+                                                  ? '${portfolioData['portfolioDescription'].substring(0, 20)}...'
+                                                  : portfolioData['portfolioDescription'],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        '조회수: ${portfolioData['cnt']}',
+                                        style: TextStyle(fontSize: 12),
+                                      ),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 10,)
+                          ],
+                        )
+                      // Text("Portfolio Title: ${portfolioData['title']}")
+                    );
+                  },
+                );
+              },
+            );
+          },
         );
       },
     );
