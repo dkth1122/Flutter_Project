@@ -212,11 +212,7 @@ class _myLikePortfolioState extends State<myLikePortfolio> {
                                             });
                                           }
                                         }
-
-
-
                                       }
-
                                     },
                                     icon: sessionId.isNotEmpty
                                         ? StreamBuilder<QuerySnapshot>(
@@ -245,9 +241,6 @@ class _myLikePortfolioState extends State<myLikePortfolio> {
                                     )
                                         : Container(), // 하트 아이콘
                                   ),
-
-
-
 
                                   Text(
                                     '카테고리: ${portfolioData['category']}',

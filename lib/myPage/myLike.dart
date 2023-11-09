@@ -7,14 +7,14 @@ import '../join/userModel.dart';
 import '../product/productView.dart';
 import 'myLikePortfolio.dart';
 
-class CustomerLikeList extends StatefulWidget {
-  const CustomerLikeList({super.key});
+class MyLikeList extends StatefulWidget {
+  const MyLikeList({super.key});
 
   @override
-  State<CustomerLikeList> createState() => _CustomerLikeListState();
+  State<MyLikeList> createState() => _MyLikeListListState();
 }
 
-class _CustomerLikeListState extends State<CustomerLikeList> {
+class _MyLikeListListState extends State<MyLikeList> {
 
   late UserModel userModel;
   List<Map<String, dynamic>> likeData = [];
@@ -49,11 +49,10 @@ class _CustomerLikeListState extends State<CustomerLikeList> {
               title: Text(option),
               onTap: () {
                 setState(() {
-                  selectedFilter = option; // 선택한 필터 값을 저장
+                  selectedFilter = option;
                 });
-
                 Navigator.pop(context);
-                LikeData(); // 필터를 선택한 후 데이터 다시 불러오기
+                LikeData();
               },
             );
           }).toList(),
@@ -200,8 +199,6 @@ class ServiceListView extends StatelessWidget {
         int price = productPrices[index];
         String iUrl = productUrls[index];
         String pName = likeData[index]['pName'];
-
-
         return ListTile(
           leading:Image.network(
               iUrl, width: 100,),

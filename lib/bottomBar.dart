@@ -4,7 +4,6 @@ import 'package:project_flutter/chat/chatList.dart';
 import 'package:project_flutter/customer/userCustomer.dart';
 import 'package:project_flutter/expert/allPortfolioList.dart';
 import 'package:project_flutter/join/login_email.dart';
-import 'package:project_flutter/myPage/customerLike.dart';
 import 'package:project_flutter/product/product.dart';
 import 'package:project_flutter/subBottomBar.dart';
 import 'package:project_flutter/test.dart';
@@ -15,6 +14,7 @@ import 'expert/my_expert.dart';
 import 'join/userModel.dart';
 import 'main.dart';
 import 'myPage/myCustomer.dart';
+import 'myPage/myLike.dart';
 
 class CircularDialog extends StatefulWidget {
   @override
@@ -230,7 +230,7 @@ class _BottomBarState extends State<BottomBar> {
             Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
           } else {
             // 사용자가 로그인한 경우에만 MyPage로 이동
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => CustomerLikeList()));
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyLikeList()));
           }
         },
         icon: Icon(Icons.favorite),

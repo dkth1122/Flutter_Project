@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import 'expert/my_expert.dart';
 import 'join/login_email.dart';
 import 'join/userModel.dart';
-import 'myPage/customerLike.dart';
 import 'myPage/myCustomer.dart';
+import 'myPage/myLike.dart';
 
 class SubBottomBar extends StatefulWidget {
   const SubBottomBar({super.key});
@@ -52,7 +52,7 @@ class _SubBottomBarState extends State<SubBottomBar> {
             Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
           } else {
             // 사용자가 로그인한 경우에만 MyPage로 이동
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => CustomerLikeList()));
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyLikeList()));
           }
         },
         icon: Icon(Icons.favorite),
