@@ -451,6 +451,7 @@ class _MyExpertState extends State<MyExpert> {
                       '전문가',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
+                        color:  Color(0xff424242),
                       ),
                     ),
                   ),
@@ -459,7 +460,7 @@ class _MyExpertState extends State<MyExpert> {
                   ),
                   Text(
                     data['nick'],
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xff424242)),
                   ),
                 ],
               ),

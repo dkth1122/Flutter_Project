@@ -397,6 +397,7 @@ class _MyCustomerState extends State<MyCustomer> {
                       '의뢰인',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
+                        color: Color(0xff424242),
                       ),
                     ),
                   ),
@@ -405,7 +406,7 @@ class _MyCustomerState extends State<MyCustomer> {
                   ),
                   Text(
                     data['nick'],
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xff424242)),
                   ),
                 ],
               ),
