@@ -292,7 +292,7 @@ class _ProductViewState extends State<ProductView>
           controller: _tabController,
           labelColor: Color(0xff424242),
           unselectedLabelColor: Colors.grey,
-          indicatorColor: Color(0xff424242),
+          indicatorColor: Color(0xFFFCAF58),
           tabs: const [
             Tab(text: '상품 상세'),
             Tab(text: '후기'),
@@ -602,7 +602,7 @@ class _ProductViewState extends State<ProductView>
                     SizedBox(width: 8),
                     IconButton(
                       icon: Icon(Icons.send),
-                      color: Color(0xFF4E598C),
+                      color: Color(0xFFFCAF58),
                       onPressed: () {
                         String review = reviewController.text;
                         FirebaseFirestore.instance
