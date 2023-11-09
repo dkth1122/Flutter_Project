@@ -13,6 +13,7 @@ class SalesItem {
   final String category;
   final String imgUrl;
   final int price;
+  final int cnt;
   final DateTime timestamp;
 
 
@@ -21,6 +22,7 @@ class SalesItem {
     required this.category,
     required this.imgUrl,
     required this.price,
+    required this.cnt,
     required this.timestamp,
   });
 }
@@ -45,7 +47,15 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
     '트렌드',
     '데이터',
     '기타',];
-  List<String> optionsButton2 = ["최신순", "가격낮은순", "가격높은순", "좋아요높은순", "조회수높은순"];
+  String selectedSort = '기본 순';
+  List<String> sortOptions = [
+    '기본 순',
+    '조회수 높은 순',
+    '최신 등록 순',
+    '가격 높은 순',
+    '가격 낮은 순',
+  ];
+
 
 
   Future<void> updateSalesItems(String userId, String categoryFilter) async {
@@ -113,54 +123,6 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
     });
     Navigator.pop(context); // 필터 모달 닫기
   }
-  void showSortOptions(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return ListView(
-          children: optionsButton2.asMap().entries.map((entry) {
-            int index = entry.key;
-            String option = entry.value;
-            return ListTile(
-              title: Text(option),
-              onTap: () {
-                setState(() {
-                  _sortBy = index + 1;
-                });
-                sortSalesItems(); // 정렬 함수 호출
-                Navigator.pop(context); // 모달을 닫습니다.
-              },
-            );
-          }).toList(),
-        );
-      },
-    );
-  }
-
-
-
-  void sortSalesItems() {
-    switch (_sortBy) {
-      case 1: // 가격 낮은순
-        salesItems.sort((a, b) => a.price.compareTo(b.price));
-        break;
-      case 2: // 가격 높은순
-        salesItems.sort((a, b) => b.price.compareTo(a.price));
-        break;
-      case 3: // 최신순
-        salesItems.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-        break;
-      default:
-      // 기본 정렬은 최신순
-        salesItems.sort((a, b) => b.timestamp.compareTo(a.timestamp));
-        break;
-    }
-    setState(() {
-
-    });
-  }
-
-
   Widget _filterButton({
     IconData? icon, // Make the icon parameter nullable
     String? text, // Make the text parameter nullable
@@ -175,40 +137,6 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
         foregroundColor: MaterialStateProperty.all(Colors.white),
       ),
       onPressed: onPressed,
-    );
-  }
-
-  void showDateRangePickerModal(BuildContext context) {
-    DateTimeRange? selectedDateRange; // 모달 다이얼로그 내에서만 사용
-
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return Container(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              Text('날짜 범위 선택'),
-              ElevatedButton(
-                onPressed: () async {
-                  final DateTimeRange? picked = await showDateRangePicker(
-                    context: context,
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2030),
-                  );
-
-                  if (picked != null) {
-                    selectedDateRange = picked; // 모달 다이얼로그 내에서 변수에 선택한 범위 저장
-                  }
-                },
-                child: Text('날짜 범위 선택'),
-              ),
-              if (selectedDateRange != null) // 선택한 날짜 범위를 표시
-                Text('선택한 시작 날짜: ${selectedDateRange!.start}\n선택한 종료 날짜: ${selectedDateRange!.end}'),
-            ],
-          ),
-        );
-      },
     );
   }
 
@@ -229,8 +157,8 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
             category: doc['category'] as String,
             imgUrl: doc['iUrl'] as String,
             price: doc['price'] as int,
+            cnt: doc['cnt'] as int,
             timestamp: (doc['sendTime'] as Timestamp).toDate(),
-
           );
         }).toList();
         return salesList;
@@ -294,12 +222,28 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
                 },
               ),
               SizedBox(width: 10), // 버튼 사이에 간격을 추가합니다
-              _filterButton(
-                icon: Icons.arrow_drop_down,
-                text: '정렬',
-                onPressed: () {
-                  showSortOptions(context);
+              DropdownButton<String>(
+                value: selectedSort,
+                items: sortOptions.map((String option) {
+                  return DropdownMenuItem<String>(
+                    value: option,
+                    child: Text(option),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  setState(() {
+                    selectedSort = value!;
+                  });
                 },
+                style: TextStyle(color: Colors.black), // 드롭다운에서 선택된 항목의 텍스트 스타일
+                icon: Icon(Icons.arrow_drop_down, color: Colors.white), // 드롭다운 화살표 아이콘
+                iconSize: 24, // 아이콘 크기
+                elevation: 16, // 드롭다운 메뉴의 elevation
+                underline: Container(
+                  height: 2, // 드롭다운 버튼 하단의 밑줄 높이
+                  color: Colors.orange, // 밑줄 색상
+                ),
+                dropdownColor: Colors.white, // 드롭다운 메뉴의 배경색다운 메뉴의 배경색
               ),
             ],
           ),
@@ -316,14 +260,32 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
                 } else {
                   List<SalesItem> filteredSales = snapshot.data!;
 
-                  if (selectedCategory.isNotEmpty) {
+                  if (selectedCategory.isNotEmpty && selectedCategory != '전체') {
                     filteredSales = filteredSales.where((item) => item.category == selectedCategory).toList();
+                  }
+
+                  if (selectedSort == '조회수 높은 순') {
+                    filteredSales.sort((a, b) {
+                      return b.cnt.compareTo(a.cnt);
+                    });
+                  } else if (selectedSort == '최신 등록 순') {
+                    filteredSales.sort((a, b) {
+                      return b.timestamp.compareTo(a.timestamp);
+                    });
+                  } else if (selectedSort == '가격 높은 순') {
+                    filteredSales.sort((a, b) {
+                      return b.price.compareTo(a.price);
+                    });
+                  } else if (selectedSort == '가격 낮은 순') {
+                    filteredSales.sort((a, b) {
+                      return a.price.compareTo(b.price);
+                    });
                   }
 
                   return ListView.builder(
                     itemCount: filteredSales.length,
                     itemBuilder: (context, index) {
-                      SalesItem salesItem = filteredSales[index]; // 필터링된 데이터를 사용
+                      SalesItem salesItem = filteredSales[index];
                       return Column(
                         children: [
                           ListTile(
@@ -351,6 +313,7 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
               },
             ),
           ),
+
 
         ],
       ),
