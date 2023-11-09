@@ -7,6 +7,7 @@ import 'package:project_flutter/proposal/myProposal.dart';
 import 'package:project_flutter/myPage/purchaseManagement.dart';
 import 'package:project_flutter/subBottomBar.dart';
 import 'package:provider/provider.dart';
+import '../chat/chatList.dart';
 import '../join/userModel.dart';
 import '../proposal/myProposalList.dart';
 import '../proposal/myProposalView.dart';
@@ -353,6 +354,14 @@ class _MyCustomerState extends State<MyCustomer> {
                   trailing: Icon(Icons.arrow_forward_ios_rounded),
                   onTap: () {
                     // 두 번째 아이템이 클릭됐을 때 수행할 작업
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.chat_outlined),
+                  title: Text("나의 대화 목록"),
+                  trailing: Icon(Icons.arrow_forward_ios_rounded),
+                  onTap: (){
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChatList()));
                   },
                 ),
                 ListTile(

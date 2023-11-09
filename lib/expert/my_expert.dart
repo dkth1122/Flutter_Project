@@ -357,6 +357,7 @@ class _MyExpertState extends State<MyExpert> {
                     title: Text(
                       '수익 관리',
                     ),
+                    trailing: Icon(Icons.arrow_forward_ios_rounded),
                     onTap: () {
                       Navigator.of(context)
                           .push(MaterialPageRoute(builder: (context) => Revenue()));
@@ -367,6 +368,7 @@ class _MyExpertState extends State<MyExpert> {
                     title: Text(
                       '나의 전문가 등급',
                     ),
+                    trailing: Icon(Icons.arrow_forward_ios_rounded),
                     onTap: () {
                       Navigator.of(context).push(
                           MaterialPageRoute(builder: (context) => ExpertRating()));
@@ -377,6 +379,7 @@ class _MyExpertState extends State<MyExpert> {
                     title: Text(
                       '나의 포트폴리오',
                     ),
+                    trailing: Icon(Icons.arrow_forward_ios_rounded),
                     onTap: () {
                       Navigator.of(context)
                           .push(MaterialPageRoute(builder: (context) => Portfolio()));
@@ -387,6 +390,7 @@ class _MyExpertState extends State<MyExpert> {
                     title: Text(
                       '메시지 응답 관리',
                     ),
+                    trailing: Icon(Icons.arrow_forward_ios_rounded),
                     onTap: () {
                       Navigator.of(context)
                           .push(MaterialPageRoute(builder: (context) => MessageResponse()));
@@ -394,7 +398,8 @@ class _MyExpertState extends State<MyExpert> {
                   ),
                   ListTile(
                     leading: Icon(Icons.chat_outlined),
-                    title: Text("나의 채팅"),
+                    title: Text("나의 대화 목록"),
+                    trailing: Icon(Icons.arrow_forward_ios_rounded),
                     onTap: (){
                       Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChatList()));
                     },
