@@ -224,54 +224,58 @@ class _MyExpertState extends State<MyExpert> {
               color: Colors.grey,
               thickness: 5.0,
             ),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                children: [
-                  Text(
-                    "보낸제안",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                  ),
-                  Container(
-                    child: Column(
-                      children: [
-                        Text("작업 가능한 프로젝트를 확인하시고 금액을 제안해 주세요."),
-                        Column(
-                          children: [
-                            ElevatedButton(
-                              onPressed: () {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context)=>ProposalList()));
-                              },
-                              style: ButtonStyle(
-                                backgroundColor: MaterialStateProperty.all(Colors.white),
-                                side: MaterialStateProperty.all(
-                                  BorderSide(
-                                    color: Color(0xff424242),
-                                    width: 0.5,
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    Text(
+                      "보낸제안",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      child: Column(
+                        children: [
+                          Text("작업 가능한 프로젝트를 확인하시고 금액을 제안해 주세요."),
+                          SizedBox(height: 8,),
+                          Column(
+                            children: [
+                              ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context)=>ProposalList()));
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(Color(0xFFFF8C42)),
+                                  side: MaterialStateProperty.all(
+                                    BorderSide(
+                                      color: Color(0xff424242),
+                                      width: 0.5,
+                                    ),
                                   ),
                                 ),
+                                child: Text(
+                                  "프로젝트 보러가기",
+                                  style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                ),
                               ),
-                              child: Text(
-                                "프로젝트 보러가기",
-                                style: TextStyle(color: Color(0xff424242)),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    margin: EdgeInsets.all(20.0),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.grey,
-                        width: 1.0,
+                            ],
+                          ),
+                        ],
                       ),
-                      borderRadius: BorderRadius.circular(4.0),
+                      margin: EdgeInsets.all(20.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.grey,
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
             Divider(
@@ -302,7 +306,7 @@ class _MyExpertState extends State<MyExpert> {
                           '전체보기',
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.blue, // 파란색 텍스트
+                            color: Color(0xFFFF8C42),
                           ),
                         ),
                       ),
