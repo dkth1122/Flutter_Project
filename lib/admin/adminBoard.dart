@@ -14,10 +14,23 @@ class _AdminBoardState extends State<AdminBoard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('게시판 관리'),
-        backgroundColor: Color(0xFF4E598C),
-      ),
+        appBar: AppBar(
+          title: Text(
+            "게시판 관리",
+            style: TextStyle(
+              color: Color(0xff424242),
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          backgroundColor: Colors.white,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            color: Color(0xff424242),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        ),
       body: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -29,7 +42,7 @@ class _AdminBoardState extends State<AdminBoard> {
               );
             },
             style: ElevatedButton.styleFrom(
-              primary: Color(0xFF4E598C),
+              primary: Color(0xFFFF8C42),
             ),
             child: Text('공지사항 등록하기'),
           ),
@@ -41,7 +54,7 @@ class _AdminBoardState extends State<AdminBoard> {
               );
             },
             style: ElevatedButton.styleFrom(
-              primary: Color(0xFF4E598C),
+              primary: Color(0xFFFF8C42),
             ),
             child: Text('FAQ 등록하기'),
           ),
@@ -53,7 +66,7 @@ class _AdminBoardState extends State<AdminBoard> {
               );
             },
             style: ElevatedButton.styleFrom(
-              primary: Color(0xFF4E598C),
+              primary: Color(0xFFFF8C42),
             ),
             child: Text('1:1문의 답변하기'),
           ),

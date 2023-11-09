@@ -23,10 +23,20 @@ class Payment extends StatelessWidget {
     return IamportPayment(
       appBar: AppBar(
         title: Text(
-          '결제 진행',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          "결제 진행",
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        backgroundColor: Color(0xFFFCAF58),
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       initialChild: Container(
         child: Center(

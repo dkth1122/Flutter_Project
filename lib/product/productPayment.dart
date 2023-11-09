@@ -69,8 +69,21 @@ class _ProductPaymentState extends State<ProductPayment> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('결제 페이지'),
-        backgroundColor: Color(0xFF4E598C),
+        title: Text(
+          "결제 페이지",
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Center(
     child: user == "없음" || user == null

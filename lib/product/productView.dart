@@ -282,13 +282,17 @@ class _ProductViewState extends State<ProductView>
       appBar: AppBar(
         title: const Text(
           "상세보기",
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
+          ),
         ),
         bottom:
         TabBar(
           controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.black,
-          indicatorColor: Colors.white,
+          labelColor: Color(0xff424242),
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: Color(0xff424242),
           tabs: const [
             Tab(text: '상품 상세'),
             Tab(text: '후기'),
@@ -300,7 +304,14 @@ class _ProductViewState extends State<ProductView>
             }
           },
         ),
-        backgroundColor: Color(0xFF4E598C),
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Container(
         padding: EdgeInsets.fromLTRB(20, 0, 20, 20),

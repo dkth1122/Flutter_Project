@@ -34,21 +34,27 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('관리자 페이지'),
-        backgroundColor: Color(0xFF4E598C),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => MyHomePage(),
-                ),
-              );
-            },
-          ),
-        ],
+        title: Text('관리자 페이지',
+            style: TextStyle(
+            color: Color(0xff424242),
+        fontWeight: FontWeight.bold,
+      ),
+
+    ),
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.home),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MyHomePage(),
+              ),
+            );
+          },
+        ),
+
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -74,7 +80,7 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
                 },
                 child: Text('광고 관리'),
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xFF4E598C),
+                  primary: Color(0xFFFF8C42),
                 ),
               ),
               ElevatedButton(
@@ -86,7 +92,7 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
                 },
                 child: Text('게시판 관리'),
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xFF4E598C),
+                  primary: Color(0xFFFF8C42),
                 ),
               ),
               ElevatedButton(
@@ -98,7 +104,7 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
                 },
                 child: Text('회원 관리'),
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xFF4E598C),
+                  primary: Color(0xFFFF8C42),
                 ),
               ),
             ],

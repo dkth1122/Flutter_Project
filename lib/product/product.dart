@@ -74,10 +74,16 @@ class _ProductState extends State<Product> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text("상품페이지"),
-        backgroundColor: Color(0xFF4E598C),
+        title: const Text("상품 페이지",
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          color: Color(0xff424242),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -85,6 +91,7 @@ class _ProductState extends State<Product> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
+            color: Color(0xff424242),
             onPressed: () {
               Navigator.push(
                 context,
@@ -122,7 +129,7 @@ class _ProductState extends State<Product> {
                       });
                     },
                     style: ElevatedButton.styleFrom(
-                      primary: selectedCategoryIndex == index ? Color(0xFFFCAF58) : Color(0xFF4E598C),
+                      primary: selectedCategoryIndex == index ? Colors.grey : Color(0xFFFCAF58),
                       minimumSize: Size(double.infinity, 90),
                     ),
                     child: Text(categories[index]),
@@ -276,7 +283,7 @@ class _ProductState extends State<Product> {
                                     right: 0,
                                     child: Container(
                                       padding: EdgeInsets.all(8),
-                                      color: Colors.black.withOpacity(0.4),
+                                      color: Colors.black.withOpacity(0.5),
                                       child: Column(
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
