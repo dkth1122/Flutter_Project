@@ -405,14 +405,6 @@
                     ],
                   ),
                 ),
-                if (!isRead)
-                  Text(
-                    "1", // 읽지 않은 메시지 표시
-                    style: TextStyle(
-                      color: Colors.red,
-                      fontSize: 12,
-                    ),
-                  ),
                 if (!isCurrentUser)
                   Padding(
                     padding: const EdgeInsets.only(left: 5),

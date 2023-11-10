@@ -5,6 +5,7 @@ import 'package:project_flutter/expert/portfolioDetail.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
+import '../subBottomBar.dart';
 import 'editPortfolio.dart';
 
 class PortfolioItem {
@@ -262,30 +263,13 @@ class _PortfolioState extends State<Portfolio> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.edit, color: Color(0xFFFF8C42)),
-                                  onPressed: () {
-                                    // EditPortfolio 위젯으로 이동
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => EditPortfolio(portfolioId: item.id),
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ]
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
                                   icon: Icon(Icons.delete, color: Color(0xFFFF8C42)),
                                   onPressed: () {
                                     // 포트폴리오 삭제 기능 호출
                                     deletePortfolio(item.title);
                                   },
                                 ),
-                              ],
+                              ]
                             ),
                           ],
                         ),
@@ -298,6 +282,7 @@ class _PortfolioState extends State<Portfolio> {
           },
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 }

@@ -212,7 +212,7 @@ class _ChatListState extends State<ChatList> {
                                 // 데이터 로드 중
                                 return CircleAvatar(
                                   radius: 30,
-                                  backgroundImage: AssetImage('assets/loading_image.png'),
+                                  backgroundImage: AssetImage('assets/profile.png'),
                                 );
                               }
                             },

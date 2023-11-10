@@ -8,6 +8,7 @@ import 'package:project_flutter/expert/myPortfolio.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
+import '../subBottomBar.dart';
 
 class PortfolioItem {
   String title;
@@ -60,11 +61,6 @@ class _AddPortfolioState extends State<AddPortfolio> {
       print("로그인 안됨");
     }
   }
-
-
-
-
-
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -657,6 +653,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
             ],
           ),
         ),
+      bottomNavigationBar: SubBottomBar(),
       );
   }
 
