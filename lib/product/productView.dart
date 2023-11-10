@@ -8,6 +8,7 @@ import 'package:project_flutter/product/productPayment.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
+import '../expert/userPortfolio.dart';
 import '../join/login_email.dart';
 
 class ProductView extends StatefulWidget {
@@ -482,17 +483,31 @@ class _ProductViewState extends State<ProductView>
 
                             return Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children:[
-                                CircleAvatar(
-                                  radius: 40,
-                                  backgroundImage: NetworkImage(userProfileImage),
+                              children:[GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context)
+                                      .push(MaterialPageRoute(builder: (context) => UserPortfolio(
+                                      seller : seller
+
+                                  )));
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children:[
+                                    CircleAvatar(
+                                      radius: 40,
+                                      backgroundImage: NetworkImage(userProfileImage),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Text(userNick), // 닉네임 출력
+                                    SizedBox(width: 50),
+                                    TextButton(
+                                      onPressed: _toggleChat,
+                                      child: Text("1:1문의하기"),
+                                    ),
+                                  ],
                                 ),
-                                SizedBox(width: 5),
-                                Text(userNick), // 닉네임 출력
-                                TextButton(
-                                  onPressed: _toggleChat,
-                                  child: Text("1:1문의하기"),
-                                ),
+                              )
                               ],
                             );
                           }
@@ -721,6 +736,30 @@ class _ProductViewState extends State<ProductView>
       },
     );
   }
+
+  void _PortFolioCD() async {
+    /*FirebaseFirestore.instance
+        .collection("expert")
+        .doc(user)
+        .collection("portfolio")
+        .orderBy('cnt', descending: true)
+        .limit(4)
+        .get()
+        .then((QuerySnapshot portfolioSnap) {
+      if (!portfolioSnap.hasData) {
+        return CircularProgressIndicator();
+      }
+
+      final List<DocumentSnapshot> portfolioDocs = portfolioSnap.docs;
+
+      for (DocumentSnapshot portfolioDoc in portfolioDocs) {
+        Map<String, dynamic> portfolioData = portfolioDoc.data() as Map<String, dynamic>;
+        // 원하는 작업 수행
+        print("Portfolio Title: ${portfolioData['title']}");
+      }
+    });*/
+  }
+
 
 
 
