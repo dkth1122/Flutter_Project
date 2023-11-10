@@ -124,8 +124,10 @@ class _ChatListState extends State<ChatList> {
                   .orderBy('sendTime', descending: true)
                   .limit(1)
                   .get(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> lastMessageSnapshot) {
-                if (lastMessageSnapshot.connectionState == ConnectionState.waiting) {
+              builder:
+                  (context, AsyncSnapshot<QuerySnapshot> lastMessageSnapshot) {
+                if (lastMessageSnapshot.connectionState ==
+                    ConnectionState.waiting) {
                   return Center(child: CircularProgressIndicator());
                 }
 
@@ -136,24 +138,29 @@ class _ChatListState extends State<ChatList> {
                 String lastMessageText = 'No last message';
                 Widget? trailingWidget;
 
-                if (lastMessageSnapshot.hasData && lastMessageSnapshot.data!.docs.isNotEmpty) {
-                  final lastMessageData = lastMessageSnapshot.data!.docs.first.data() as Map<String, dynamic>;
-                  lastMessageText = lastMessageData['text'] as String? ?? 'No last message';
-                  final String? lastMessageImageUrl = lastMessageData['imageUrl'] as String?;
+                if (lastMessageSnapshot.hasData &&
+                    lastMessageSnapshot.data!.docs.isNotEmpty) {
+                  final lastMessageData = lastMessageSnapshot.data!.docs.first
+                      .data() as Map<String, dynamic>;
+                  lastMessageText =
+                      lastMessageData['text'] as String? ?? 'No last message';
+                  final String? lastMessageImageUrl =
+                      lastMessageData['imageUrl'] as String?;
 
-                  if (lastMessageImageUrl != null && lastMessageImageUrl!.isNotEmpty) {
+                  if (lastMessageImageUrl != null &&
+                      lastMessageImageUrl!.isNotEmpty) {
                     lastMessageText = "이미지를 보냈습니다.";
                   }
                   // sendTime을 표시하기 위한 코드 수정
-                  final lastMessageTime = lastMessageData['sendTime'] as Timestamp?;
+                  final lastMessageTime =
+                      lastMessageData['sendTime'] as Timestamp?;
                   final messageDateTime = lastMessageTime?.toDate();
                   timeFormat = DateFormat.jm().format(messageDateTime!);
                 }
 
                 return Card(
                   elevation: 3,
-                  margin:
-                  EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -163,8 +170,7 @@ class _ChatListState extends State<ChatList> {
                       await Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              ChatApp(roomId: document.id),
+                          builder: (context) => ChatApp(roomId: document.id),
                         ),
                       );
                       // ChatApp에서 돌아왔을 때 메시지를 읽었음을 표시
@@ -179,16 +185,42 @@ class _ChatListState extends State<ChatList> {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          CircleAvatar(
-                            radius: 30,
-                            // Add profile image here
-                            backgroundImage: AssetImage(url),
+                          FutureBuilder<QuerySnapshot>(
+                            future: FirebaseFirestore.instance
+                                .collection('userList')
+                                .where('userId', isEqualTo: user2Value)
+                                .get(),
+                            builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.connectionState == ConnectionState.done) {
+                                if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                                  var userDoc = snapshot.data!.docs.first;
+                                  Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
+                                  if (userData != null && userData.containsKey('profileImageUrl')) {
+                                    String userProfileUrl = userData['profileImageUrl'];
+                                    return CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage: NetworkImage(userProfileUrl),
+                                    );
+                                  }
+                                }
+                                // 필드가 없는 경우 기본 이미지 표시
+                                return CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: AssetImage('assets/profile.png'),
+                                );
+                              } else {
+                                // 데이터 로드 중
+                                return CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: AssetImage('assets/loading_image.png'),
+                                );
+                              }
+                            },
                           ),
                           SizedBox(width: 16),
                           Expanded(
                             child: Column(
-                              crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   chatTitle,
@@ -215,10 +247,9 @@ class _ChatListState extends State<ChatList> {
                               Text(
                                 timeFormat,
                                 style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.bold
-                                ),
+                                    fontSize: 12,
+                                    color: Colors.grey,
+                                    fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 8),
                               //챗봇용
@@ -231,11 +262,18 @@ class _ChatListState extends State<ChatList> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => ChatResponsePage(roomId: document.id),
+                                        builder: (context) => ChatResponsePage(
+                                            roomId: document.id),
                                       ),
                                     );
                                   },
-                                  child: Text("?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white),),
+                                  child: Text(
+                                    "?",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: Colors.white),
+                                  ),
                                 ),
                               ),
                             ],
@@ -255,9 +293,10 @@ class _ChatListState extends State<ChatList> {
 
   Future<void> _markMessagesAsRead(String roomId) async {
     final myId = user1; // 현재 사용자의 ID를 가져오는 방법을 구현해야 합니다.
-    final messagesRef =
-    FirebaseFirestore.instance.collection('chat').doc(roomId).collection(
-        'message');
+    final messagesRef = FirebaseFirestore.instance
+        .collection('chat')
+        .doc(roomId)
+        .collection('message');
 
     final messagesQuery = await messagesRef
         .where('user', isEqualTo: myId)
@@ -285,8 +324,7 @@ class _ChatListState extends State<ChatList> {
                 FirebaseFirestore.instance
                     .collection('chat')
                     .doc(roomId)
-                    .update({'status': '$user1 D'})
-                    .then((value) {
+                    .update({'status': '$user1 D'}).then((value) {
                   Navigator.of(context).pop();
                 });
               },
@@ -296,7 +334,8 @@ class _ChatListState extends State<ChatList> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('취소'),)
+              child: Text('취소'),
+            )
           ],
         );
       },
