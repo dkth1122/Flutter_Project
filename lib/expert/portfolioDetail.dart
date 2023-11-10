@@ -168,6 +168,20 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
                       '참여기간 : ${DateFormat('yyyy-MM-dd').format(data['startDate'].toDate())}'
                           '~ ${DateFormat('yyyy-MM-dd').format(data['endDate'].toDate())}',
                     ),
+                    SizedBox(height: 20),
+                    Text(
+                      "고객사",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    Text('${data['customer']}', style: TextStyle(fontSize: 16)),
+                    SizedBox(height: 20),
+                    Text(
+                      "업종",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    Text('${data['industry']}', style: TextStyle(fontSize: 16)),
                   ],
                 ),
               ),

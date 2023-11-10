@@ -208,6 +208,18 @@ class _AddPortfolioState extends State<AddPortfolio> {
     return downloadURL;
   }
 
+  //title 중복 검사용
+  Future<bool> isTitleUnique(String title, String userId) async {
+    final expertCollection = firestore.collection('expert');
+    final expertDoc = expertCollection.doc(userId);
+    final portfolioCollection = expertDoc.collection('portfolio');
+
+    final querySnapshot = await portfolioCollection.where('title', isEqualTo: title).get();
+
+    return querySnapshot.docs.isEmpty;
+  }
+
+
   //포트폴리오 등록
   Future<void> addPortfolioToFirestore(PortfolioItem item, String userId) async {
     try {
@@ -234,9 +246,9 @@ class _AddPortfolioState extends State<AddPortfolio> {
         'category': item.category,
         'startDate': item.startDate,
         'endDate': item.endDate,
-        'customer': item.customer,
-        'industry': item.industry,
-        'portfolioDescription': item.portfolioDescription,
+        'customer': item.customer,//고객사
+        'industry': item.industry,//업종
+        'portfolioDescription': item.portfolioDescription,//포트폴리오 설명
         'hashtags': item.hashtags,
         'likeCnt' : 0,
         'cnt' : 0
@@ -253,41 +265,45 @@ class _AddPortfolioState extends State<AddPortfolio> {
 
 
 
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text(
-            '포트폴리오 등록',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold
-            ),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          '포트폴리오 등록',
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
           ),
-          backgroundColor: Color(0xFF4E598C),
         ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xFFFF8C42),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
         body: Padding(
           padding: EdgeInsets.fromLTRB(20, 0, 20, 20),
           child: ListView(
             children: <Widget>[
               SizedBox(height: 10,),
-              Text(
-                '등록을 위해 아래 정보를 입력해주세요',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
               SizedBox(height: 16.0),
               Text(
                 "필수 정보",
-                style: TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff424242)),
               ),
               SizedBox(height: 16.0),
               Text(
                 "제목",
                 style: TextStyle(
                   fontSize: 16,
+                  color: Color(0xff424242)
                 ),
               ),
               TextField(
@@ -301,6 +317,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
                 "내용",
                 style: TextStyle(
                   fontSize: 16,
+                  color: Color(0xff424242)
                 ),
               ),
               TextFormField(
@@ -311,7 +328,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
                 ),
               ),
               SizedBox(height: 12.0),
-              Text("썸네일 이미지 선택", style: TextStyle(fontWeight: FontWeight.bold)),
+              Text("썸네일 이미지 선택", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff424242))),
               SizedBox(height: 12.0),
               thumbImagePath != null
                   ? Column(
@@ -330,7 +347,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
                       });
                     },
                     icon: Icon(Icons.clear), // "x" 아이콘 추가
-                    label: Text('선택 취소'),
+                    label: Text('선택 취소',style: TextStyle(fontWeight: FontWeight.bold,color: Color(0xff424242)),),
                   ),
                 ],
               )
@@ -338,21 +355,21 @@ class _AddPortfolioState extends State<AddPortfolio> {
                 onPressed: () {
                   _selectThumbnailImage(context);
                 },
-                child: Text('이미지 선택'),
+                child: Text('이미지 선택', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xFF4E598C),
+                  primary: Color(0xFFFF8C42),
                 ),
               ),
               // 이미지 선택 부분
-              Text("서브 이미지 선택", style: TextStyle(fontWeight: FontWeight.bold)),
+              Text("서브 이미지 선택", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff424242))),
               SizedBox(height: 12.0),
               ElevatedButton(
                 onPressed: () {
                   _selectSubImage(context);
                 },
-                child: Text('이미지 선택'),
+                child: Text('이미지 선택', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),),
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xFF4E598C),
+                  primary: Color(0xFFFF8C42),
                 ),
               ),
 
@@ -396,7 +413,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
                     child: Text(
                       "카테고리: $selectedCategory",
                       style: TextStyle(
-                        color: Colors.blue,
+                        color: Color(0xFFFF8C42),
                         fontWeight: FontWeight.bold,
                         fontSize: 16
                       ),
@@ -431,11 +448,11 @@ class _AddPortfolioState extends State<AddPortfolio> {
                     },
                     child: Text(
                       "시작: ${startDate != null ? DateFormat('yyyy-MM-dd').format(startDate!) : '날짜 선택'}",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFFF8C42)),
                     ),
                   ),
                   Text("~",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFFF8C42)),
                   ),
                   TextButton(
                     onPressed: () {
@@ -443,7 +460,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
                     },
                     child: Text(
                       "끝: ${endDate != null ? DateFormat('yyyy-MM-dd').format(endDate!) : '날짜 선택'}",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFFFF8C42)),
                     ),
                   ),
                 ],
@@ -480,33 +497,62 @@ class _AddPortfolioState extends State<AddPortfolio> {
               ),
               SizedBox(height: 16.0),
               ElevatedButton(
-                onPressed: () {
-                  if (startDate == null || endDate == null) {
+                onPressed: () async {
+                  String errorMessage = "";
+
+                  if (titleController.text.isEmpty) {
+                    errorMessage = "제목을 입력하세요.";
+                  } else if (descriptionController.text.isEmpty) {
+                    errorMessage = "내용을 입력하세요.";
+                  } else if (thumbImagePath == null) {
+                    errorMessage = "썸네일 이미지를 선택하세요.";
+                  } else if (imagePaths.isEmpty) {
+                    errorMessage = "서브 이미지를 선택하세요.";
+                  } else if (selectedCategory.isEmpty) {
+                    errorMessage = "카테고리를 선택하세요.";
+                  } else if (startDate == null || endDate == null) {
+                    errorMessage = "시작 날짜와 끝난 날짜를 선택하세요.";
+                  } else if (customer.isEmpty) {
+                    errorMessage = "고객사를 입력하세요.";
+                  } else if (industry.isEmpty) {
+                    errorMessage = "업종을 입력하세요.";
+                  } else if (portfolioDescription.isEmpty) {
+                    errorMessage = "포트폴리오 설명을 입력하세요.";
+                  }
+
+                  if (errorMessage.isNotEmpty) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: Text('시작 날짜와 끝 날짜를 선택하세요.'),
+                        content: Text(errorMessage),
                       ),
                     );
-                  } else {
-                    _addUser();
-                    final portfolioItem = PortfolioItem(
-                      title: titleController.text,
-                      description: descriptionController.text,
-                      thumbnailUrl: thumbImagePath ?? "",
-                      category: selectedCategory,
-                      startDate: startDate,
-                      endDate: endDate,
-                      customer: customer,
-                      industry: industry,
-                      portfolioDescription: portfolioDescription,
-                      hashtags: selectedHashtags,
-                    );
+                    return;
+                  }
 
-                    if (user != "없음") {
+                  if (user != "없음") {
+                    // 제목이 중복되지 않는지 확인
+                    final isUnique = await isTitleUnique(titleController.text, user);
+
+                    if (isUnique) {
+                      _addUser();
+                      final portfolioItem = PortfolioItem(
+                        title: titleController.text,
+                        description: descriptionController.text,
+                        thumbnailUrl: thumbImagePath!,
+                        category: selectedCategory,
+                        startDate: startDate,
+                        endDate: endDate,
+                        customer: customer,
+                        industry: industry,
+                        portfolioDescription: portfolioDescription,
+                        hashtags: selectedHashtags,
+                      );
+
                       addPortfolioToFirestore(portfolioItem, user);
                       setState(() {
                         portfolioItems.add(portfolioItem);
                       });
+
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text('포트폴리오가 등록되었습니다.'),
@@ -514,21 +560,26 @@ class _AddPortfolioState extends State<AddPortfolio> {
                       );
                       Navigator.of(context).push(MaterialPageRoute(builder: (context) => Portfolio()));
                     } else {
-                      // 사용자가 로그인하지 않은 경우의 처리
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('로그인이 필요한 서비스입니다.'),
+                          content: Text('이미 사용 중인 제목입니다. 다른 제목을 선택하세요.'),
                         ),
                       );
                     }
+                  } else {
+                    // 사용자가 로그인하지 않은 경우의 처리
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('로그인이 필요한 서비스입니다.'),
+                      ),
+                    );
                   }
                 },
-                child: Text('포트폴리오 등록'),
+                child: Text('포트폴리오 등록', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                 style: ElevatedButton.styleFrom(
-                  primary: Color(0xFF4E598C),
+                  primary: Color(0xFFFF8C42),
                 ),
               ),
-
               SizedBox(height: 16.0),
                 ListView.builder(
                   shrinkWrap: true,

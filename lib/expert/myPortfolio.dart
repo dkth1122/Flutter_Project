@@ -43,6 +43,7 @@ class _PortfolioState extends State<Portfolio> {
     fetchPortfolioItems();
   }
 
+  //포트폴리오 출력
   Future<void> fetchPortfolioItems() async {
     try {
       QuerySnapshot expertSnapshot = await expertCollection.where('userId', isEqualTo: user).get();
@@ -82,6 +83,25 @@ class _PortfolioState extends State<Portfolio> {
     }
   }
 
+  // 포트폴리오 삭제 기능
+  Future<void> deletePortfolio(String title) async {
+    try {
+      final expertDoc = await expertCollection.doc(user).get();
+      final portfolioRef = expertDoc.reference.collection('portfolio');
+
+      await portfolioRef.where('title', isEqualTo: title).get().then((value) {
+        for (var doc in value.docs) {
+          doc.reference.delete();
+        }
+      });
+
+      // 포트폴리오 삭제 후 목록을 업데이트
+      fetchPortfolioItems();
+    } catch (e) {
+      print('포트폴리오 삭제 오류: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,7 +121,7 @@ class _PortfolioState extends State<Portfolio> {
         ),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.add),
+            icon: Icon(Icons.add, color: Color(0xFFFF8C42),),
             onPressed: () {
               Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddPortfolio()));
             },
