@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:project_flutter/customer/userCustomer.dart';
 import 'package:project_flutter/expert/my_expert.dart';
 import 'package:project_flutter/main.dart';
 import 'package:project_flutter/myPage/myCoupon.dart';
@@ -375,14 +376,14 @@ class _MyCustomerState extends State<MyCustomer> {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => PurchaseManagement(userId:userId)));
                   },
                 ),
-                ListTile(
-                  leading: Icon(Icons.credit_card),
-                  title: Text('결제/환불내역'),
-                  trailing: Icon(Icons.arrow_forward_ios_rounded),
-                  onTap: () {
-                    // 두 번째 아이템이 클릭됐을 때 수행할 작업
-                  },
-                ),
+                // ListTile(
+                //   leading: Icon(Icons.credit_card),
+                //   title: Text('결제/환불내역'),
+                //   trailing: Icon(Icons.arrow_forward_ios_rounded),
+                //   onTap: () {
+                //     // 두 번째 아이템이 클릭됐을 때 수행할 작업
+                //   },
+                // ),
                 ListTile(
                   leading: Icon(Icons.chat_outlined),
                   title: Text("나의 대화 목록"),
@@ -393,11 +394,10 @@ class _MyCustomerState extends State<MyCustomer> {
                 ),
                 ListTile(
                   leading: Icon(Icons.question_mark),
-                  title: Text('고객센터'),
+                  title: Text('공지사항'),
                   trailing: Icon(Icons.arrow_forward_ios_rounded),
                   onTap: () {
-                    // 세 번째 아이템이 클릭됐을 때 수행할 작업
-                  },
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => UserCustomer()));                  },
                 ),
               ],
             ),
