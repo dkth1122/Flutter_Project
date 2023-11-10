@@ -46,7 +46,6 @@ class _SearchState extends State<Search> {
       UserModel um = Provider.of<UserModel>(context, listen: false);
       if (um.isLogin) {
         user = um.userId!;
-        print(user);
       } else {
         user = "없음";
         print("로그인 안됨");
@@ -104,7 +103,6 @@ class _SearchState extends State<Search> {
     UserModel um = Provider.of<UserModel>(context, listen: false);
     if (um.isLogin) {
       user = um.userId!;
-      print(user);
     } else {
       print("로그인 안됨");
     }
@@ -242,7 +240,6 @@ class _SearchState extends State<Search> {
     UserModel um = Provider.of<UserModel>(context, listen: false);
     if (um.isLogin) {
       String user = um.userId!;
-      print(user);
       final PageController controller =
       PageController(initialPage: 4, viewportFraction: 0.3);
       return StreamBuilder(

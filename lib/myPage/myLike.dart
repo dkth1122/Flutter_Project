@@ -100,7 +100,7 @@ class _MyLikeListListState extends State<MyLikeList> {
         category = categorys;
       });
     }else{
-      print("에러 발생 ==> 확인");
+      print("에러 발생");
     }
   }
 

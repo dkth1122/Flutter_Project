@@ -145,7 +145,7 @@ class _PortfolioState extends State<Portfolio> {
         print('포트폴리오 삭제 오류: $e');
       }
     }else{
-      print("삭제 실패!!!!!!!!!!!!");
+      print("삭제 실패");
     }
   }
 

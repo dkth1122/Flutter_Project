@@ -181,8 +181,6 @@ class _AllPortfolioListState extends State<UserPortfolio> {
                                                 .where('portfoiloId', isEqualTo: uId)
                                                 .where('title', isEqualTo:portfolioData['title'])
                                                 .get();
-                                            print(sessionId);
-                                            print(uId);
 
                                             if (result.docs.isNotEmpty) {
                                               final documentId = result.docs.first.id;
@@ -194,7 +192,6 @@ class _AllPortfolioListState extends State<UserPortfolio> {
                                                   .collection("portfolio")
                                                   .where('title', isEqualTo: portfolioData['title'])
                                                   .get();
-                                              print(portfolioQuery);
 
                                               if (portfolioQuery.docs.isNotEmpty) {
                                                 final productDocId = portfolioQuery.docs.first.id;

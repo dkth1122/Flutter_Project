@@ -33,7 +33,6 @@ class _MyQuestionState extends State<MyQuestion> {
 
     if (um.isLogin) {
       sessionId = um.userId!;
-      print(sessionId);
     } else {
       sessionId = "";
     }

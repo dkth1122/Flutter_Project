@@ -52,8 +52,6 @@ class _ProductPaymentState extends State<ProductPayment> {
     if (um.isLogin) {
       // 사용자가 로그인한 경우
       user = um.userId!;
-      print(user);
-
     } else {
       // 사용자가 로그인하지 않은 경우
       user = "없음";
@@ -307,7 +305,6 @@ class _ProductPaymentState extends State<ProductPayment> {
 
   int calculateDiscountedPrice() { // 할인된 가격 결제시 넘길 금액
     discountedPrice = int.parse(widget.price) - discountPercentage.toInt();
-    print(discountedPrice);
     return discountedPrice;
   }
 }

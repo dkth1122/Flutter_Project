@@ -242,9 +242,9 @@ class _JoinState extends State<Join> {
     final RegExp nameRegExp = RegExp(r'^[가-힣]{1,10}$');
     return nameRegExp.hasMatch(name);
   }
-  // 정규식을 사용하여 닉네임이 최대 10자 이내인지 확인
+  // 정규식을 사용하여 닉네임이 최대 5자 이내인지 확인
   bool isNicknameValid(String nickname) {
-    final RegExp nicknameRegExp = RegExp(r'^[a-zA-Z0-9가-힣]{1,8}$');
+    final RegExp nicknameRegExp = RegExp(r'^[a-zA-Z0-9가-힣]{1,5}$');
     return nicknameRegExp.hasMatch(nickname);
   }
 
@@ -266,11 +266,6 @@ class _JoinState extends State<Join> {
     }
     return isDuplicate;
   }
-
-
-
-
-
 
 
   @override
@@ -456,13 +451,13 @@ class _JoinState extends State<Join> {
                           });
                         } else {
                           setState(() {
-                            nickValidationMessage = '닉네임은 최대 10자 이내로 입력하세요.';
+                            nickValidationMessage = '닉네임은 최대 5자 이내로 입력하세요.';
                           });
                         }
                       },
                       decoration: InputDecoration(
                         labelText: '닉네임',
-                        hintText: '10자 이내, 특수기호 불가',
+                        hintText: '5자 이내, 특수기호 불가',
 
 
                       ),

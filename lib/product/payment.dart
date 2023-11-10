@@ -66,9 +66,6 @@ class Payment extends StatelessWidget {
         cardQuota: [2, 3],
       ),
       callback: (Map<String, String> result) {
-        print(user);
-        print(price);
-        print(productName);
         Navigator.push(
           context,
           MaterialPageRoute(

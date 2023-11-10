@@ -49,7 +49,6 @@ class _myLikePortfolioState extends State<myLikePortfolio> {
             Map<String, dynamic> jjimData = jjimDocs[index].data() as Map<String, dynamic>;
             String uId = jjimData['portfoiloId'];
             String portfolioTitle = jjimData['title'];
-            print(uId);
 
             return StreamBuilder(
               stream: FirebaseFirestore.instance
@@ -143,8 +142,6 @@ class _myLikePortfolioState extends State<myLikePortfolio> {
                                             .where('portfoiloId', isEqualTo: uId)
                                             .where('title', isEqualTo:portfolioData['title'])
                                             .get();
-                                        print(sessionId);
-                                        print(uId);
 
                                         if (result.docs.isNotEmpty) {
                                           final documentId = result.docs.first.id;
@@ -156,7 +153,6 @@ class _myLikePortfolioState extends State<myLikePortfolio> {
                                               .collection("portfolio")
                                               .where('title', isEqualTo: portfolioData['title'])
                                               .get();
-                                          print(portfolioQuery);
 
                                           if (portfolioQuery.docs.isNotEmpty) {
                                             final productDocId = portfolioQuery.docs.first.id;
