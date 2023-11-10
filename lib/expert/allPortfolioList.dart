@@ -169,9 +169,6 @@ class _AllPortfolioListState extends State<AllPortfolioList> {
                                                 .where('portfoiloId', isEqualTo: uId)
                                                 .where('title', isEqualTo:portfolioData['title'])
                                                 .get();
-                                            print(sessionId);
-                                            print(uId);
-
                                             if (result.docs.isNotEmpty) {
                                               final documentId = result.docs.first.id;
                                               FirebaseFirestore.instance.collection('portfolioLike').doc(documentId).delete();
@@ -182,8 +179,6 @@ class _AllPortfolioListState extends State<AllPortfolioList> {
                                                   .collection("portfolio")
                                                   .where('title', isEqualTo: portfolioData['title'])
                                                   .get();
-                                              print(portfolioQuery);
-
                                               if (portfolioQuery.docs.isNotEmpty) {
                                                 final productDocId = portfolioQuery.docs.first.id;
                                                 final currentLikeCount = portfolioQuery.docs.first['likeCnt'] ?? 0;

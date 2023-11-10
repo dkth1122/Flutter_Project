@@ -54,7 +54,6 @@
       UserModel um = Provider.of<UserModel>(context, listen: false);
       if (um.isLogin) {
         user1 = um.userId!;
-        print(user1);
       } else {
         user1 = "없음";
         print("로그인 안됨");

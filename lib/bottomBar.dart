@@ -1,22 +1,15 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:project_flutter/chat/chatList.dart';
 import 'package:project_flutter/customer/userCustomer.dart';
-import 'package:project_flutter/expert/allPortfolioList.dart';
 import 'package:project_flutter/join/login_email.dart';
 import 'package:project_flutter/product/product.dart';
 import 'package:project_flutter/proposal/myProposalList.dart';
-import 'package:project_flutter/subBottomBar.dart';
-import 'package:project_flutter/test.dart';
-import 'package:project_flutter/tutorial.dart';
 import 'package:provider/provider.dart';
-
 import 'expert/messageResponse.dart';
 import 'expert/my_expert.dart';
 import 'expert/ratings.dart';
 import 'expert/revenue.dart';
 import 'join/userModel.dart';
-import 'main.dart';
 import 'myPage/myCoupon.dart';
 import 'myPage/myCustomer.dart';
 import 'myPage/myLike.dart';
@@ -283,15 +276,12 @@ class _BottomBarState extends State<BottomBar> {
               final status = userModel.status;
               final userId = userModel.userId;
               if (status == 'C') {
-                print("의뢰인");
                 // 'C'인 경우 MyCustomer로 이동
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyCustomer(userId: userId!)));
               } else if (status == 'E') {
-                print("전문가");
                 // 'E'인 경우 MyExpert로 이동
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert(userId: userId!)));
               } else {
-                print("예외");
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) =>MyExpert(userId: userId!)));
               }
             }

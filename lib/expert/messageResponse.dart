@@ -26,7 +26,6 @@ class _MessageResponsenState extends State<MessageResponse> {
     UserModel um = Provider.of<UserModel>(context, listen: false);
     if (um.isLogin) {
       user = um.userId!;
-      print(user);
       // Firestore에서 설정 정보 가져오기
       getSettingsFromFirestore();
     } else {

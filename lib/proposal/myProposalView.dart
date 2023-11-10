@@ -36,8 +36,6 @@ class _MyProposalViewState extends State<MyProposalView> {
     UserModel userModel = Provider.of<UserModel>(context, listen: false);
 
     String user = userModel.isLogin ? userModel.userId! : "없음";
-    print("채팅유저 ===> $chatUser");
-
     if (!userModel.isLogin) {
       _showLoginAlert(context);
       return;

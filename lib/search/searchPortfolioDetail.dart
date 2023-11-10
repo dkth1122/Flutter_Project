@@ -38,8 +38,6 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
     } else {
       sessionId = "";
     }
-    print(sessionId);
-    print(widget.user);
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -370,10 +368,6 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
 
   void _toggleChat() async {
     UserModel userModel = Provider.of<UserModel>(context, listen: false);
-
-    String user = userModel.isLogin ? userModel.userId! : "없음";
-    print("채팅유저 ===> $chatUser");
-
     if (!userModel.isLogin) {
       _showLoginAlert(context);
       return;

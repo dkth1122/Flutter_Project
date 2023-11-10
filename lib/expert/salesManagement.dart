@@ -120,7 +120,6 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
   void applyCategoryFilter(String option) {
     setState(() {
       selectedCategory = option;
-      // print(selectedCategory);
     });
     Navigator.pop(context); // 필터 모달 닫기
   }

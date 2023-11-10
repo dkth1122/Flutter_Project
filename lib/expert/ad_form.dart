@@ -29,7 +29,6 @@ class _AdFormState extends State<AdForm> {
       user = um.userId!;
     } else {
       user = '없음';
-      print('로그인X');
     }
   }
 

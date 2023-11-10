@@ -56,7 +56,6 @@ class _EditPortfolioState extends State<EditPortfolio> {
     UserModel um = Provider.of<UserModel>(context, listen: false);
     if (um.isLogin) {
       user = um.userId!;
-      print(user);
     } else {
       user = "없음";
       print("로그인 안됨");

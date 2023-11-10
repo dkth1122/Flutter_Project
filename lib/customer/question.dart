@@ -33,10 +33,8 @@ class _QuestionState extends State<Question> {
 
     if (um.isLogin) {
       sessionId = um.userId!;
-      print(sessionId);
     } else {
       sessionId = "";
-      print(sessionId);
     }
     if (_title.text.isNotEmpty && _content.text.isNotEmpty) {
       CollectionReference board = FirebaseFirestore.instance.collection('question');

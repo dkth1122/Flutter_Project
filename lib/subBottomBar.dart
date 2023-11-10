@@ -72,15 +72,12 @@ class _SubBottomBarState extends State<SubBottomBar> {
               final status = userModel.status;
               final userId = userModel.userId;
               if (status == 'C') {
-                print("의뢰인");
                 // 'C'인 경우 MyCustomer로 이동
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyCustomer(userId: userId!)));
               } else if (status == 'E') {
-                print("전문가");
                 // 'E'인 경우 MyExpert로 이동
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyExpert(userId: userId!)));
               } else {
-                print("예외");
                 Navigator.of(context).push(MaterialPageRoute(builder: (context) =>MyExpert(userId: userId!)));
               }
             }

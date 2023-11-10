@@ -52,11 +52,8 @@ class _ProductViewState extends State<ProductView>
 
     if (um.isLogin) {
       sessionId = um.userId!;
-      print(sessionId);
     } else {
-      sessionId = "";
-      print(sessionId);
-    }
+      sessionId = "";}
 
     FirebaseFirestore.instance
         .collection('like')
@@ -134,7 +131,6 @@ class _ProductViewState extends State<ProductView>
 
     if (um.isLogin) {
       user = um.userId!;
-      print(user);
     } else {
       user = "없음";
       print("로그인 안됨");
@@ -196,8 +192,6 @@ class _ProductViewState extends State<ProductView>
   void _toggleChat() async {
     UserModel userModel = Provider.of<UserModel>(context, listen: false);
 
-    String user = userModel.isLogin ? userModel.userId! : "없음";
-    print("채팅유저 ===> $chatUser");
 
     if (!userModel.isLogin) {
       _showLoginAlert(context);
