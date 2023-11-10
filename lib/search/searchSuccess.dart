@@ -225,24 +225,19 @@ class _SearchSuccessState extends State<SearchSuccess> {
                   return title.contains(searchText) || description.contains(searchText);
                 }).toList();
 
-                if (filteredPortfolios.isEmpty) {
-                  if (index == 0) {
-                    return Center(
-                      child: Text('검색어가 없습니다'),
-                    );
-                  }
-                  return Container();
+                if (index == 1 && filteredPortfolios.isEmpty) {
+                  return Center(
+                    child: Text('검색어가 없습니다'),
+                  );
                 }
 
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: filteredPortfolios.length,
-                  itemBuilder: (context, index) {
-                    Map<String, dynamic> portfolioData = filteredPortfolios[index].data() as Map<String, dynamic>;
-                    return InkWell(
+                // 검색 결과가 있을 때만 표시
+                if (filteredPortfolios.isNotEmpty) {
+                  return Column(
+                    children: filteredPortfolios.map((portfolioData) {
+                      return InkWell(
                         onTap: () {
-                          Map<String, dynamic> selectedPortfolioData = filteredPortfolios[index].data() as Map<String, dynamic>;
+                          Map<String, dynamic> selectedPortfolioData = portfolioData.data() as Map<String, dynamic>;
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -260,10 +255,10 @@ class _SearchSuccessState extends State<SearchSuccess> {
                               height: 100,
                               padding: EdgeInsets.all(5),
                               decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 0.6,
-                                      color: Color.fromRGBO(182, 182, 182, 0.6)
-                                  )
+                                border: Border.all(
+                                  width: 0.6,
+                                  color: Color.fromRGBO(182, 182, 182, 0.6),
+                                ),
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -271,7 +266,7 @@ class _SearchSuccessState extends State<SearchSuccess> {
                                   Row(
                                     children: [
                                       ClipRRect(
-                                        borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
+                                        borderRadius: BorderRadius.circular(10.0),
                                         child: Image.network(
                                           portfolioData['thumbnailUrl'],
                                           width: 130,
@@ -315,11 +310,13 @@ class _SearchSuccessState extends State<SearchSuccess> {
                               ),
                             ),
                           ],
-                        )
-                        // Text("Portfolio Title: ${portfolioData['title']}")
-                    );
-                  },
-                );
+                        ),
+                      );
+                    }).toList(),
+                  );
+                } else {
+                  return Container(); // 검색 결과가 없을 때는 아무 것도 표시하지 않음
+                }
               },
             );
           },
@@ -327,6 +324,10 @@ class _SearchSuccessState extends State<SearchSuccess> {
       },
     );
   }
+
+
+
+
 
 
 }
