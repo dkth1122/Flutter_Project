@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:project_flutter/product/productView.dart';
 class SalesManagementPage extends StatefulWidget {
   final String userId;
@@ -224,7 +225,7 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
             ),
           ),
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               _filterButton(
                 icon: Icons.arrow_drop_down,
@@ -301,7 +302,7 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
                             title: Text(salesItem.pName),
                             subtitle: Text(salesItem.category),
                             leading: Image.network(salesItem.imgUrl),
-                            trailing: Text('${salesItem.price.toString()}원'),
+                            trailing: Text('${NumberFormat('#,###').format(salesItem.price)}원'),
                             onTap: () {
                               Navigator.push(
                                 context,

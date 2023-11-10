@@ -42,7 +42,7 @@ class _PurchaseViewState extends State<PurchaseView> {
             InfoBox("구매번호", data['orderNo']),
             InfoBox("상품명", data['productName']),
             InfoBox("판매자", data['seller']),
-            InfoBox("가격", "${data['price']}원"),
+            InfoBox("가격", '${NumberFormat('#,###').format(data['price'])}원'),
             InfoBox("사용한 쿠폰", data['cName']),
             InfoBox(
               "구매일자",

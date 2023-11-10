@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:project_flutter/myPage/purchaseView.dart';
 import 'package:project_flutter/subBottomBar.dart';
 class PurchaseManagement extends StatefulWidget {
@@ -191,7 +192,7 @@ void applyCouponFilter(String option) {
                   ],
                 ),
                 trailing: Text(
-                  '${data['price'].toString()}원',
+                  '${NumberFormat('#,###').format(data['price'].toDouble())}원',
                   style: TextStyle(
                     fontSize: 18, // 가격 폰트 크기
                     color: Colors.orange, // 가격 색상

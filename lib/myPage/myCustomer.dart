@@ -205,6 +205,7 @@ class _MyCustomerState extends State<MyCustomer> {
           style: TextStyle(color:Color(0xff424242), fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
+        backgroundColor: Colors.white,
         elevation: 1.0,
         iconTheme: IconThemeData(color: Color(0xff424242)),
         leading: IconButton(
