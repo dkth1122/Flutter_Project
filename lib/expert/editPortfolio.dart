@@ -47,6 +47,36 @@ class EditPortfolio extends StatefulWidget {
 class _EditPortfolioState extends State<EditPortfolio> {
   late String user;
 
+  late String portfolioId;
+  String selectedCategory = "UX기획";
+  List<String> selectedHashtags = []; // 선택한 해시태그 목록
+
+  // 이미지 선택 상태 변수
+  bool isThumbnailSelected = false;
+  bool isImageSelected = false;
+
+  // 이미지 파일 경로를 저장하는 변수
+  String? thumbImagePath;
+  List<String> imagePaths = [];
+
+  //이미지 기존거 출력 변수
+  String? thumbImage;
+  List<String> subImage = [];
+
+
+  DateTime? startDate;
+  DateTime? endDate;
+  String customer = "";
+  String industry = "";
+  String portfolioDescription = "";
+
+  TextEditingController titleController = TextEditingController();
+  TextEditingController descriptionController = TextEditingController();
+  TextEditingController imageUrlController = TextEditingController();
+  TextEditingController customerController = TextEditingController();
+  TextEditingController industryController = TextEditingController();
+  TextEditingController portfolioDescriptionController = TextEditingController();
+
   // Firestore 인스턴스 생성
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -61,29 +91,46 @@ class _EditPortfolioState extends State<EditPortfolio> {
       user = "없음";
       print("로그인 안됨");
     }
+    // EditPortfolioState의 초기화 시 포트폴리오 아이디를 가져옴
+    portfolioId = widget.portfolioId;
+
+    // 포트폴리오 정보 가져오기
+    loadPortfolioData();
   }
 
-  TextEditingController titleController = TextEditingController();
-  TextEditingController descriptionController = TextEditingController();
-  TextEditingController imageUrlController = TextEditingController();
+  //포트폴리오 정보 가져오기
+  void loadPortfolioData() async {
+    try {
+      // Firestore 컬렉션 및 서브컬렉션 참조 생성
+      CollectionReference expertCollection = firestore.collection('expert');
+      DocumentReference expertDoc = expertCollection.doc(user);
+      CollectionReference portfolioCollection = expertDoc.collection('portfolio');
 
-  String selectedCategory = "UX기획";
-  List<String> selectedHashtags = []; // 선택한 해시태그 목록
+      // 해당 포트폴리오의 정보 가져오기
+      DocumentSnapshot portfolioSnapshot = await portfolioCollection.doc(portfolioId).get();
 
-  // 이미지 선택 상태 변수
-  bool isThumbnailSelected = false;
-  bool isImageSelected = false;
+      // 가져온 정보를 화면에 적용
+      setState(() {
+        titleController.text = portfolioSnapshot['title'] ?? '';
+        descriptionController.text = portfolioSnapshot['description'] ?? '';
 
-  // 이미지 파일 경로를 저장하는 변수
-  String? thumbImagePath;
-  List<String> imagePaths = [];
-
-
-  DateTime? startDate;
-  DateTime? endDate;
-  String customer = "";
-  String industry = "";
-  String portfolioDescription = "";
+        // 추가 필드들
+        selectedCategory = portfolioSnapshot['category'] ?? '';
+        startDate = (portfolioSnapshot['startDate'] as Timestamp?)?.toDate();
+        endDate = (portfolioSnapshot['endDate'] as Timestamp?)?.toDate();
+        customerController.text = portfolioSnapshot['customer'] ?? ''; // 초기화 추가
+        industryController.text = portfolioSnapshot['industry'] ?? ''; // 초기화 추가
+        portfolioDescriptionController.text = portfolioSnapshot['portfolioDescription'] ?? ''; // 초기화 추가
+        selectedHashtags = List<String>.from(portfolioSnapshot['hashtags'] ?? []);
+        //썸네일
+        thumbImage = portfolioSnapshot['thumbnailUrl'] ?? '';
+        // 서브 이미지 URL 목록
+        subImage = List<String>.from(portfolioSnapshot['subImageUrls'] ?? []);
+      });
+    } catch (e) {
+      print('포트폴리오 정보 로딩 중 오류 발생: $e');
+    }
+  }
 
   Map<String, List<String>> categoryHashtags = {
     "UX기획": ["#기획∙스토리보드", "#기타 기획"],
@@ -137,14 +184,6 @@ class _EditPortfolioState extends State<EditPortfolio> {
     }
   }
 
-  //userId 추가
-  void _addUser() async {
-    CollectionReference userId = FirebaseFirestore.instance.collection('expert');
-    await userId.doc(user).set({
-      'userId' : user
-    });
-  }
-
 
   // 이미지 선택 메서드
   void _selectSubImage(BuildContext context) async {
@@ -161,6 +200,8 @@ class _EditPortfolioState extends State<EditPortfolio> {
 
   List<PortfolioItem> portfolioItems = [];
 
+
+  //시작 날짜
   Future<void> _selectStartDate(BuildContext context) async {
     final DateTime picked = (await showDatePicker(
       context: context,
@@ -175,6 +216,7 @@ class _EditPortfolioState extends State<EditPortfolio> {
     }
   }
 
+  //끝난 날짜
   Future<void> _selectEndDate(BuildContext context) async {
     final DateTime picked = (await showDatePicker(
       context: context,
@@ -219,7 +261,8 @@ class _EditPortfolioState extends State<EditPortfolio> {
   }
 
 
-  //포트폴리오 등록
+  //포트폴리오 업데이트
+  // 포트폴리오 업데이트
   Future<void> addPortfolioToFirestore(PortfolioItem item, String userId) async {
     try {
       // Firestore 컬렉션 및 서브컬렉션 참조 생성
@@ -235,8 +278,8 @@ class _EditPortfolioState extends State<EditPortfolio> {
         subImageUrls.add(imageUrl);
       }
 
-      // PortfolioItem을 Firestore에 추가
-      await portfolioCollection.add({
+      // Map을 이용하여 업데이트할 필드와 값을 설정
+      Map<String, dynamic> updateFields = {
         'title': item.title,
         'description': item.description,
         'thumbnailUrl': thumbnailUrl, // 썸네일 이미지 URL
@@ -244,22 +287,26 @@ class _EditPortfolioState extends State<EditPortfolio> {
         'category': item.category,
         'startDate': item.startDate,
         'endDate': item.endDate,
-        'customer': item.customer,//고객사
-        'industry': item.industry,//업종
-        'portfolioDescription': item.portfolioDescription,//포트폴리오 설명
+        'customer': item.customer, // 고객사
+        'industry': item.industry, // 업종
+        'portfolioDescription': item.portfolioDescription, // 포트폴리오 설명
         'hashtags': item.hashtags,
-        'likeCnt' : 0,
-        'cnt' : 0
+      };
 
-      });
+      // 필드 값이 null이 아닌 경우에만 업데이트
+      updateFields.removeWhere((key, value) => value == null);
+
+      // PortfolioItem을 Firestore에 추가
+      await portfolioCollection.doc(portfolioId).update(updateFields);
 
       // 데이터 추가 성공
-      print('포트폴리오가 Firestore에 추가되었습니다.');
+      print('포트폴리오가 Firestore에 업데이트되었습니다.');
     } catch (e) {
       // 데이터 추가 실패
-      print('포트폴리오 추가 중 오류 발생: $e');
+      print('포트폴리오 업데이트 중 오류 발생: $e');
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -322,6 +369,34 @@ class _EditPortfolioState extends State<EditPortfolio> {
               ),
             ),
             SizedBox(height: 12.0),
+
+            // Existing thumbnail image
+            SizedBox(height: 12.0),
+            Text("썸네일 이미지", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff424242))),
+            SizedBox(height: 12.0),
+            Image.network(
+              thumbImage ?? "", // Use thumbImagePath if it's not null
+              width: 100,
+              height: 100,
+              fit: BoxFit.cover,
+            ),
+
+            // Existing sub-images
+            SizedBox(height: 12.0),
+            Text("서브 이미지들", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff424242))),
+            SizedBox(height: 12.0),
+            Row(
+              children: [
+                for (String subImage in subImage)
+                  Image.network(
+                    subImage,
+                    width: 50,
+                    height: 50,
+                    fit: BoxFit.cover,
+                  ),
+              ],
+            ),
+
             Text("썸네일 이미지 선택", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xff424242))),
             SizedBox(height: 12.0),
             thumbImagePath != null
@@ -366,7 +441,6 @@ class _EditPortfolioState extends State<EditPortfolio> {
                 primary: Color(0xFFFF8C42),
               ),
             ),
-
             Column(
               children: [
                 if (imagePaths.isNotEmpty) ...imagePaths.asMap().entries.map((entry) {
@@ -374,11 +448,13 @@ class _EditPortfolioState extends State<EditPortfolio> {
                   final imagePath = entry.value;
                   return Row(
                     children: [
-                      Image.file(
-                        File(imagePath),
-                        width: 100,
-                        height: 100,
-                        fit: BoxFit.cover,
+                      Expanded( // 추가된 부분
+                        child: Image.file(
+                          File(imagePath),
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.cover,
+                        ),
                       ),
                       IconButton(
                         onPressed: () {
@@ -417,6 +493,7 @@ class _EditPortfolioState extends State<EditPortfolio> {
             ),
             SizedBox(height: 12.0),
             Wrap(
+              spacing: 8.0, // 이 값 조절
               children: (categoryHashtags[selectedCategory] ?? []).map((hashtag) {
                 return ChoiceChip(
                   label: Text(hashtag),
@@ -461,31 +538,37 @@ class _EditPortfolioState extends State<EditPortfolio> {
             ),
             SizedBox(height: 12.0),
             TextField(
+              controller: customerController, // Link to the controller
               decoration: InputDecoration(
                 labelText: '고객사',
                 border: OutlineInputBorder(),
               ),
               onChanged: (value) {
+                // You can optionally use the onChanged callback if needed
                 customer = value;
               },
             ),
             SizedBox(height: 12.0),
             TextField(
+              controller: industryController, // Link to the controller
               decoration: InputDecoration(
                 labelText: '업종',
                 border: OutlineInputBorder(),
               ),
               onChanged: (value) {
+                // You can optionally use the onChanged callback if needed
                 industry = value;
               },
             ),
             SizedBox(height: 12.0),
             TextField(
+              controller: portfolioDescriptionController, // Link to the controller
               decoration: InputDecoration(
                 labelText: '포트폴리오 설명',
                 border: OutlineInputBorder(),
               ),
               onChanged: (value) {
+                // You can optionally use the onChanged callback if needed
                 portfolioDescription = value;
               },
             ),
@@ -528,7 +611,6 @@ class _EditPortfolioState extends State<EditPortfolio> {
                   final isUnique = await isTitleUnique(titleController.text, user);
 
                   if (isUnique) {
-                    _addUser();
                     final portfolioItem = PortfolioItem(
                       title: titleController.text,
                       description: descriptionController.text,
