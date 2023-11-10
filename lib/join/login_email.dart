@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project_flutter/subBottomBar.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_flutter/join/userModel.dart';
@@ -39,10 +40,18 @@ class _LoginPageState extends State<LoginPage> {
       controller: controller,
       obscureText: labelText == '패스워드',
       decoration: InputDecoration(
-        labelText: labelText,
         labelStyle: TextStyle(
-          color: Color(0xff424242),
+          color: Color(0xff424242), // 레이블 텍스트의 색상
         ),
+        focusedBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFFFF8C42), width: 2.0),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(color: Color(0xFFFF8C42), width: 2.0),
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        labelText: labelText,
       ),
     );
   }
@@ -53,12 +62,12 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: Text(
           '로그인',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+          style: TextStyle(color: Color(0xff424242), fontWeight: FontWeight.bold),
         ),
+        backgroundColor: Colors.white,
         centerTitle: true,
-        backgroundColor: Color(0xFFFCAF58),
         elevation: 1.0,
-        iconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Color(0xff424242)),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
@@ -78,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
             ElevatedButton(
               style: ButtonStyle(
                 minimumSize: MaterialStateProperty.all(Size(500, 55)),
-                backgroundColor: MaterialStateProperty.all(Color(0xFF4E598C)),
+                backgroundColor: MaterialStateProperty.all(Color(0xFFFF8C42)),
                 foregroundColor: MaterialStateProperty.all(Colors.white),
               ),
               onPressed: _login,
@@ -116,12 +125,13 @@ class _LoginPageState extends State<LoginPage> {
               },
               child: Text(
                 '회원가입',
-                style: TextStyle(color: Colors.black),
+                style: TextStyle(color: Color(0xff424242)),
               ),
             ),
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 

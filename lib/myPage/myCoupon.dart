@@ -1,5 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/subBottomBar.dart';
+import 'package:provider/provider.dart';
+
+import '../join/userModel.dart';
 
 class MyCoupon extends StatefulWidget {
   const MyCoupon({super.key});
@@ -9,13 +13,55 @@ class MyCoupon extends StatefulWidget {
 }
 
 class _MyCouponState extends State<MyCoupon> {
+
+  Widget _listProposal() {
+    UserModel userModel = Provider.of<UserModel>(context, listen: false);
+    final userId = userModel.userId;
+
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection("coupon")
+          .where("user", isNotEqualTo: userId)
+          .snapshots(),
+      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
+        if (!snap.hasData) {
+          return Center(child: CircularProgressIndicator());
+        }
+        return ListView.builder(
+          shrinkWrap: true,
+          itemCount: snap.data!.docs.length,
+          itemBuilder: (context, index) {
+            DocumentSnapshot doc = snap.data!.docs[index];
+            Map<String, dynamic> data =
+            doc.data() as Map<String, dynamic>;
+            return ListTile(
+              title: Text(
+                data['cName'],
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(
+                '${data['discount']}% 할인 쿠폰',
+                style: TextStyle(fontSize: 16), // 텍스트 크기 조정
+              ),
+              trailing: Text(
+                "유효 기간: 2023-12-31",
+                style: TextStyle(fontSize: 16), // 텍스트 크기 조정
+              ),
+            );
+
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
           "쿠폰",
-          style: TextStyle(color:Color(0xff424242), fontWeight: FontWeight.bold),
+          style: TextStyle(color: Color(0xff424242), fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
         elevation: 1.0,
@@ -27,6 +73,7 @@ class _MyCouponState extends State<MyCoupon> {
           },
         ),
       ),
+      body: _listProposal(),
       bottomNavigationBar: SubBottomBar(),
     );
   }

@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../subBottomBar.dart';
+
 
 class Join extends StatefulWidget {
   const Join({super.key});
@@ -273,39 +275,43 @@ class _JoinState extends State<Join> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primaryColor: Color(0xFF4E598C),
-        hintColor: Color(0xFFFCAF58),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.white, // 여기서 색상을 흰색으로 설정
+        ),
+        primaryColor: Colors.white,
+        hintColor: Color(0xff424242),
         fontFamily: 'Pretendard',
+        iconTheme: IconThemeData(
+          color: Color(0xff424242), // 아이콘 색상 설정
+          size: 24, // 아이콘 크기 설정
+        ),
         textTheme: TextTheme(
-          bodyLarge: TextStyle(color: Colors.black, fontSize: 16),
+          bodyLarge: TextStyle(color: Color(0xff424242), fontSize: 16),
         ),
         inputDecorationTheme: InputDecorationTheme(
           labelStyle: TextStyle(
-            color: Colors.black, // 레이블 텍스트의 색상
+            color: Color(0xff424242), // 레이블 텍스트의 색상
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0),
+            borderSide: BorderSide(color: Color(0xFFFF8C42), width: 2.0),
             borderRadius: BorderRadius.circular(10.0),
           ),
           enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0),
+            borderSide: BorderSide(color: Color(0xFFFF8C42), width: 2.0),
             borderRadius: BorderRadius.circular(10.0),
-          ),
-          hintStyle: TextStyle(
-            color: Color(0xFFFF8C42) ,
           ),
 
         ),
       ),
+
       home: Scaffold(
         appBar: AppBar(
           title: Text('회원가입',
-            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            style: TextStyle(color: Color(0xff424242), fontWeight: FontWeight.bold),
           ),
           centerTitle: true,
-          backgroundColor: Color(0xFFFCAF58), // 배경색 변경
           elevation: 1.0,
-          iconTheme: IconThemeData(color: Colors.white),
+          iconTheme: IconThemeData(color: Color(0xff424242)),
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
@@ -588,14 +594,17 @@ class _JoinState extends State<Join> {
                 child: Text('회원가입'),
                 style: ButtonStyle(
                   minimumSize: MaterialStateProperty.all(Size(200, 55)),
-                  backgroundColor: MaterialStateProperty.all(Color(0xFF4E598C)),
+                  backgroundColor: MaterialStateProperty.all(Color(0xFFFF8C42)),
                   foregroundColor: MaterialStateProperty.all(Colors.white),
                 ),
                ),
             ]
         ),
         ),
+        bottomNavigationBar: SubBottomBar(),
       ),
+
+
     );
   }
 }

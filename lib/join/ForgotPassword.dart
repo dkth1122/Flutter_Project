@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../subBottomBar.dart';
+
 class ForgotPasswordTabBar extends StatefulWidget {
   @override
   _ForgotPasswordTabBarState createState() => _ForgotPasswordTabBarState();
@@ -52,21 +54,32 @@ class _ForgotPasswordTabBarState extends State<ForgotPasswordTabBar> {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primaryColor: Color(0xFF4E598C),
-        hintColor: Color(0xFFFCAF58),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.white, // 여기서 색상을 흰색으로 설정
+        ),
+        primaryColor: Colors.white,
+        hintColor: Color(0xff424242),
         fontFamily: 'Pretendard',
+        iconTheme: IconThemeData(
+          color: Color(0xff424242), // 아이콘 색상 설정
+          size: 24, // 아이콘 크기 설정
+        ),
         textTheme: TextTheme(
-          bodyLarge: TextStyle(color: Colors.black, fontSize: 16), // 스낵바 내용 텍스트 스타일 변경
+          bodyLarge: TextStyle(color: Color(0xff424242), fontSize: 16),
         ),
         inputDecorationTheme: InputDecorationTheme(
           labelStyle: TextStyle(
-            color: Colors.black, // 레이블 텍스트의 색상
+            color: Color(0xff424242), // 레이블 텍스트의 색상
           ),
           focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFF4E598C), width: 2.0), // 활성화된 텍스트 필드의 테두리 스타일
-            borderRadius: BorderRadius.circular(10.0), // 테두리의 모서리를 둥글게 만듭니다.
+            borderSide: BorderSide(color: Color(0xFFFF8C42), width: 2.0),
+            borderRadius: BorderRadius.circular(10.0),
           ),
-          // 여기에 필요한 다른 스타일을 추가할 수 있습니다.
+          enabledBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Color(0xFFFF8C42), width: 2.0),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+
         ),
       ),
 
@@ -76,12 +89,11 @@ class _ForgotPasswordTabBarState extends State<ForgotPasswordTabBar> {
           appBar: AppBar(
             title: Text(
               '아이디 비밀번호 찾기',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Color(0xff424242), fontWeight: FontWeight.bold),
             ),
             centerTitle: true,
-            backgroundColor: Color(0xFFFCAF58), // 배경색 변경
             elevation: 1.0,
-            iconTheme: IconThemeData(color: Colors.white),
+            iconTheme: IconThemeData(color: Color(0xff424242)),
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
               onPressed: () {
@@ -103,12 +115,13 @@ class _ForgotPasswordTabBarState extends State<ForgotPasswordTabBar> {
                   text: '비밀번호',
                 ),
               ],
-              labelColor: Color(0xFF4E598C), // 선택된 탭의 텍스트 컬러
-              unselectedLabelColor: Colors.white, // 선택되지 않은 탭의 텍스트 컬러
+              labelColor: Color(0xFFFF8C42), // 선택된 탭의 텍스트 컬러
+              labelStyle: TextStyle(fontWeight: FontWeight.bold),
+              unselectedLabelColor: Color(0xFFFF8C42), // 선택되지 않은 탭의 텍스트 컬러
               indicator: BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: Color(0xFF4E598C), // 밑줄의 색상을 변경하려면 여기에서 지정
+                    color: Color(0xFFFF8C42), // 밑줄의 색상을 변경하려면 여기에서 지정
                     width: 3.0, // 밑줄의 두께를 조절할 수 있습니다.
                   ),
                 ),
@@ -121,8 +134,10 @@ class _ForgotPasswordTabBarState extends State<ForgotPasswordTabBar> {
               ForgotPasswordPage(),
             ],
           ),
+          bottomNavigationBar: SubBottomBar(),
         ),
       ),
+
     );
   }
 }
@@ -141,14 +156,14 @@ class ForgotIdPage extends StatelessWidget {
         children: <Widget>[
           Text(
             '이름과 가입한 이메일을 입력하세요.',
-            style: TextStyle(fontSize: 16, color: Colors.black), // 텍스트 스타일 변경
+            style: TextStyle(fontSize: 16, color: Color(0xff424242)), // 텍스트 스타일 변경
           ),
           SizedBox(height: 10),
           TextFormField(
             controller: _nameController,
             decoration: InputDecoration(
               labelText: '이름',
-              labelStyle: TextStyle(color: Colors.black), // 레이블 텍스트 스타일 변경
+              labelStyle: TextStyle(color: Color(0xff424242)), // 레이블 텍스트 스타일 변경
             ),
           ),
           SizedBox(height: 20),
@@ -156,7 +171,7 @@ class ForgotIdPage extends StatelessWidget {
             controller: _emailController,
             decoration: InputDecoration(
               labelText: '이메일',
-              labelStyle: TextStyle(color: Colors.black), // 레이블 텍스트 스타일 변경
+              labelStyle: TextStyle(color: Color(0xff424242)), // 레이블 텍스트 스타일 변경
             ),
           ),
           SizedBox(height: 20),
@@ -199,7 +214,7 @@ class ForgotIdPage extends StatelessWidget {
             },
             child: Text('아이디 찾기', style: TextStyle(color: Colors.white)), // 버튼 스타일 변경
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(Color(0xFF4E598C)), // 버튼 배경색 변경
+              backgroundColor: MaterialStateProperty.all(Color(0xFFFF8C42)), // 버튼 배경색 변경
             ),
           ),
         ],
@@ -222,14 +237,14 @@ class ForgotPasswordPage extends StatelessWidget {
         children: <Widget>[
           Text(
             '이름과 가입한 아이디를 입력하세요.',
-            style: TextStyle(fontSize: 16, color: Colors.black), // 텍스트 스타일 변경
+            style: TextStyle(fontSize: 16, color:Color(0xff424242)), // 텍스트 스타일 변경
           ),
           SizedBox(height: 10),
           TextFormField(
             controller: _nameController,
             decoration: InputDecoration(
               labelText: '이름',
-              labelStyle: TextStyle(color: Colors.black), // 레이블 텍스트 스타일 변경
+              labelStyle: TextStyle(color: Color(0xff424242)), // 레이블 텍스트 스타일 변경
             ),
           ),
           SizedBox(height: 20),
@@ -237,7 +252,7 @@ class ForgotPasswordPage extends StatelessWidget {
             controller: _idController,
             decoration: InputDecoration(
               labelText: '아이디',
-              labelStyle: TextStyle(color: Colors.black), // 레이블 텍스트 스타일 변경
+              labelStyle: TextStyle(color: Color(0xff424242)), // 레이블 텍스트 스타일 변경
             ),
           ),
           SizedBox(height: 20),
