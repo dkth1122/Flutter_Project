@@ -5,6 +5,7 @@ import 'package:project_flutter/expert/portfolioDetail.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
+import 'editPortfolio.dart';
 
 class PortfolioItem {
   final String id;
@@ -256,6 +257,23 @@ class _PortfolioState extends State<Portfolio> {
                             Text(
                               '카테고리 : ${item.category}',
                               style: TextStyle(fontSize: 12),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.edit, color: Color(0xFFFF8C42)),
+                                  onPressed: () {
+                                    // EditPortfolio 위젯으로 이동
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EditPortfolio(portfolioId: item.id),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ]
                             ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
