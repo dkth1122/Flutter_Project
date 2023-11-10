@@ -5,22 +5,28 @@ import 'package:project_flutter/customer/userCustomer.dart';
 import 'package:project_flutter/expert/allPortfolioList.dart';
 import 'package:project_flutter/join/login_email.dart';
 import 'package:project_flutter/product/product.dart';
+import 'package:project_flutter/proposal/myProposalList.dart';
 import 'package:project_flutter/subBottomBar.dart';
 import 'package:project_flutter/test.dart';
 import 'package:project_flutter/tutorial.dart';
 import 'package:provider/provider.dart';
 
+import 'expert/messageResponse.dart';
 import 'expert/my_expert.dart';
+import 'expert/ratings.dart';
+import 'expert/revenue.dart';
 import 'join/userModel.dart';
 import 'main.dart';
+import 'myPage/myCoupon.dart';
 import 'myPage/myCustomer.dart';
 import 'myPage/myLike.dart';
+import 'myPage/purchaseManagement.dart';
 
 class CircularDialog extends StatefulWidget {
   @override
   State<CircularDialog> createState() => _CircularDialogState();
 }
-
+String sessionId = "";
 class _CircularDialogState extends State<CircularDialog> {
   double rotation = 0.0;
   Offset initialPosition = Offset(0, 0);
@@ -46,11 +52,20 @@ class _CircularDialogState extends State<CircularDialog> {
   }
 
   List<Offset> iconOffsets = [];
-  List<String> addButtonTexts = ["포트폴리오", "chat", "고객센터", "테스트", "5", "6", "상품", "튜토리얼"];
+  List<String> addButtonTexts = ["구매관리", "쿠폰관리", "고객센터", "수익관리", "응답관리", "등급확인", "상품보기", "프로젝트"];
   List<IconData> iconData = [Icons.star, Icons.message, Icons.people, Icons.chat, Icons.access_alarms_rounded, Icons.back_hand, Icons.add_circle_outline, Icons.telegram_sharp];
-  List<Widget> pageChange = [AllPortfolioList(),ChatList(),UserCustomer(),Test(),MyHomePage(),MyHomePage(),Product(),Tutorial()];
+  List<Widget> pageChange = [PurchaseManagement(userId:sessionId),MyCoupon(),UserCustomer(),Revenue(),MessageResponse(),ExpertRating(),Product(),MyProposalList(userId : sessionId)];
   List<double> iconRotations = [pi / 2, 135 * (pi / 180), pi, 225 * (pi / 180), 270 * (pi / 180), 315 * (pi / 180), 360 * (pi / 180), 45 * (pi / 180)]; // 각 아이콘의 회전 각도
-
+  List<Color> iconColors = [
+    Color(0xFF1839C9),
+    Color(0xFF1839C9),
+    Colors.black,
+    Color(0xE0FF6D13),
+    Color(0xE0FF6D13),
+    Color(0xE0FF6D13),
+    Colors.black,
+    Color(0xFF1839C9),
+  ];
   @override
   void initState() {
     super.initState();
@@ -124,6 +139,7 @@ class _CircularDialogState extends State<CircularDialog> {
                               iconRotations[i],
                               addButtonTexts[i],
                               i,
+                              iconColors[i]
                             ),
                         ],
                       ),
@@ -138,7 +154,7 @@ class _CircularDialogState extends State<CircularDialog> {
     );
   }
 
-  Widget buildAddButton(Offset offset, IconData icon, double rotationAngle, String text, int pageIndex) {
+  Widget buildAddButton(Offset offset, IconData icon, double rotationAngle, String text, int pageIndex, Color iconColors) {
     return Positioned(
       top: offset.dy,
       left: offset.dx,
@@ -155,7 +171,7 @@ class _CircularDialogState extends State<CircularDialog> {
               },
               icon: Icon(
                 icon,
-                color: Color(0xff424242),
+                color: iconColors,
               ),
             ),
             InkWell(
@@ -165,7 +181,11 @@ class _CircularDialogState extends State<CircularDialog> {
                   MaterialPageRoute(builder: (context) => pageChange[pageIndex]),
                 );
               },
-              child: Text(text)
+              child: Text(text,
+                style: TextStyle(
+                  color: iconColors, // 여기에 원하는 색상을 지정하세요.
+                ),
+              )
             ),
           ],
         ),
@@ -200,6 +220,14 @@ class _BottomBarState extends State<BottomBar> {
 
   @override
   Widget build(BuildContext context) {
+
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+
+    if (um.isLogin) {
+      sessionId = um.userId!;
+    } else {
+      sessionId = "";
+    }
     return BottomAppBar(
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
