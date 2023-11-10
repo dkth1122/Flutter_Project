@@ -8,6 +8,7 @@ import 'package:project_flutter/product/productView.dart';
 import 'package:project_flutter/search/search.dart';
 import 'package:project_flutter/bottomBar.dart';
 import 'package:project_flutter/search/searchPortfolioDetail.dart';
+import 'package:project_flutter/subBottomBar.dart';
 import 'package:project_flutter/tutorial.dart';
 import 'package:provider/provider.dart';
 import 'admin/adminDomain.dart';
@@ -311,7 +312,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       // extendBody: true, // body를 침범하도록 함
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: um.isLogin ? FloatingActionButton(
         onPressed: () {
           Navigator.push(
             context,
@@ -325,9 +326,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ), // 이미지 경로를 설정
         backgroundColor: Colors.transparent, // 배경색을 투명으로 설정
         elevation: 0.0, // 그림자를 없애는 설정
-      ),
+      ) : Container(),
 
-      bottomNavigationBar: BottomBar(),
+      bottomNavigationBar: um.isLogin ? BottomBar() : SubBottomBar(),
     );
   }
 

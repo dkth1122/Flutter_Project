@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
+
+import '../join/userModel.dart';
 
 class SearchPortfolioDetail extends StatefulWidget {
   final Map<String, dynamic> portfolioItem;
@@ -13,6 +16,8 @@ class SearchPortfolioDetail extends StatefulWidget {
 }
 
 class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
+
+  String sessionId = "";
   @override
   void initState() {
     super.initState();
@@ -21,6 +26,15 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
 
   @override
   Widget build(BuildContext context) {
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+
+    if (um.isLogin) {
+      sessionId = um.userId!;
+    } else {
+      sessionId = "";
+    }
+    print(sessionId);
+    print(widget.user);
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -63,7 +77,112 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
                       ],
                     ),
                     SizedBox(height: 10),
-                    Text('카테고리 > ${widget.portfolioItem['category']}', style: TextStyle(fontSize: 16)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('카테고리 > ${widget.portfolioItem['category']}', style: TextStyle(fontSize: 16)),
+                        IconButton(
+                          onPressed: () async{
+                            if (sessionId.isNotEmpty){
+                              final QuerySnapshot result = await FirebaseFirestore
+                                  .instance
+                                  .collection('portfolioLike')
+                                  .where('user', isEqualTo: sessionId)
+                                  .where('portfoiloId', isEqualTo: widget.user)
+                                  .where('title', isEqualTo:widget.portfolioItem['title'])
+                                  .get();
+
+                              if (result.docs.isNotEmpty){
+                                final documentId = result.docs.first.id;
+                                FirebaseFirestore.instance.collection('portfolioLike').doc(documentId).delete();
+
+                                final portfolioQuery = await FirebaseFirestore.instance
+                                    .collection('expert')
+                                    .doc(widget.user)
+                                    .collection("portfolio")
+                                    .where('title', isEqualTo: widget.portfolioItem['title'])
+                                    .get();
+
+                                if (portfolioQuery.docs.isNotEmpty){
+                                  final productDocId = portfolioQuery.docs.first.id;
+                                  final currentLikeCount = portfolioQuery.docs.first['likeCnt'] ?? 0;
+
+                                  int newLikeCount;
+
+                                  // 좋아요를 취소했을 때
+                                  if (result.docs.isNotEmpty) {
+                                    newLikeCount = currentLikeCount - 1;
+                                  } else {
+                                    newLikeCount = currentLikeCount + 1;
+                                  }
+                                  // "likeCnt" 업데이트
+                                  FirebaseFirestore.instance
+                                      .collection('expert')
+                                      .doc(widget.user)
+                                      .collection("portfolio")
+                                      .doc(productDocId)
+                                      .set({
+                                    'likeCnt': newLikeCount,
+                                  }, SetOptions(merge: true));
+                                }
+                              }else{
+                                FirebaseFirestore.instance.collection('portfolioLike').add({
+                                  'user': sessionId,
+                                  'portfoiloId': widget.user,
+                                  'title' : widget.portfolioItem['title']
+                                });
+                                final portfolioQuery = await FirebaseFirestore.instance
+                                    .collection('expert')
+                                    .doc(widget.user)
+                                    .collection("portfolio")
+                                    .where('title', isEqualTo: widget.portfolioItem['title'])
+                                    .get();
+                                if (portfolioQuery.docs.isNotEmpty) {
+                                  final portfolioDocId = portfolioQuery.docs.first.id;
+                                  final currentLikeCount = portfolioQuery.docs.first['likeCnt'] ?? 0;
+
+                                  // "likeCnt" 업데이트
+                                  FirebaseFirestore.instance
+                                      .collection('expert')
+                                      .doc(widget.user)
+                                      .collection("portfolio")
+                                      .doc(portfolioDocId).update({
+                                    'likeCnt': currentLikeCount + 1, // 좋아요를 추가했으므로 증가
+                                  });
+                                }
+                              }
+                            }
+                          },
+                          icon: sessionId.isNotEmpty
+                            ? StreamBuilder<QuerySnapshot>(
+                            stream: FirebaseFirestore.instance
+                                .collection('portfolioLike')
+                                .where('user', isEqualTo: sessionId)
+                                .where('portfoiloId', isEqualTo: widget.user)
+                                .where('title', isEqualTo:widget.portfolioItem['title'])
+                                .snapshots(),
+                            builder: (context, snapshot){
+                              if (snapshot.hasData) {
+                                if (snapshot.data!.docs.isNotEmpty) {
+                                  return Icon(
+                                    Icons.favorite,
+                                    color: Colors.red,
+                                    size: 30,
+                                  );
+                                }
+                              }
+                              return Icon(
+                                Icons.favorite_border,
+                                color: Colors.red,
+                                size: 30,
+
+                              );
+                            },
+                          )
+                              :Container(),
+                        )
+                      ],
+                    ),
                     SizedBox(height: 10),
                     Text(
                       widget.portfolioItem['title'] ?? '제목 없음',

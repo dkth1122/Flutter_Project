@@ -208,8 +208,6 @@ class _AllPortfolioListState extends State<AllPortfolioList> {
                                                 }, SetOptions(merge: true));
                                               }
 
-
-
                                             }else{
                                               FirebaseFirestore.instance.collection('portfolioLike').add({
                                                 'user': sessionId,
