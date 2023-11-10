@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:project_flutter/subBottomBar.dart';
 import 'package:provider/provider.dart';
 
+import '../chat/chat.dart';
+import '../join/login_email.dart';
 import '../join/userModel.dart';
 
 class SearchPortfolioDetail extends StatefulWidget {
@@ -19,6 +21,8 @@ class SearchPortfolioDetail extends StatefulWidget {
 class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
 
   String sessionId = "";
+  String chatUser = "";
+
   @override
   void initState() {
     super.initState();
@@ -196,7 +200,9 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
                           ),
                         ),
                         ElevatedButton(
-                          onPressed: (){},
+                          onPressed: (){
+                            _toggleChat();
+                          },
                           child: Text("1:1 문의하기"),
                           style: ElevatedButton.styleFrom(
                             primary: Color(0xFFFF8C42), // 직접 색상 지정
@@ -332,6 +338,118 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
         }
       });
     });
+  }
+
+  void _showLoginAlert(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('알림'),
+          content: Text('로그인 후 이용 가능한 서비스입니다.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('확인'),
+            ),
+          ],
+        );
+      },
+    ).then((value) {
+      if (value != null && value is bool && value) {
+        // 로그인 페이지로 이동하는 코드 작성
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => LoginPage()),
+        );
+      }
+    });
+  }
+
+  void _toggleChat() async {
+    UserModel userModel = Provider.of<UserModel>(context, listen: false);
+
+    String user = userModel.isLogin ? userModel.userId! : "없음";
+    print("채팅유저 ===> $chatUser");
+
+    if (!userModel.isLogin) {
+      _showLoginAlert(context);
+      return;
+    }
+
+    UserModel um = Provider.of<UserModel>(context, listen: false);
+
+
+    if(widget.user == um.userId.toString()){
+      // 본인에게 채팅을 보낼 때 스낵바를 표시
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("본인에게는 채팅을 보낼 수 없습니다."),
+      ));
+      return;
+    }
+
+    // user1과 user2 중에서 큰 값을 선택하여 user1에 할당
+    String user1 = chatUser.compareTo(um.userId.toString()) > 0 ? chatUser : um.userId.toString();
+    String user2 = chatUser.compareTo(um.userId.toString()) > 0 ? um.userId.toString() : widget.user;
+
+    // Firestore 데이터베이스에 채팅방을 생성하는 함수
+    Future<void> createChatRoom(String roomId, String user1, String user2) async {
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      CollectionReference chatRoomsCollection = firestore.collection("chat");
+      String roomId = '$user1' + '_' + '$user2';
+
+      // 채팅방 ID를 사용하여 Firestore에 채팅방을 추가
+      await chatRoomsCollection.doc(roomId).set({
+        'user1': user1,
+        'user2': user2,
+        'roomId' : roomId, // 채팅방 생성 일시
+      });
+    }
+
+    // 두 사용자 간의 채팅방 ID 확인 및 생성
+    String getOrCreateChatRoomId(String user1, String user2) {
+      String chatRoomId = '$user1' + '_' + '$user2';
+      // Firestore에서 채팅방 ID를 확인하고, 존재하지 않으면 생성
+      bool chatRoomExists = false; // Firestore에서 채팅방 존재 여부 확인하는 로직;
+      if (!chatRoomExists) {
+        // 채팅방이 없다면 생성
+        createChatRoom(chatRoomId, user1, user2);
+      }
+      return chatRoomId;
+    }
+
+    void _showPurchaseAlert(BuildContext context) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('알림'),
+            content: Text('로그인 후 이용 가능한 서비스입니다.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('확인'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    //채팅방으로 이동
+    void moveToChatRoom(BuildContext context, String chatRoomId) {
+      Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) => ChatApp(roomId: chatRoomId),
+      ));
+    }
+
+    //메소드 실행
+    String chatRoomId = getOrCreateChatRoomId(user1, user2);
+    moveToChatRoom(context, chatRoomId);
   }
 
 
