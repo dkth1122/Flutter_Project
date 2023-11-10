@@ -261,12 +261,12 @@ class _PortfolioState extends State<Portfolio> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 IconButton(
-                                  icon: Icon(Icons.delete, color: Color(0xFFFF8C42)),
+                                  icon: Icon(Icons.edit, color: Color(0xFFFF8C42)),
                                   onPressed: () {
                                     // 포트폴리오 수정 페이지로 이동
                                     Navigator.of(context).push(
                                       MaterialPageRoute(
-                                        builder: (context) => EditPortfolio(portfolioId: '',),
+                                        builder: (context) => EditPortfolio(portfolioId:item.id,),
                                       ),
                                     );
                                   },
