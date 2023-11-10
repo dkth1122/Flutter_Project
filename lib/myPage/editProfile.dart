@@ -411,7 +411,7 @@ class _EditProfileState extends State<EditProfile> {
           ),
           actions: [
             IconButton(
-              icon: Icon(Icons.save),
+              icon: Icon(Icons.save, color: Color(0xFFFF8C42),),
               onPressed: () async {
                 updateUserData();
               }
