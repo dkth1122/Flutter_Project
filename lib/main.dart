@@ -172,7 +172,7 @@ class _MyHomePageState extends State<MyHomePage> {
               automaticallyImplyLeading: false, // 뒤로 가기 화살표 숨김
 
               flexibleSpace: FlexibleSpaceBar(
-                titlePadding: EdgeInsets.all(20),
+                titlePadding: EdgeInsets.fromLTRB(20 , 34, 20, 0),
                 title: Image.asset ('assets/logo.png',),
               ),
               actions: [
