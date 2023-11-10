@@ -83,24 +83,72 @@ class _PortfolioState extends State<Portfolio> {
     }
   }
 
-  // 포트폴리오 삭제 기능
+  // 포트폴리오와 관련된 좋아요 정보 삭제
+  // 포트폴리오 삭제 함수
   Future<void> deletePortfolio(String title) async {
-    try {
-      final expertDoc = await expertCollection.doc(user).get();
-      final portfolioRef = expertDoc.reference.collection('portfolio');
+    // 다이얼로그 표시
+    bool deleteConfirmed = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('포트폴리오 삭제'),
+          content: Text('정말로 이 포트폴리오를 삭제하시겠습니까?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('아니요'),
+              onPressed: () {
+                Navigator.of(context).pop(false); // 삭제 취소
+              },
+            ),
+            TextButton(
+              child: Text('예'),
+              onPressed: () {
+                Navigator.of(context).pop(true); // 삭제 확인
+              },
+            ),
+          ],
+        );
+      },
+    );
 
-      await portfolioRef.where('title', isEqualTo: title).get().then((value) {
-        for (var doc in value.docs) {
-          doc.reference.delete();
-        }
-      });
+    // 사용자가 삭제를 확인한 경우
+    if (deleteConfirmed == true) {
+      try {
+        final expertDoc = await expertCollection.doc(user).get();
+        final portfolioRef = expertDoc.reference.collection('portfolio');
 
-      // 포트폴리오 삭제 후 목록을 업데이트
-      fetchPortfolioItems();
-    } catch (e) {
-      print('포트폴리오 삭제 오류: $e');
+        // 포트폴리오 삭제
+        await portfolioRef.where('title', isEqualTo: title).get().then((value) {
+          for (var doc in value.docs) {
+            doc.reference.delete();
+          }
+        });
+
+        // portfolioLike 콜렉션에서 해당 포트폴리오와 관련된 좋아요 정보 삭제
+        final likeRef = expertDoc.reference.collection('portfolioLike');
+        await likeRef.where('portfoiloId', isEqualTo: user).where('title', isEqualTo: title).get().then((value) {
+          for (var doc in value.docs) {
+            doc.reference.delete();
+            print("문서 삭제 완료======================");
+          }
+        });
+
+        // 포트폴리오 삭제 후 목록을 업데이트
+        await fetchPortfolioItems();
+
+        // 스낵바로 삭제 완료 메시지 표시
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('포트폴리오 삭제 완료'),
+          ),
+        );
+      } catch (e) {
+        print('포트폴리오 삭제 오류: $e');
+      }
     }
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -208,6 +256,18 @@ class _PortfolioState extends State<Portfolio> {
                             Text(
                               '카테고리 : ${item.category}',
                               style: TextStyle(fontSize: 12),
+                            ),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.delete, color: Color(0xFFFF8C42)),
+                                  onPressed: () {
+                                    // 포트폴리오 삭제 기능 호출
+                                    deletePortfolio(item.title);
+                                  },
+                                ),
+                              ],
                             ),
                           ],
                         ),

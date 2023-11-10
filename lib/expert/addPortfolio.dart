@@ -223,7 +223,6 @@ class _AddPortfolioState extends State<AddPortfolio> {
   //포트폴리오 등록
   Future<void> addPortfolioToFirestore(PortfolioItem item, String userId) async {
     try {
-
       // Firestore 컬렉션 및 서브컬렉션 참조 생성
       CollectionReference expertCollection = firestore.collection('expert');
       DocumentReference expertDoc = expertCollection.doc(userId);
@@ -262,10 +261,6 @@ class _AddPortfolioState extends State<AddPortfolio> {
       print('포트폴리오 추가 중 오류 발생: $e');
     }
   }
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -548,7 +543,9 @@ class _AddPortfolioState extends State<AddPortfolio> {
                         hashtags: selectedHashtags,
                       );
 
+                      //포트폴리오 등록
                       addPortfolioToFirestore(portfolioItem, user);
+
                       setState(() {
                         portfolioItems.add(portfolioItem);
                       });
@@ -581,7 +578,8 @@ class _AddPortfolioState extends State<AddPortfolio> {
                 ),
               ),
               SizedBox(height: 16.0),
-                ListView.builder(
+              //미리보기 오류 발생
+              /*ListView.builder(
                   shrinkWrap: true,
                   itemCount: portfolioItems.  length,
                   itemBuilder: (context, index) {
@@ -655,7 +653,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
                       ),
                     );
                   },
-                ),
+                ),*/
             ],
           ),
         ),
