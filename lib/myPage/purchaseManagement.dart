@@ -158,57 +158,59 @@ void applyCouponFilter(String option) {
       query = query.where("cName", isNotEqualTo: "사용하지 않음");
     }
 
-    return StreamBuilder(
-      stream: query.snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
-        if (!snap.hasData) {
-          return Center(child: CircularProgressIndicator());
-        }
+    return Expanded(
+      child: StreamBuilder(
+        stream: query.snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
+          if (!snap.hasData) {
+            return Center(child: CircularProgressIndicator());
+          }
 
-        return ListView.builder(
-          shrinkWrap: true,
-          itemCount: snap.data!.docs.length,
-          itemBuilder: (context, index) {
-            DocumentSnapshot doc = snap.data!.docs[index];
-            Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-            return Card(
-              elevation: 2, // 카드 음영 효과
-              margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4), // 카드 여백 조절
-              child: ListTile(
-                contentPadding: EdgeInsets.all(16), // ListTile 내용 여백 조절
-                title: Text(
-                  data['productName'],
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20, // 제목 폰트 크기
+          return ListView.builder(
+            shrinkWrap: true,
+            itemCount: snap.data!.docs.length,
+            itemBuilder: (context, index) {
+              DocumentSnapshot doc = snap.data!.docs[index];
+              Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+              return Card(
+                elevation: 2, // 카드 음영 효과
+                margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4), // 카드 여백 조절
+                child: ListTile(
+                  contentPadding: EdgeInsets.all(16), // ListTile 내용 여백 조절
+                  title: Text(
+                    data['productName'],
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20, // 제목 폰트 크기
+                    ),
                   ),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 5,),
-                    _buildInfoBox("주문번호 ", data['orderNo']),
-                    _buildInfoBox("사용쿠폰 ", data['cName']=data['cName']=="사용하지 않음"?" -":data['cName'] ),
-                  ],
-                ),
-                trailing: Text(
-                  '${NumberFormat('#,###').format(data['price'].toDouble())}원',
-                  style: TextStyle(
-                    fontSize: 18, // 가격 폰트 크기
-                    color: Colors.orange, // 가격 색상
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 5,),
+                      _buildInfoBox("주문번호 ", data['orderNo']),
+                      _buildInfoBox("사용쿠폰 ", data['cName']=data['cName']=="사용하지 않음"?" -":data['cName'] ),
+                    ],
                   ),
+                  trailing: Text(
+                    '${NumberFormat('#,###').format(data['price'].toDouble())}원',
+                    style: TextStyle(
+                      fontSize: 18, // 가격 폰트 크기
+                      color: Colors.orange, // 가격 색상
+                    ),
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => PurchaseView(document: doc)),
+                    );
+                  },
                 ),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PurchaseView(document: doc)),
-                  );
-                },
-              ),
-            );
-          },
-        );
-      },
+              );
+            },
+          );
+        },
+      ),
     );
   }
 

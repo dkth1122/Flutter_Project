@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:project_flutter/subBottomBar.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
@@ -278,6 +279,7 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
           ),
         ],
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 
