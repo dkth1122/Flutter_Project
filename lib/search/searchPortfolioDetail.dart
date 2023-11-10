@@ -184,12 +184,24 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
                       ],
                     ),
                     SizedBox(height: 10),
-                    Text(
-                      widget.portfolioItem['title'] ?? '제목 없음',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget.portfolioItem['title'] ?? '제목 없음',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: (){},
+                          child: Text("1:1 문의하기"),
+                          style: ElevatedButton.styleFrom(
+                            primary: Color(0xFFFF8C42), // 직접 색상 지정
+                          ),
+                        )
+                      ],
                     ),
                     SizedBox(height: 10),
                     Wrap(
