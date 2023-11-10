@@ -271,40 +271,11 @@ class _JoinState extends State<Join> {
 
 
 
+
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.white, // 여기서 색상을 흰색으로 설정
-        ),
-        primaryColor: Colors.white,
-        hintColor: Color(0xff424242),
-        fontFamily: 'Pretendard',
-        iconTheme: IconThemeData(
-          color: Color(0xff424242), // 아이콘 색상 설정
-          size: 24, // 아이콘 크기 설정
-        ),
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: Color(0xff424242), fontSize: 16),
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          labelStyle: TextStyle(
-            color: Color(0xff424242), // 레이블 텍스트의 색상
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFFFF8C42), width: 2.0),
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Color(0xFFFF8C42), width: 2.0),
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-
-        ),
-      ),
-
-      home: Scaffold(
+    return Scaffold(
         appBar: AppBar(
           title: Text('회원가입',
             style: TextStyle(color: Color(0xff424242), fontWeight: FontWeight.bold),
@@ -602,9 +573,6 @@ class _JoinState extends State<Join> {
         ),
         ),
         bottomNavigationBar: SubBottomBar(),
-      ),
-
-
     );
   }
 }

@@ -54,6 +54,18 @@ class _MyCustomerState extends State<MyCustomer> {
       return null;
     }
   }
+//쿠폰개수가져오는함수
+  Future<int> getCouponCnt() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('coupon').where("userId",isEqualTo: userId )
+          .get();
+      return querySnapshot.size;
+    } catch (e) {
+      print('Error getting document count: $e');
+      return -1; // 에러가 발생하면 -1을 반환하거나 다른 방식으로 처리할 수 있습니다.
+    }
+  }
   Widget _MyProposalFirst() {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
@@ -237,6 +249,7 @@ class _MyCustomerState extends State<MyCustomer> {
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) => MyCoupon()));
             },
+
             child: Container(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -244,7 +257,21 @@ class _MyCustomerState extends State<MyCustomer> {
                   Text("할인 쿠폰", style: TextStyle(fontSize:18, color: Colors.grey, fontWeight: FontWeight.bold),),
                   SizedBox(height: 5,),
                   Divider(),
-                  Text("5장", style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold, color: Color(0xff424242)),),
+                  FutureBuilder<int>(
+                    future: getCouponCnt(),
+                    builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('에러 발생: ${snapshot.error}');
+                      } else {
+                        return Text(
+                         ' ${snapshot.data?.toString() ?? '0'}장',
+                          style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold, color: Color(0xff424242)),
+                        );
+                      }
+                    },
+                  ),
                 ],
               ),
                 margin: EdgeInsets.fromLTRB(10, 0, 10, 5),
