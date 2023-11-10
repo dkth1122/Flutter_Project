@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:project_flutter/proposal/myProposal.dart';
 
 import 'myProposalView.dart';
@@ -41,7 +42,7 @@ class _MyProposalListState extends State<MyProposalList> {
         ));
       },
       child: Container(
-        height: 120,
+        height: 140,
         margin: EdgeInsets.all(16),
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -58,7 +59,6 @@ class _MyProposalListState extends State<MyProposalList> {
           border: Border.all(
             color: Color(0xFFFF8C42), // 보더 컬러 설정
           ),
-
         ),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -105,7 +105,7 @@ class _MyProposalListState extends State<MyProposalList> {
                     color: priceColor, // 가격 텍스트 색상 설정
                   ),
                   Text(
-                    price.toString(),
+                    '${NumberFormat('#,###').format(price)}원',
                     style: TextStyle(
                       fontSize: 18,
                       color: priceColor, // 가격 텍스트 색상 설정

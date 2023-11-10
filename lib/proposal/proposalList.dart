@@ -153,13 +153,7 @@ class _ProposalListState extends State<ProposalList> {
           },
         ),
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            _listProposal()
-          ],
-        ),
-      ),
+      body: _listProposal(),
       bottomNavigationBar: SubBottomBar(),
     );
 

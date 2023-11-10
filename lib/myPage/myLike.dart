@@ -1,6 +1,7 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
@@ -224,7 +225,7 @@ class ServiceListView extends StatelessWidget {
             leading:Image.network(
                 iUrl, width: 100,),
             title: Text(pName,style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
-            subtitle:Text(' $price 원'),
+            subtitle:Text('${NumberFormat('#,###').format(price)}원',),
             trailing: Text(category),
             onTap: () {
               Navigator.push(

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:project_flutter/customer/userCustomer.dart';
 import 'package:project_flutter/expert/my_expert.dart';
 import 'package:project_flutter/main.dart';
@@ -80,12 +81,21 @@ class _MyCustomerState extends State<MyCustomer> {
         }
 
         if (snap.data!.docs.isEmpty) {
-          return Text("아직 제안서가 없습니다.");
+          return Container(
+              alignment: Alignment.center,
+              child: Column(
+                children: [
+                  SizedBox(height: 10,),
+                  Text("아직 제안서가 없습니다."),
+                  SizedBox(height: 10,),
+                ],
+              ));
         }
 
         DocumentSnapshot doc = snap.data!.docs.first;
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
+        final formattedBudget = NumberFormat('###,###').format(data["price"]);
+        
         return Container(
           decoration: BoxDecoration(
             border: Border.all(
@@ -101,7 +111,7 @@ class _MyCustomerState extends State<MyCustomer> {
                   TextSpan(
                     text: "${data["title"]}",
                     style: TextStyle(
-                      fontSize: 24, // 큰 글자 크기
+                      fontSize: 20, // 큰 글자 크기
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF424242), // 색상 설정
                       decoration: data['delYn'] == 'Y' ? TextDecoration.lineThrough : null,
@@ -121,7 +131,7 @@ class _MyCustomerState extends State<MyCustomer> {
                           "받은 제안 수: ${data["accept"].toString()}건", // 큰 글자 크기
                           style: TextStyle(
                             fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                            // fontWeight: FontWeight.bold,
                             color: Color(0xff424242), // 글자 색상 설정
                             decoration: TextDecoration.underline, // 밑줄 추가
                             decorationColor: Color(0xFFFF9C784), // 밑줄 색상 설정
@@ -129,7 +139,7 @@ class _MyCustomerState extends State<MyCustomer> {
                         ),
 
                         Text(
-                          "예산: ${data["price"].toString()}", // 큰 글자 크기
+                          "예산: $formattedBudget 원", // 큰 글자 크기
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -255,7 +265,13 @@ class _MyCustomerState extends State<MyCustomer> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("할인 쿠폰", style: TextStyle(fontSize:18, color: Colors.grey, fontWeight: FontWeight.bold),),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("할인 쿠폰", style: TextStyle(fontSize:20, color: Colors.grey, fontWeight: FontWeight.bold),),
+                      Icon(Icons.card_giftcard, color: Color(0xFFFF8C42))
+                    ],
+                  ),
                   SizedBox(height: 5,),
                   Divider(),
                   FutureBuilder<int>(
@@ -299,7 +315,7 @@ class _MyCustomerState extends State<MyCustomer> {
                     children: [
                       Text(
                         "내 프로젝트",
-                        style: TextStyle(fontSize: 24),
+                        style: TextStyle(fontSize: 20),
                       ),
                       TextButton(
                         onPressed: () {
@@ -340,7 +356,7 @@ class _MyCustomerState extends State<MyCustomer> {
                                 style: TextStyle(
                                   fontSize: 18,  // 텍스트 크기 늘리기
                                   fontWeight: FontWeight.bold,  // 글꼴 두껍게 설정
-                                  color: Color(0xff424242),  // 원하는 색상으로 설정
+                                  color: Colors.grey[700],  // 원하는 색상으로 설정
                                 ),
                               ),
                               SizedBox(width: 10),

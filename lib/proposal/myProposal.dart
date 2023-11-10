@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
@@ -110,7 +111,12 @@ class _MyProjectProposalState extends State<MyProjectProposal> {
               SizedBox(height: 10),
               TextField(
                 controller: _title,
-                decoration: InputDecoration(labelText: "프로젝트 제목"),
+                decoration: InputDecoration(labelText: "프로젝트 제목",
+                  hintText: '10자 이하로 입력하세요.',
+                ),
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(10), // 최대 10글자까지 입력 가능하도록 설정
+                ],
               ),
               SizedBox(height: 20),
 
@@ -118,8 +124,11 @@ class _MyProjectProposalState extends State<MyProjectProposal> {
                 controller: _content,
                 decoration: InputDecoration(
                   labelText: '제안 설명',
-                  hintText: '10자 이상 입력하세요.',
+                  hintText: '20자 이하로 입력하세요.',
                 ),
+                inputFormatters: [
+                  LengthLimitingTextInputFormatter(20), // 최대 10글자까지 입력 가능하도록 설정
+                ],
               ),
               SizedBox(height: 20),
               TextField(

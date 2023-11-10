@@ -48,12 +48,13 @@ class _MyCouponState extends State<MyCoupon> {
                   ListTile(
                     title: Text(
                       data['cName'],
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFFFF8C42)),
                     ),
                     subtitle: Text(
                       '${data['discount']}% 할인 쿠폰',
                       style: TextStyle(fontSize: 16),
                     ),
+                    leading: Icon(Icons.card_giftcard, color: Color(0xFFFF8C42)),
                     trailing: Text(
                       "유효 기간: 2023-12-31",
                       style: TextStyle(fontSize: 16),

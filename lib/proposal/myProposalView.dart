@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../chat/chat.dart';
@@ -168,7 +169,7 @@ class _MyProposalViewState extends State<MyProposalView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          widget.proposalTitle,
+         "프로젝트 상세보기",
           style: TextStyle(color: Color(0xff424242), fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
@@ -213,27 +214,56 @@ class _MyProposalViewState extends State<MyProposalView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '제목: ${widget.proposalTitle}',
+                  Text("프로젝트 제목",
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       decoration: widget.proposalDel == 'Y' ? TextDecoration.lineThrough : null,
                       color: widget.proposalDel == 'Y'? Colors.grey : Colors.black,
+                    ),),
+                  SizedBox(height: 8,),
+                  Text(
+                    widget.proposalTitle,
+                    style: TextStyle(
+                      fontSize: 24,
+                      decoration: widget.proposalDel == 'Y' ? TextDecoration.lineThrough : null,
+                      color: widget.proposalDel == 'Y'? Colors.grey : Colors.black,
                     ),
                   ),
                   Divider(),
-                  Text(
-                    '설명: ${widget.proposalContent}',
+                  Text("설명",
                     style: TextStyle(
-                      fontSize: 20,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
+                      decoration: widget.proposalDel == 'Y' ? TextDecoration.lineThrough : null,
+                      color: widget.proposalDel == 'Y'? Colors.grey : Colors.black,
+                    ),),
+                  SizedBox(height: 8,),
+                  Text(
+                    widget.proposalContent,
+                    style: TextStyle(
+                      fontSize: 24,
+                      decoration: widget.proposalDel == 'Y' ? TextDecoration.lineThrough : null,
+                      color: widget.proposalDel == 'Y'? Colors.grey : Colors.black,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text("예산",
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      decoration: widget.proposalDel == 'Y' ? TextDecoration.lineThrough : null,
+                      color: widget.proposalDel == 'Y'? Colors.grey : Colors.black,
+                    ),),
+                  SizedBox(height: 8),
+                  Text(
+                    '${NumberFormat('#,###').format(widget.proposalPrice)}원',
+                    style: TextStyle(
+                      fontSize: 24,
                       decoration: widget.proposalDel == 'Y' ? TextDecoration.lineThrough : null,
                       color: widget.proposalDel == 'Y' ? Colors.grey : Colors.black,
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text('예산: ${widget.proposalPrice.toString()}원'),
                   SizedBox(height: 8),
                   Text('프로젝트 시작일과 종료일은 채팅으로 협의하세요~'),
                   TextButton(
@@ -252,19 +282,16 @@ class _MyProposalViewState extends State<MyProposalView> {
                     ),
                   ),
                   Divider(color :Colors.grey),
-                  Text(
-                    '제안한 전문가 목록',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  SizedBox(height: 10),
+                  Center(
+                    child: Text(
+                      '제안한 전문가 목록',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  SizedBox(height: 8),
-                  Text("1:1문의를 원하시면 스와이프하세요!",
-                    style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.red,
-                  ),),
                   _buildUserList(widget.proposalTitle),
                   SizedBox(height: 20), // 여기에 새로운 위젯 추가
                   // 다른 새로운 위젯 추가
@@ -290,76 +317,87 @@ class _MyProposalViewState extends State<MyProposalView> {
         if (snapshot.hasError) {
           return Text('Error: ${snapshot.error}');
         }
-        if (snapshot.hasData) {
-          return ListView.builder(
-            shrinkWrap: true,
-            itemCount: snapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              var uid = snapshot.data!.docs[index]['uId'];
-              return FutureBuilder(
-                future: FirebaseFirestore.instance
-                    .collection('userList')
-                    .where('userId', isEqualTo: uid)
-                    .get(),
-                builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> userSnapshot) {
-                  if (userSnapshot.connectionState == ConnectionState.waiting) {
-                    return CircularProgressIndicator();
-                  }
-                  if (userSnapshot.hasError) {
-                    return Text('Error: ${userSnapshot.error}');
-                  }
-                  if (userSnapshot.hasData) {
-                    var user = userSnapshot.data!.docs[0];
-                    var uid = user['userId'];
-                    return Dismissible(
-                      key: UniqueKey(), // 고유한 키로 설정
-                      background: Container(
-                        color:Color(0xFFFF8C42), // 스와이프 배경 색상
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.only(left: 20),
-                        child: Icon(
-                          Icons.chat, // 삭제 아이콘 또는 원하는 내용으로 대체
-                          color: Colors.white,
-                        ),
-                      ),
-
-                      onDismissed: (direction) {
-                        if (direction == DismissDirection.endToStart) {
-                          // 스와이프 방향이 오른쪽에서 왼쪽으로 이동할 때만 수행
-                          setState(() {
-                            _toggleChat(uid);
-
-                          });
-                        }
-                      },
-                      direction: DismissDirection.endToStart, // 오른쪽에서 왼쪽으로 스와이프 비활성화
-                      child: ListTile(
-                        leading: Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: DecorationImage(
-                              fit: BoxFit.cover,
-                              image: NetworkImage(user['profileImageUrl']),
+        if (snapshot.hasData && snapshot.data!.docs.length > 0) {
+          return Column(
+            children: [
+              Text(
+                '1:1문의를 원하시면 스와이프하세요!',
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.red,
+                ),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: snapshot.data!.docs.length,
+                itemBuilder: (context, index) {
+                  var uid = snapshot.data!.docs[index]['uId'];
+                  return FutureBuilder(
+                    future: FirebaseFirestore.instance
+                        .collection('userList')
+                        .where('userId', isEqualTo: uid)
+                        .get(),
+                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> userSnapshot) {
+                      if (userSnapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (userSnapshot.hasError) {
+                        return Text('Error: ${userSnapshot.error}');
+                      }
+                      if (userSnapshot.hasData) {
+                        var user = userSnapshot.data!.docs[0];
+                        var uid = user['userId'];
+                        return Dismissible(
+                          key: UniqueKey(), // 고유한 키로 설정
+                          background: Container(
+                            color:Color(0xFFFF8C42), // 스와이프 배경 색상
+                            alignment: Alignment.centerLeft,
+                            padding: EdgeInsets.only(left: 20),
+                            child: Icon(
+                              Icons.chat, // 삭제 아이콘 또는 원하는 내용으로 대체
+                              color: Colors.white,
                             ),
                           ),
-                        ),
-                        title: Text(user['nick']),
-                        subtitle: Text(user['userId']),
-                        trailing: TextButton(
-                          onPressed: () {
-                            _toggleChat(uid);
+
+                          onDismissed: (direction) {
+                            if (direction == DismissDirection.startToEnd) {
+                              // 스와이프 방향이 오른쪽에서 왼쪽으로 이동할 때만 수행
+                              setState(() {
+                                _toggleChat(uid);
+
+                              });
+                            }
                           },
-                          child: Text("1:1문의하기>>", style: TextStyle(color: Color(0xFFFF8C42), fontWeight: FontWeight.bold),),
-                        ),
-                      ),
-                    );
-                  }
-                  return SizedBox(); // Placeholder for future state
+                          direction: DismissDirection.startToEnd, // 오른쪽에서 왼쪽으로 스와이프 비활성화
+                          child: ListTile(
+                            leading: Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  fit: BoxFit.cover,
+                                  image: NetworkImage(user['profileImageUrl']),
+                                ),
+                              ),
+                            ),
+                            title: Text(user['nick']),
+                            subtitle: Text(user['userId']),
+                            trailing: TextButton(
+                              onPressed: () {
+                                _toggleChat(uid);
+                              },
+                              child: Text("1:1문의하기>>", style: TextStyle(color: Color(0xFFFF8C42), fontWeight: FontWeight.bold),),
+                            ),
+                          ),
+                        );
+                      }
+                      return SizedBox(); // Placeholder for future state
+                    },
+                  );
                 },
-              );
-            },
+              ),
+            ],
           );
         }
         return SizedBox(); // Placeholder for future state
