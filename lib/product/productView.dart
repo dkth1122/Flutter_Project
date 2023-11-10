@@ -498,9 +498,9 @@ class _ProductViewState extends State<ProductView>
                                       radius: 40,
                                       backgroundImage: NetworkImage(userProfileImage),
                                     ),
-                                    SizedBox(width: 25),
+                                    SizedBox(width: 20),
                                     Text(userNick), // 닉네임 출력
-                                    SizedBox(width: 130),
+                                    SizedBox(width: 80),
                                     TextButton(
                                       onPressed: _toggleChat,
                                       child: Text("1:1문의하기"),
