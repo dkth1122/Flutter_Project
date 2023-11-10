@@ -206,7 +206,7 @@ class ServiceListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      itemCount: likeData.length,
+      itemCount: productPrices.length,
       itemBuilder: (context, index) {
         int price = productPrices[index];
         String iUrl = productUrls[index];
@@ -222,25 +222,24 @@ class ServiceListView extends StatelessWidget {
               )
           ),
           child: ListTile(
-            leading:Image.network(
-                iUrl, width: 100,),
+              leading: Image.network(iUrl, width: 100,),
               title: Text(
-                pName.length > 10 ? '${pName.substring(0, 14)}...' : pName,
+                pName.length > 14 ? '${pName.substring(0, 14)}...' : pName,
                 style: TextStyle(fontWeight: FontWeight.bold),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
-              subtitle:Text('${NumberFormat('#,###').format(price)}원 ',),
-            // trailing:  Column(
-            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //   children: [
-            //     Icon(Icons.favorite, color: Colors.red),
-            //     Text(
-            //       category,
-            //       style: TextStyle(fontSize: 12),
-            //     ),
-            //   ],
-            // ),
+              subtitle: Text('${NumberFormat('#,###').format(price)}원 '),
+              trailing: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Icon(Icons.favorite, color: Colors.red),
+                  Text(
+                    category,
+                    style: TextStyle(fontSize: 12),
+                  ),
+                ],
+              ),
             onTap: () {
               Navigator.push(
                 context,
