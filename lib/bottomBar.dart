@@ -57,14 +57,18 @@ class _CircularDialogState extends State<CircularDialog> {
   List<Widget> pageChange = [PurchaseManagement(userId:sessionId),MyCoupon(),UserCustomer(),Revenue(),MessageResponse(),ExpertRating(),Product(),MyProposalList(userId : sessionId)];
   List<double> iconRotations = [pi / 2, 135 * (pi / 180), pi, 225 * (pi / 180), 270 * (pi / 180), 315 * (pi / 180), 360 * (pi / 180), 45 * (pi / 180)]; // 각 아이콘의 회전 각도
   List<Color> iconColors = [
-    Color(0xFF1839C9),
-    Color(0xFF1839C9),
-    Colors.black,
-    Color(0xE0FF6D13),
-    Color(0xE0FF6D13),
-    Color(0xE0FF6D13),
-    Colors.black,
-    Color(0xFF1839C9),
+    Color(0xFF5B5BFF),//구매
+    Color(0xFF5B5BFF),//쿠폰
+
+    Color(0xff79c41f),//고객센터
+
+    Color(0xFFFF7D29),//수익
+    Color(0xFFFF7D29),//응답
+    Color(0xFFFF7D29),//등급
+
+    Color(0xff79c41f),//상품보기
+
+    Color(0xFF5B5BFF),//내프젝
   ];
   @override
   void initState() {
