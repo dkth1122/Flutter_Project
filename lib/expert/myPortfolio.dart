@@ -36,10 +36,8 @@ class _PortfolioState extends State<Portfolio> {
     UserModel um = Provider.of<UserModel>(context, listen: false);
     if (um.isLogin) {
       user = um.userId!;
-      print(user);
     } else {
       user = "없음";
-      print("로그인 안됨");
     }
     // Firestore에서 포트폴리오 항목을 가져오는 메서드를 호출
     fetchPortfolioItems();
@@ -127,11 +125,10 @@ class _PortfolioState extends State<Portfolio> {
         });
 
         // portfolioLike 콜렉션에서 해당 포트폴리오와 관련된 좋아요 정보 삭제
-        final likeRef = expertDoc.reference.collection('portfolioLike');
+        final likeRef =  FirebaseFirestore.instance.collection('portfolioLike');
         await likeRef.where('portfoiloId', isEqualTo: user).where('title', isEqualTo: title).get().then((value) {
           for (var doc in value.docs) {
             doc.reference.delete();
-            print("문서 삭제 완료======================");
           }
         });
 
@@ -147,6 +144,8 @@ class _PortfolioState extends State<Portfolio> {
       } catch (e) {
         print('포트폴리오 삭제 오류: $e');
       }
+    }else{
+      print("삭제 실패!!!!!!!!!!!!");
     }
   }
 
@@ -197,7 +196,6 @@ class _PortfolioState extends State<Portfolio> {
             final item = portfolioItems[index];
             return InkWell(
               onTap: () {
-                print(user);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -262,6 +260,17 @@ class _PortfolioState extends State<Portfolio> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
+                                IconButton(
+                                  icon: Icon(Icons.delete, color: Color(0xFFFF8C42)),
+                                  onPressed: () {
+                                    // 포트폴리오 수정 페이지로 이동
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => EditPortfolio(portfolioId: '',),
+                                      ),
+                                    );
+                                  },
+                                ),
                                 IconButton(
                                   icon: Icon(Icons.delete, color: Color(0xFFFF8C42)),
                                   onPressed: () {

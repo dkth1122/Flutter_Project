@@ -115,12 +115,6 @@ class _AddPortfolioState extends State<AddPortfolio> {
       "#데이터베이스",
     ],
     "기타": ["#하드웨어·임베디드", "#보안", "#QA·테스트", "#컴퓨터 기술지원", "#파일변환", "#기타"],
-    "직무직군": [
-      "#백엔드 개발자",
-      "#풀스택 개발자",
-      "#데브옵스·인프라 직군",
-      "#데이터·ML·DL 직군",
-    ],
   };
 
   // 이미지 선택 메서드
@@ -736,16 +730,6 @@ class _AddPortfolioState extends State<AddPortfolio> {
                   Navigator.of(context).pop();
                 },
               ),
-              ListTile(
-                title: Text("직무직군"),
-                onTap: () {
-                  setState(() {
-                    selectedCategory = "직무직군";
-                  });
-                  Navigator.of(context).pop();
-                },
-              ),
-              // 다른 카테고리 항목 추가
             ],
           ),
         );

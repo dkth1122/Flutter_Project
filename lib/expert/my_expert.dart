@@ -210,14 +210,19 @@ class _MyExpertState extends State<MyExpert> {
                 color: Colors.grey[300],
                 borderRadius: BorderRadius.circular(20.0),
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("내 등급", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey,),),
-                  SizedBox(height: 5,),
-                  Divider(thickness: 1,),
-                  Text("$rating", style: TextStyle(fontSize:23, fontWeight: FontWeight.bold, color: Color(0xff424242)),)
-                ],
+              child: InkWell(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => ExpertRating()));
+                },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("내 등급", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey,),),
+                      SizedBox(height: 5,),
+                      Divider(thickness: 1,),
+                      Text("$rating", style: TextStyle(fontSize:23, fontWeight: FontWeight.bold, color: Color(0xff424242)),)
+                    ],
+                  ),
               ),
             ),
             Divider(
