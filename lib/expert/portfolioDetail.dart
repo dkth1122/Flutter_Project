@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
+import '../subBottomBar.dart';
+
 class PortfolioDetailPage extends StatefulWidget {
   final portfolioItem;
   final user;
@@ -222,6 +224,8 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
           ),
         ],
       ),
+      bottomNavigationBar: SubBottomBar(),
+
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:project_flutter/proposal/proposalVIew.dart';
+import 'package:project_flutter/subBottomBar.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
@@ -16,31 +17,88 @@ class _ProposalListState extends State<ProposalList> {
   bool isAccepted = false;
 
 
-  Widget _buildInfoBox(String value, String label) {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        color: Color(0xFFEFEFEF), // 박스 배경색
-      ),
-      child: Column(
-        children: [
-          Text(
-            value,
-            style: TextStyle(fontWeight: FontWeight.bold),
+  Widget _buildInfoBox(title, content, price, user, documentId, userId) {
+    return InkWell(
+      onTap: (){
+        Navigator.push(context,  MaterialPageRoute(
+          builder: (context) => ProposalView(
+              proposalTitle: title,
+              proposalContent: content,
+              proposalPrice: price,
+              proposer: user,
+              documentId: documentId,
+              userId : userId!
           ),
-          Divider(
-            color: Colors.grey, // 선 색상
-            thickness: 1, // 선의 두께
-          ),
-          Text(
-            label,
-            style: TextStyle(
-              fontStyle: FontStyle.italic,
-              color: Colors.grey, // 라벨 텍스트 색상
+        ),
+        );
+      },
+      child: Container(
+        height: 120,
+        margin: EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white, // 배경색 설정
+          borderRadius: BorderRadius.circular(10), // 보더 둥글게 설정
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.5),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: Offset(0, 3), // 그림자 효과
             ),
+          ],
+          border: Border.all(
+            color: Color(0xFFFF8C42), // 보더 컬러 설정
           ),
-        ],
+
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Flexible(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xff424242),
+                      ),
+                    ),
+                    SizedBox(height: 8,),
+                    Text(
+                      content,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey, // 서브타이틀 텍스트 색상 설정
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: [
+                  Icon(
+                    Icons.arrow_drop_down,
+                    size: 24,
+                    color: Color(0xff424242),
+                  ),
+                  Text(
+                    price.toString(),
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Color(0xff424242),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -69,49 +127,7 @@ class _ProposalListState extends State<ProposalList> {
             Map<String, dynamic> data =
             doc.data() as Map<String, dynamic>;
             String documentId = doc.id;
-            return ListTile(
-              tileColor: Color(0xFFEFEFEF), // 타일 배경색 설정
-              contentPadding: EdgeInsets.all(16),
-              title: Text(data["title"], style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
-              subtitle:
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: 8), // 간격 조절을 위한 SizedBox 추가
-                  Text(
-                    data["category"],
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  SizedBox(height: 8), // 간격 조절을 위한 SizedBox 추가
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildInfoBox('${data["price"]}원', '예산'),
-                      _buildInfoBox('${data["accept"]}개', '받은 제안'),
-                      _buildInfoBox('${data["cnt"]}개', '조회수'),
-                    ],
-                  ),
-                ],
-              ),
-              trailing: IconButton(
-                onPressed: () {
-                },
-                icon:Icon(Icons.check_box),
-              ),
-              onTap: (){
-                Navigator.push(context,  MaterialPageRoute(
-                  builder: (context) => ProposalView(
-                    proposalTitle: data["title"],
-                    proposalContent: data["content"],
-                    proposalPrice: data["price"],
-                    proposer: data["user"],
-                    documentId: documentId,
-                    userId : userId!
-                  ),
-                ),
-                );
-              },
-            );
+            return _buildInfoBox(data['title'], data['content'], data['price'],data['user'],documentId,userId);
           },
         );
       },
@@ -144,6 +160,7 @@ class _ProposalListState extends State<ProposalList> {
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
 
   }
