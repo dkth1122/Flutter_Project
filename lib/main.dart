@@ -173,7 +173,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
               flexibleSpace: FlexibleSpaceBar(
                 titlePadding: EdgeInsets.all(20),
-                title: Text('Fixer 4 U'),
+                title: Image.asset ('assets/logo.png',),
               ),
               actions: [
                 if (isAdmin)
