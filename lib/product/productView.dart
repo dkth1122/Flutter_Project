@@ -428,8 +428,8 @@ class _ProductViewState extends State<ProductView>
                   children: [
                     Image.network(
                       widget.imageUrl,
-                      width: 200,
-                      height: 200,
+                      width: 300,
+                      height: 220,
                       fit: BoxFit.cover,
                     ),
                     const SizedBox(height :20),
@@ -444,14 +444,14 @@ class _ProductViewState extends State<ProductView>
                     Text(
                       '${productData['pDetail']}',
                       style: const TextStyle(
-                        fontSize: 12,
+                        fontSize: 15,
                       ),
                     ),
                     const SizedBox(height :10),
                     Text (
                       '가격 : $formattedPrice 원',
                       style :const TextStyle (
-                        fontSize :12 ,
+                        fontSize :15 ,
                       ),
                     ),
                     const SizedBox(height :10),
@@ -492,9 +492,9 @@ class _ProductViewState extends State<ProductView>
                                       radius: 40,
                                       backgroundImage: NetworkImage(userProfileImage),
                                     ),
-                                    SizedBox(width: 5),
+                                    SizedBox(width: 20),
                                     Text(userNick), // 닉네임 출력
-                                    SizedBox(width: 50),
+                                    SizedBox(width: 80),
                                     TextButton(
                                       onPressed: _toggleChat,
                                       child: Text("1:1문의하기"),

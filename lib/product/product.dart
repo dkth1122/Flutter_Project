@@ -33,9 +33,7 @@ class _ProductState extends State<Product> {
       return Stream<QuerySnapshot>.empty();
     }
   }
-  final CarouselController _controller = CarouselController();
-  List<String> imageBanner = ['assets/banner1.webp','assets/banner2.webp','assets/banner3.webp','assets/banner4.webp','assets/banner5.webp'];
-  int _current = 0;
+
   List<String> categories = [
     'UX기획',
     '웹',
@@ -137,16 +135,6 @@ class _ProductState extends State<Product> {
                 }),
               ),
             ),
-            //배너움직일때마다 재로딩됨 ㅡ,.ㅡ
-            //  SizedBox(
-            //   height: 150,
-            //   child: Stack(
-            //     children: [
-            //       sliderWidget(),
-            //       sliderIndicator(),
-            //     ],
-            //   ),
-            // ),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Row(
@@ -348,63 +336,6 @@ class _ProductState extends State<Product> {
         ),
       ),
       bottomNavigationBar: BottomBar(),
-    );
-  }
-
-  Widget sliderWidget() {
-    return CarouselSlider(
-      carouselController: _controller,
-      items: imageBanner.map(
-            (imagePath) {
-          return Builder(
-            builder: (context) {
-              return SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                ),
-              );
-            },
-          );
-        },
-      ).toList(),
-      options: CarouselOptions(
-        height: 150,
-        viewportFraction: 1.0,
-        autoPlay: true,
-        autoPlayInterval: const Duration(seconds: 2),
-        onPageChanged: (index, reason) {
-          setState(() {
-            _current = index;
-          });
-        },
-      ),
-    );
-  }
-
-  Widget sliderIndicator() {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: imageBanner.asMap().entries.map((entry) {
-          return GestureDetector(
-            onTap: () => _controller.animateToPage(entry.key),
-            child: Container(
-              width: 12,
-              height: 12,
-              margin:
-              const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color:
-                Colors.white.withOpacity(_current == entry.key ? 0.9 : 0.4),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
     );
   }
 
