@@ -75,18 +75,6 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => AdminAd()),
-                  );
-                },
-                child: Text('광고 관리'),
-                style: ElevatedButton.styleFrom(
-                  primary: Color(0xFFFF8C42),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
                     MaterialPageRoute(builder: (context) => AdminBoard()),
                   );
                 },
