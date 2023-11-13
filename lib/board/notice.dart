@@ -57,7 +57,24 @@ class _NoticeState extends State<Notice> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("공지사항 등록"),backgroundColor: Color(0xFFFF8C42),),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          '공지사항 등록하기',
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: Container(
         padding: EdgeInsets.all(10),
         child: SingleChildScrollView( // SingleChildScrollView로 감싸서 스크롤 가능하도록 만듭니다.

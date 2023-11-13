@@ -29,7 +29,24 @@ class _FaqUpdateState extends State<FaqUpdate> {
     final _scrollController = ScrollController(); // 스크롤 컨트롤러 추가
 
     return Scaffold(
-      appBar: AppBar(title: Text("FAQ 수정하기"),backgroundColor: Color(0xFFFF8C42),),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          'FAQ 수정하기',
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: Container(
         padding: EdgeInsets.all(10),
         child: SingleChildScrollView(

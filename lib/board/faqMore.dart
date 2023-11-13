@@ -28,7 +28,24 @@ class _FaqMoreState extends State<FaqMore> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text("FAQ"),backgroundColor: Color(0xFFFF8C42),),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          'FAQ',
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: SingleChildScrollView(
         child: SingleChildScrollView(
           child: Container(

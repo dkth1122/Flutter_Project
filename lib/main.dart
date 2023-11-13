@@ -765,23 +765,24 @@ class _MyHomePageState extends State<MyHomePage> {
         }
 
         var portfolios = snapshot.data!.docs;
-
         portfolios.sort((a, b) => (b['cnt'] as int).compareTo(a['cnt'] as int));
+        var top4Portfolios = portfolios.take(4).toList();
 
         return ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: portfolios.length,
+          itemCount: top4Portfolios.length,
           itemBuilder: (context, index) {
-            var data = portfolios[index].data() as Map<String, dynamic>;
+            var data = top4Portfolios[index].data() as Map<String, dynamic>;
+
             return InkWell(
               onTap: () {
-                var parentCollectionId = portfolios[index].reference.parent!.parent!.id; // 두 단계 위의 상위 컬렉션의 ID 가져오기
+                var parentCollectionId = top4Portfolios[index].reference.parent!.parent!.id;
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => SearchPortfolioDetail(
-                      portfolioItem: portfolios[index].data() as Map<String, dynamic>,
+                      portfolioItem: data,
                       user: parentCollectionId,
                     ),
                   ),
@@ -793,10 +794,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     height: 100,
                     padding: EdgeInsets.all(5),
                     decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 0.6,
-                            color: Color.fromRGBO(182, 182, 182, 0.6)
-                        )
+                      border: Border.all(
+                        width: 0.6,
+                        color: Color.fromRGBO(182, 182, 182, 0.6),
+                      ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -804,7 +805,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         Row(
                           children: [
                             ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
+                              borderRadius: BorderRadius.circular(10.0),
                               child: Image.network(
                                 data['thumbnailUrl'],
                                 width: 130,
@@ -856,6 +857,7 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
+
 
 
 }

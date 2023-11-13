@@ -30,7 +30,24 @@ class _NoticeViewState extends State<NoticeView> {
 
     Map<String, dynamic> data = widget.document.data() as Map<String, dynamic>;
     return Scaffold(
-      appBar: AppBar(title: Text("공지사항 View"),backgroundColor: Color(0xFFFF8C42),),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          '공지사항 상세보기',
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: Container(
         padding: EdgeInsets.all(10),
         child: ListView(
