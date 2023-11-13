@@ -143,7 +143,7 @@ class _MyProposalListState extends State<MyProposalList> {
               category: data["category"],
               content: data["content"],
               price: data["price"],
-              delYn: data["title"],
+              delYn: data["delYn"],
             );
           },
 
