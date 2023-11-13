@@ -27,7 +27,7 @@ class _SearchState extends State<Search> {
 
   //추천 검색어 시작
   final TextEditingController _latelySearch = TextEditingController();
-  List<String> searchKeywords = ["워드프레스","홈페이지","홈페이지 제작","카페24","크롤링","블로그","매크로","아임웹","애드센스","상세 패이지",];
+  List<String> searchKeywords = ["워드프레스","홈페이지","홈페이지 제작","카페24","크롤링","블로그","매크로","아임웹","애드센스","상세 페이지",];
   TextEditingController textFieldController = TextEditingController();
   void handleContainerTap(String keyword) {
     setState(() {

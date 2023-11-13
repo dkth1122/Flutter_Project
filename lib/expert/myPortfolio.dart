@@ -235,7 +235,9 @@ class _PortfolioState extends State<Portfolio> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  item.title,
+                                item.title.length > 7
+                                      ? '${item.title.substring(0, 7)}...'
+                                      : item.title,
                                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                                 ),
                                 Container(
