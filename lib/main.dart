@@ -133,6 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _current2 = 0;
   final CarouselController _controller = CarouselController();
   // 1초에 한번씩 로딩되는 문제를 해결하기 위해 밖으로 뺏음
+  final Stream<QuerySnapshot> portfolioStream = FirebaseFirestore.instance.collectionGroup("portfolio").limit(4).snapshots();
   final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").orderBy("cnt", descending: true).limit(4).snapshots();
   final Stream<QuerySnapshot> productStream2 = FirebaseFirestore.instance.collection("product")
       .where("likeCnt", isGreaterThanOrEqualTo: 1)
@@ -299,10 +300,10 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     // 가장 많이 본 포트폴리오
                     Container(
-                        padding: EdgeInsets.fromLTRB(10, 0, 10, 10),
+                        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
                         child: _cntPortFolio()
                     ),
-                    SizedBox(height: 20,),
+                    SizedBox(height: 10,),
 
                   ],
                 ),
@@ -749,132 +750,112 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _cntPortFolio() {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection("expert").snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> expertSnap) {
-        if (!expertSnap.hasData) {
-          return CircularProgressIndicator();
+    return StreamBuilder<QuerySnapshot>(
+      stream: portfolioStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
         }
 
-        final List<DocumentSnapshot> expertDocs = expertSnap.data!.docs;
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Transform.scale(
+            scale: 0.1,
+            child: CircularProgressIndicator(strokeWidth: 20,),
+          );
+        }
+
+        var portfolios = snapshot.data!.docs;
+
+        portfolios.sort((a, b) => (b['cnt'] as int).compareTo(a['cnt'] as int));
 
         return ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
-          itemCount: expertDocs.length,
+          itemCount: portfolios.length,
           itemBuilder: (context, index) {
-            Map<String, dynamic> expertData = expertDocs[index].data() as Map<String, dynamic>;
-            String uId = expertData['userId'];
-
-            return StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection("expert")
-                  .doc(uId)
-                  .collection("portfolio")
-                  .orderBy('cnt', descending: true)  // 'cnt' 필드를 기준으로 내림차순으로 정렬
-                  .limit(4)
-                  .snapshots(),
-              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> portfolioSnap) {
-                if (!portfolioSnap.hasData) {
-                  return CircularProgressIndicator();
-                }
-
-                final List<DocumentSnapshot> portfolioDocs = portfolioSnap.data!.docs;
-
-                final filteredPortfolios = List.from(portfolioDocs);
-
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  itemCount: filteredPortfolios.length,
-                  itemBuilder: (context, index) {
-                    Map<String, dynamic> portfolioData = filteredPortfolios[index].data() as Map<String, dynamic>;
-                    return InkWell(
-                        onTap: () {
-                          Map<String, dynamic> selectedPortfolioData = filteredPortfolios[index].data() as Map<String, dynamic>;
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SearchPortfolioDetail(
-                                portfolioItem: selectedPortfolioData,
-                                user: uId,
-                              ),
-                            ),
-                          );
-                        },
-                        child: Column(
-                          children: [
-                            Container(
-                              height: 100,
-                              padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 0.6,
-                                      color: Color.fromRGBO(182, 182, 182, 0.6)
-                                  )
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
-                                        child: Image.network(
-                                          portfolioData['thumbnailUrl'],
-                                          width: 130,
-                                          height: 100,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      SizedBox(width: 10,),
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            portfolioData['title'].length > 7
-                                                ? '${portfolioData['title'].substring(0, 7)}...'
-                                                : portfolioData['title'],
-                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                          ),
-                                          Container(
-                                            width: 110,
-                                            child: Text(
-                                              portfolioData['portfolioDescription'].length > 20
-                                                  ? '${portfolioData['portfolioDescription'].substring(0, 20)}...'
-                                                  : portfolioData['portfolioDescription'],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        '조회수: ${portfolioData['cnt']}',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 10,)
-                          ],
-                        )
-                      // Text("Portfolio Title: ${portfolioData['title']}")
-                    );
-                  },
+            var data = portfolios[index].data() as Map<String, dynamic>;
+            return InkWell(
+              onTap: () {
+                var parentCollectionId = portfolios[index].reference.parent!.parent!.id; // 두 단계 위의 상위 컬렉션의 ID 가져오기
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SearchPortfolioDetail(
+                      portfolioItem: portfolios[index].data() as Map<String, dynamic>,
+                      user: parentCollectionId,
+                    ),
+                  ),
                 );
               },
+              child: Column(
+                children: [
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                            width: 0.6,
+                            color: Color.fromRGBO(182, 182, 182, 0.6)
+                        )
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
+                              child: Image.network(
+                                data['thumbnailUrl'],
+                                width: 130,
+                                height: 100,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            SizedBox(width: 10,),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  data['title'].length > 7
+                                      ? '${data['title'].substring(0, 7)}...'
+                                      : data['title'],
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                Container(
+                                  width: 110,
+                                  child: Text(
+                                    data['description'].length > 20
+                                        ? '${data['description'].substring(0, 20)}...'
+                                        : data['description'],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              '조회수: ${data['cnt'].toString()}',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10,)
+                ],
+              ),
             );
           },
         );
       },
     );
   }
+
 
 }

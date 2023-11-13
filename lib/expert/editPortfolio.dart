@@ -86,6 +86,7 @@ class _EditPortfolioState extends State<EditPortfolio> {
     UserModel um = Provider.of<UserModel>(context, listen: false);
     if (um.isLogin) {
       user = um.userId!;
+      print(user);
     } else {
       user = "없음";
       print("로그인 안됨");
@@ -249,18 +250,20 @@ class _EditPortfolioState extends State<EditPortfolio> {
   }
 
   //title 중복 검사용
-  Future<bool> isTitleUnique(String title, String userId) async {
+  Future<bool> isTitleUnique(String title, String userId, String currentPortfolioId) async {
     final expertCollection = firestore.collection('expert');
     final expertDoc = expertCollection.doc(userId);
     final portfolioCollection = expertDoc.collection('portfolio');
 
-    final querySnapshot = await portfolioCollection.where('title', isEqualTo: title).get();
+    // 현재 편집 중인 포트폴리오를 제외하고 동일한 제목을 가진 포트폴리오가 있는지 확인하는 쿼리
+    final querySnapshot = await portfolioCollection
+        .where('title', isEqualTo: title)
+        .where(FieldPath.documentId, isNotEqualTo: currentPortfolioId)
+        .get();
 
     return querySnapshot.docs.isEmpty;
   }
 
-
-  //포트폴리오 업데이트
   // 포트폴리오 업데이트
   Future<void> addPortfolioToFirestore(PortfolioItem item, String userId) async {
     try {
@@ -269,42 +272,51 @@ class _EditPortfolioState extends State<EditPortfolio> {
       DocumentReference expertDoc = expertCollection.doc(userId);
       CollectionReference portfolioCollection = expertDoc.collection('portfolio');
 
-      // 이미지 업로드 및 URL 가져오기
-      String thumbnailUrl = await uploadThumbnailImage(File(thumbImagePath!), userId);
+      // 썸네일 이미지 URL 처리
+      String thumbnailUrl = '';
+      if (thumbImagePath != null && thumbImagePath!.isNotEmpty) {
+        thumbnailUrl = await uploadThumbnailImage(File(thumbImagePath!), userId);
+      }
+
+      // 서브 이미지 URL 목록 처리
       List<String> subImageUrls = [];
       for (String imagePath in imagePaths) {
-        String imageUrl = await uploadSubImage(File(imagePath), userId);
-        subImageUrls.add(imageUrl);
+        if (imagePath != null && imagePath.isNotEmpty) {
+          String imageUrl = await uploadSubImage(File(imagePath), userId);
+          subImageUrls.add(imageUrl);
+        }
       }
+
+      // startDate 및 endDate 처리
+      Timestamp? startTimestamp = item.startDate != null ? Timestamp.fromDate(item.startDate!) : null;
+      Timestamp? endTimestamp = item.endDate != null ? Timestamp.fromDate(item.endDate!) : null;
 
       // Map을 이용하여 업데이트할 필드와 값을 설정
       Map<String, dynamic> updateFields = {
         'title': item.title,
         'description': item.description,
-        'thumbnailUrl': thumbnailUrl, // 썸네일 이미지 URL
-        'subImageUrls': subImageUrls, // 서브 이미지 URL 목록
+        if (thumbnailUrl.isNotEmpty) 'thumbnailUrl': thumbnailUrl,
+        if (subImageUrls.isNotEmpty) 'subImageUrls': subImageUrls,
         'category': item.category,
-        'startDate': item.startDate,
-        'endDate': item.endDate,
-        'customer': item.customer, // 고객사
-        'industry': item.industry, // 업종
-        'portfolioDescription': item.portfolioDescription, // 포트폴리오 설명
+        if (startTimestamp != null) 'startDate': startTimestamp,
+        if (endTimestamp != null) 'endDate': endTimestamp,
+        'customer': item.customer,
+        'industry': item.industry,
+        'portfolioDescription': item.portfolioDescription,
         'hashtags': item.hashtags,
       };
 
-      // 필드 값이 null이 아닌 경우에만 업데이트
-      updateFields.removeWhere((key, value) => value == null);
-
-      // PortfolioItem을 Firestore에 추가
+      // PortfolioItem을 Firestore에 업데이트
       await portfolioCollection.doc(portfolioId).update(updateFields);
 
-      // 데이터 추가 성공
-      print('포트폴리오가 Firestore에 업데이트되었습니다.');
+      // 데이터 업데이트 성공
+      print('포트폴리오가 Firestore에 성공적으로 업데이트되었습니다.');
     } catch (e) {
-      // 데이터 추가 실패
+      // 데이터 업데이트 실패
       print('포트폴리오 업데이트 중 오류 발생: $e');
     }
   }
+
 
 
   @override
@@ -543,7 +555,6 @@ class _EditPortfolioState extends State<EditPortfolio> {
                 border: OutlineInputBorder(),
               ),
               onChanged: (value) {
-                // You can optionally use the onChanged callback if needed
                 customer = value;
               },
             ),
@@ -555,7 +566,6 @@ class _EditPortfolioState extends State<EditPortfolio> {
                 border: OutlineInputBorder(),
               ),
               onChanged: (value) {
-                // You can optionally use the onChanged callback if needed
                 industry = value;
               },
             ),
@@ -567,7 +577,6 @@ class _EditPortfolioState extends State<EditPortfolio> {
                 border: OutlineInputBorder(),
               ),
               onChanged: (value) {
-                // You can optionally use the onChanged callback if needed
                 portfolioDescription = value;
               },
             ),
@@ -576,25 +585,21 @@ class _EditPortfolioState extends State<EditPortfolio> {
               onPressed: () async {
                 String errorMessage = "";
 
-                if (titleController.text.isEmpty) {
-                  errorMessage = "제목을 입력하세요.";
-                } else if (descriptionController.text.isEmpty) {
-                  errorMessage = "내용을 입력하세요.";
-                } else if (thumbImagePath == null) {
-                  errorMessage = "썸네일 이미지를 선택하세요.";
-                } else if (imagePaths.isEmpty) {
-                  errorMessage = "서브 이미지를 선택하세요.";
-                } else if (selectedCategory.isEmpty) {
-                  errorMessage = "카테고리를 선택하세요.";
-                } else if (startDate == null || endDate == null) {
-                  errorMessage = "시작 날짜와 끝난 날짜를 선택하세요.";
-                } else if (customer.isEmpty) {
-                  errorMessage = "고객사를 입력하세요.";
-                } else if (industry.isEmpty) {
-                  errorMessage = "업종을 입력하세요.";
-                } else if (portfolioDescription.isEmpty) {
-                  errorMessage = "포트폴리오 설명을 입력하세요.";
-                }
+                // if (titleController.text.isEmpty) {
+                //   errorMessage = "제목을 입력하세요.";
+                // } else if (descriptionController.text.isEmpty) {
+                //   errorMessage = "내용을 입력하세요.";
+                // } else if (selectedCategory.isEmpty) {
+                //   errorMessage = "카테고리를 선택하세요.";
+                // } else if (startDate == null || endDate == null) {
+                //   errorMessage = "시작 날짜와 끝난 날짜를 선택하세요.";
+                // } else if (customer.isEmpty) {
+                //   errorMessage = "고객사를 입력하세요.";
+                // } else if (industry.isEmpty) {
+                //   errorMessage = "업종을 입력하세요.";
+                // } else if (portfolioDescription.isEmpty) {
+                //   errorMessage = "포트폴리오 설명을 입력하세요.";
+                // }
 
                 if (errorMessage.isNotEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -607,19 +612,19 @@ class _EditPortfolioState extends State<EditPortfolio> {
 
                 if (user != "없음") {
                   // 제목이 중복되지 않는지 확인
-                  final isUnique = await isTitleUnique(titleController.text, user);
+                  final isUnique = await isTitleUnique(titleController.text, user, portfolioId);
 
                   if (isUnique) {
                     final portfolioItem = PortfolioItem(
                       title: titleController.text,
                       description: descriptionController.text,
-                      thumbnailUrl: thumbImagePath!,
+                      thumbnailUrl: thumbImage!,
                       category: selectedCategory,
                       startDate: startDate,
                       endDate: endDate,
-                      customer: customer,
-                      industry: industry,
-                      portfolioDescription: portfolioDescription,
+                      customer: customerController.text,
+                      industry: industryController.text,
+                      portfolioDescription: portfolioDescriptionController.text,
                       hashtags: selectedHashtags,
                     );
 
@@ -635,7 +640,7 @@ class _EditPortfolioState extends State<EditPortfolio> {
                         content: Text('포트폴리오가 등록되었습니다.'),
                       ),
                     );
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => Portfolio()));
+                   Navigator.of(context).push(MaterialPageRoute(builder: (context) => Portfolio()));
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

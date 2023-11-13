@@ -55,18 +55,31 @@ class _TutorialState extends State<Tutorial> {
                 alignment: Alignment.center,
                 children: <Widget>[
                   Image.asset(tutorialPages[currentPage]),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      ElevatedButton(
-                        onPressed: previousPage,
-                        child: Text("이전"),
-                      ),
-                      ElevatedButton(
-                        onPressed: nextPage,
-                        child: Text("다음"),
-                      ),
-                    ],
+                  Container(
+                    padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        ElevatedButton(
+                          onPressed: previousPage,
+                          child: Icon(Icons.arrow_back, size: 32),  // 아이콘을 사용하여 버튼 크기 조절
+                          style: ElevatedButton.styleFrom(
+                            shape: CircleBorder(),
+                            fixedSize: Size(64, 64),  // 버튼 크기 조절
+                            primary: Colors.grey,  // 배경색을 회색으로 설정
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: nextPage,
+                          child: Icon(Icons.arrow_forward, size: 32),  // 아이콘을 사용하여 버튼 크기 조절
+                          style: ElevatedButton.styleFrom(
+                            shape: CircleBorder(),
+                            fixedSize: Size(64, 64),  // 버튼 크기 조절
+                            primary: Colors.grey,  // 배경색을 회색으로 설정
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
