@@ -133,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _current2 = 0;
   final CarouselController _controller = CarouselController();
   // 1초에 한번씩 로딩되는 문제를 해결하기 위해 밖으로 뺏음
-  final Stream<QuerySnapshot> portfolioStream = FirebaseFirestore.instance.collectionGroup("portfolio").limit(4).snapshots();
+  final Stream<QuerySnapshot> portfolioStream = FirebaseFirestore.instance.collectionGroup("portfolio").snapshots();
   final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").orderBy("cnt", descending: true).limit(4).snapshots();
   final Stream<QuerySnapshot> productStream2 = FirebaseFirestore.instance.collection("product")
       .where("likeCnt", isGreaterThanOrEqualTo: 1)

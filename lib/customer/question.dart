@@ -83,9 +83,9 @@ class _QuestionState extends State<Question> {
             SizedBox(height: 10,),
             Text("자주 묻는 질문에 대한 답변은 FAQ 페이지에서 확인해 보세요", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),),
             SizedBox(height: 10,),
-            Text("[문의하시기전에 확인해 주세요!]", style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(22, 158, 230, 1)),),
-            Text("Fixer 4 U는 서비스 중개 플랫폼 입니다. 서비스 작업 의뢰는 Fixer 4 U 사이트에서 전문가에게 직접 문의해 주시기를 부탁드립니다.", style: TextStyle(fontWeight: FontWeight.bold,color: Color.fromRGBO(22, 158, 230, 1))),
-            Text("또한, 계정 인증에 관한 문의는 '휴대전화 번호' 또는 '이메일 주소'를 전달해 주시면 빠른 안내가 가능합니다.", style: TextStyle(fontWeight: FontWeight.bold, color: Color.fromRGBO(22, 158, 230, 1))),
+            Text("[문의하시기전에 확인해 주세요!]", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFF8C42)),),
+            Text("Fixer 4 U는 서비스 중개 플랫폼 입니다. 서비스 작업 의뢰는 Fixer 4 U 사이트에서 전문가에게 직접 문의해 주시기를 부탁드립니다.", style: TextStyle(fontWeight: FontWeight.bold,color: Color(0xFFFF8C42))),
+            Text("또한, 계정 인증에 관한 문의는 '휴대전화 번호' 또는 '이메일 주소'를 전달해 주시면 빠른 안내가 가능합니다.", style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFFFF8C42))),
             SizedBox(height: 10,),
             Text("제목", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
             Container(
@@ -119,6 +119,9 @@ class _QuestionState extends State<Question> {
               child: ElevatedButton(
                 onPressed: _addBoard,
                 child: Text("제출"),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFFF8C42)), // 원하는 색상으로 변경
+                ),
               ),
             ),
             SizedBox(height: 20),
