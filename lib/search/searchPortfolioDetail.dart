@@ -315,28 +315,41 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
     );
   }
 
-  void updatePortfolioCollection(String user) {
+  void updatePortfolioCollection(String user) async {
     FirebaseFirestore firestore = FirebaseFirestore.instance;
-    String documentId = user; // 'your_document_id'를 실제 문서 ID로 대체
+    String documentId = user;
 
-    // 'portfolio' 서브컬렉션의 문서들을 가져옵니다.
-    firestore.collection('expert').doc(documentId).collection('portfolio').get().then((querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        String title = doc['title'];
+    try {
+      var querySnapshot = await firestore
+          .collection('expert')
+          .doc(documentId)
+          .collection('portfolio')
+          .where('title', isEqualTo: widget.portfolioItem['title'])
+          .get();
 
-        if (title == widget.portfolioItem['title']) {
-          if (doc.data().containsKey('cnt')) {
-            int currentCount = doc['cnt'];
-            int updatedCount = currentCount + 1;
+      var doc = querySnapshot.docs.first;
+      String title = doc['title'];
 
-            doc.reference.update({
-              'cnt': updatedCount,
-            });
-          }
-        }
-      });
-    });
+      if (title == widget.portfolioItem['title']) {
+        int currentCount = doc['cnt'] ?? 0;
+        int updatedCount = currentCount + 1;
+
+        await doc.reference.update({
+          'cnt': updatedCount,
+        });
+
+        // 갱신된 데이터를 활용하여 화면을 업데이트
+        setState(() {
+          widget.portfolioItem['cnt'] = updatedCount;
+        });
+      }
+    } catch (e) {
+      print('Error updating portfolio collection: $e');
+    }
   }
+
+
+
 
   void _showLoginAlert(BuildContext context) {
     showDialog(

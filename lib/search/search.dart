@@ -107,7 +107,24 @@ class _SearchState extends State<Search> {
       print("로그인 안됨");
     }
     return Scaffold(
-      appBar: AppBar(title: Text("검색"),backgroundColor: Color(0xFFFCAF58),),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Text(
+          '검색',
+          style: TextStyle(
+            color: Color(0xff424242),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Color(0xff424242),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
+      ),
       body: Container(
         padding: EdgeInsets.all(10),
         child: ListView(

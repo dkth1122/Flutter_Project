@@ -27,6 +27,7 @@ class CategoryProduct extends StatefulWidget {
 }
 
 class _CategoryProductState extends State<CategoryProduct> {
+  final Stream<QuerySnapshot> portfolioStream = FirebaseFirestore.instance.collectionGroup("portfolio").snapshots();
   int _current = 0;
   final CarouselController _controller = CarouselController();
 
@@ -81,17 +82,23 @@ class _CategoryProductState extends State<CategoryProduct> {
           body: TabBarView(
             children: [
               SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _categoryProductList(sendText)
-                  ],
+                child: Container(
+                  padding: EdgeInsets.fromLTRB(10, 0,10, 0),
+                  child: Column(
+                    children: [
+                      _categoryProductList(sendText)
+                    ],
+                  ),
                 ),
               ),
               SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _categoryPortfolioList(sendText)
-                  ],
+                child: Container(
+                  padding: EdgeInsets.fromLTRB(10, 0,10, 0),
+                  child: Column(
+                    children: [
+                      _categoryPortfolioList(sendText)
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -153,7 +160,8 @@ class _CategoryProductState extends State<CategoryProduct> {
                         border: Border.all(
                             width: 0.6,
                             color: Color.fromRGBO(182, 182, 182, 0.6)
-                        )
+                        ),
+                      color: Colors.white,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -212,121 +220,125 @@ class _CategoryProductState extends State<CategoryProduct> {
       },
     );
   }
-  Widget _categoryPortfolioList(String sendText) {
-    return StreamBuilder(
-      stream: FirebaseFirestore.instance.collection('expert').snapshots(),
-      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
+
+  Widget _categoryPortfolioList(String searchText) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: portfolioStream,
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
         }
-        final List<DocumentSnapshot> experts = snapshot.data!.docs;
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Transform.scale(
+            scale: 0.1,
+            child: CircularProgressIndicator(strokeWidth: 20,),
+          );
+        }
+
+        var portfolios = snapshot.data!.docs;
+
+        // searchText가 포함된 아이템만 필터링
+        var filteredPortfolios = portfolios.where((portfolio) {
+          var data = portfolio.data() as Map<String, dynamic>;
+          return data['category'].toLowerCase().contains(searchText.toLowerCase());
+        }).toList();
+
+        if (filteredPortfolios.isEmpty) {
+          return Column(
+            children: [
+              SizedBox(height: 20,),
+              Center(
+                child: Text('포트폴리오 리스트 없음'),
+              ),
+            ],
+          );
+        }
 
         return ListView.builder(
-          physics: NeverScrollableScrollPhysics(), // 스크롤 금지
           shrinkWrap: true,
-          itemCount: experts.length,
+          physics: NeverScrollableScrollPhysics(),
+          itemCount: filteredPortfolios.length,
           itemBuilder: (context, index) {
-            final expertData = experts[index].data() as Map<String, dynamic>;
-            final userId = expertData['userId'].toString();
-
-            return StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('expert')
-                  .doc(userId)
-                  .collection('portfolio')
-                  .where("category", isEqualTo: sendText)
-                  .snapshots(),
-              builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
-                }
-                final List<DocumentSnapshot> portfolioDocs = snapshot.data!.docs;
-
-                return ListView.builder(
-                    physics: NeverScrollableScrollPhysics(), // 스크롤 금지
-                    shrinkWrap: true,
-                    itemCount: portfolioDocs.length,
-                    itemBuilder: (context, index){
-                      Map<String, dynamic> data = portfolioDocs[index].data() as Map<String, dynamic>;
-                      return InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SearchPortfolioDetail(
-                                portfolioItem: data,
-                                user: userId,
+            var data = filteredPortfolios[index].data() as Map<String, dynamic>;
+            return InkWell(
+              onTap: () {
+                var parentCollectionId = filteredPortfolios[index].reference.parent!.parent!.id;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SearchPortfolioDetail(
+                      portfolioItem: filteredPortfolios[index].data() as Map<String, dynamic>,
+                      user: parentCollectionId,
+                    ),
+                  ),
+                );
+              },
+              child: Column(
+                children: [
+                  SizedBox(height: 10,),
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.all(5),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        width: 0.6,
+                        color: Color.fromRGBO(182, 182, 182, 0.6),
+                      ),
+                      color: Colors.white,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(10.0),
+                              child: Image.network(
+                                data['thumbnailUrl'],
+                                width: 130,
+                                height: 100,
+                                fit: BoxFit.cover,
                               ),
                             ),
-                          );
-                        },
-                        child: Column(
-                          children: [
-                            SizedBox(height: 10,),
-                            Container(
-                              height: 100,
-                              padding: EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 0.6,
-                                      color: Color.fromRGBO(182, 182, 182, 0.6)
-                                  )
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(10.0), // 라운드 정도를 조절하세요
-                                        child: Image.network(
-                                          data['thumbnailUrl'],
-                                          width: 130,
-                                          height: 100,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      SizedBox(width: 10,),
-                                      Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            data['title'].length > 7
-                                                ? '${data['title'].substring(0, 7)}...'
-                                                : data['title'],
-                                            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                          ),
-                                          Container(
-                                            width: 110,
-                                            child: Text(
-                                              data['description'].length > 20
-                                                  ? '${data['description'].substring(0, 20)}...'
-                                                  : data['description'],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                            SizedBox(width: 10,),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  data['title'].length > 7
+                                      ? '${data['title'].substring(0, 7)}...'
+                                      : data['title'],
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                ),
+                                Container(
+                                  width: 110,
+                                  child: Text(
+                                    data['description'].length > 20
+                                        ? '${data['description'].substring(0, 20)}...'
+                                        : data['description'],
                                   ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        '조회수: ${data['cnt'].toString()}',
-                                        style: TextStyle(fontSize: 12),
-                                      ),
-                                    ],
-                                  )
-                                ],
-                              ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
-                      );
-                    }
-                );
-              },
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              '조회수: ${data['cnt'].toString()}',
+                              style: TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 10,)
+                ],
+              ),
             );
           },
         );
