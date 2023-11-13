@@ -24,11 +24,54 @@ class Portfolio extends StatefulWidget {
 }
 
 class _PortfolioState extends State<Portfolio> {
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+
   final CollectionReference expertCollection = FirebaseFirestore.instance.collection('expert');
   late List<PortfolioItem> portfolioItems = [];
   String user = "";
   late PortfolioItem item;
   bool isLoading = true;
+
+  // 당겨서 새로고침 작업 수행 메서드
+  Future<void> _onRefresh() async {
+    // 여기서 원하는 작업 수행 (예: 데이터 다시 불러오기)
+    await fetchPortfolioItems();
+  }
+
+// addPortfolio 메서드
+  Future<void> addPortfolio() async {
+    // 로딩 시작
+    showLoadingIndicator();
+
+    final result = await Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddPortfolio()));
+
+    if (result == true) {
+      // 추가된 포트폴리오가 있을 경우 목록을 다시 로드 (3초 후에)
+      await Future.delayed(Duration(seconds: 3), () async {
+        await fetchPortfolioItems();
+        // 로딩 종료
+        hideLoadingIndicator();
+      });
+    } else {
+      // 로딩 종료 (포트폴리오 추가가 취소된 경우)
+      hideLoadingIndicator();
+    }
+  }
+
+// 로딩 표시
+  void showLoadingIndicator() {
+    setState(() {
+      isLoading = true;
+    });
+  }
+
+// 로딩 숨기기
+  void hideLoadingIndicator() {
+    setState(() {
+      isLoading = false;
+    });
+  }
+
 
   @override
   void initState() {
@@ -43,7 +86,7 @@ class _PortfolioState extends State<Portfolio> {
     fetchPortfolioItems();
   }
 
-  //포트폴리오 출력
+  // 포트폴리오 출력
   Future<void> fetchPortfolioItems() async {
     try {
       QuerySnapshot expertSnapshot = await expertCollection.where('userId', isEqualTo: user).get();
@@ -56,7 +99,10 @@ class _PortfolioState extends State<Portfolio> {
           Map<String, dynamic> data = portfolioDoc.data() as Map<String, dynamic>;
 
           // 필수 필드의 존재 여부를 확인하고 처리
-          if (data['title'] != null && data['description'] != null && data['thumbnailUrl'] != null && data['category'] != null) {
+          if (data['title'] != null &&
+              data['description'] != null &&
+              data['thumbnailUrl'] != null &&
+              data['category'] != null) {
             item = PortfolioItem(
               portfolioDoc.id,
               data['title'],
@@ -125,7 +171,7 @@ class _PortfolioState extends State<Portfolio> {
         });
 
         // portfolioLike 콜렉션에서 해당 포트폴리오와 관련된 좋아요 정보 삭제
-        final likeRef =  FirebaseFirestore.instance.collection('portfolioLike');
+        final likeRef = FirebaseFirestore.instance.collection('portfolioLike');
         await likeRef.where('portfoiloId', isEqualTo: user).where('title', isEqualTo: title).get().then((value) {
           for (var doc in value.docs) {
             doc.reference.delete();
@@ -144,12 +190,10 @@ class _PortfolioState extends State<Portfolio> {
       } catch (e) {
         print('포트폴리오 삭제 오류: $e');
       }
-    }else{
+    } else {
       print("삭제 실패");
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -170,127 +214,129 @@ class _PortfolioState extends State<Portfolio> {
         ),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.add, color: Color(0xFFFF8C42),),
-            onPressed: () {
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddPortfolio()));
-            },
+            icon: Icon(Icons.add, color: Color(0xFFFF8C42)),
+            onPressed: addPortfolio,
           ),
         ],
       ),
-      body: Container(
-        padding: EdgeInsets.all(10),
-        child: isLoading
-            ? Center(
-          child: CircularProgressIndicator(), // 로딩 스피너 표시
-        )
-            : portfolioItems.isEmpty
-            ? Center(
-          child: Text(
-            '등록하신 포트폴리오가 없습니다.',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-        )
-            : ListView.builder(
-          itemCount: portfolioItems.length,
-          itemBuilder: (context, index) {
-            final item = portfolioItems[index];
-            return InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PortfolioDetailPage(portfolioItem: item, user: user),
-                  ),
-                );
-              },
-              child: Column(
-                children: [
-                  SizedBox(height: 10),
-                  Container(
-                    height: 100,
-                    padding: EdgeInsets.all(5),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 0.6,
-                        color: Color.fromRGBO(182, 182, 182, 0.6),
+      body: RefreshIndicator(
+        key: _refreshIndicatorKey,
+        onRefresh: _onRefresh,
+        child: Container(
+          padding: EdgeInsets.all(10),
+          child: isLoading
+              ? Center(
+            child: CircularProgressIndicator(),
+          )
+              : portfolioItems.isEmpty
+              ? Center(
+            child: Text(
+              '등록하신 포트폴리오가 없습니다.',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          )
+              : ListView.builder(
+            itemCount: portfolioItems.length,
+            itemBuilder: (context, index) {
+              final item = portfolioItems[index];
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PortfolioDetailPage(portfolioItem: item, user: user),
+                    ),
+                  );
+                },
+                child: Column(
+                  children: [
+                    SizedBox(height: 10),
+                    Container(
+                      height: 100,
+                      padding: EdgeInsets.all(5),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: 0.6,
+                          color: Color.fromRGBO(182, 182, 182, 0.6),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(10.0),
+                                child: Image.network(
+                                  item.thumbnailUrl,
+                                  width: 130,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              SizedBox(width: 10),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    item.title.length > 7 ? '${item.title.substring(0, 7)}...' : item.title,
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
+                                  Container(
+                                    width: 110,
+                                    child: Text(
+                                      item.description.length > 20
+                                          ? '${item.description.substring(0, 20)}...'
+                                          : item.description,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Text(
+                                '카테고리 : ${item.category}',
+                                style: TextStyle(fontSize: 12),
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit, color: Color(0xFFFF8C42)),
+                                    onPressed: () {
+                                      // 포트폴리오 수정 페이지로 이동
+                                      Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                          builder: (context) => EditPortfolio(
+                                            portfolioId: item.id,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete, color: Color(0xFFFF8C42)),
+                                    onPressed: () {
+                                      // 포트폴리오 삭제 기능 호출
+                                      deletePortfolio(item.title);
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(10.0),
-                              child: Image.network(
-                                item.thumbnailUrl,
-                                width: 130,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                item.title.length > 7
-                                      ? '${item.title.substring(0, 7)}...'
-                                      : item.title,
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                ),
-                                Container(
-                                  width: 110,
-                                  child: Text(
-                                    item.description.length > 20
-                                        ? '${item.description.substring(0, 20)}...'
-                                        : item.description,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Text(
-                              '카테고리 : ${item.category}',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                IconButton(
-                                  icon: Icon(Icons.edit, color: Color(0xFFFF8C42)),
-                                  onPressed: () {
-                                    // 포트폴리오 수정 페이지로 이동
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) => EditPortfolio(portfolioId:item.id,),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.delete, color: Color(0xFFFF8C42)),
-                                  onPressed: () {
-                                    // 포트폴리오 삭제 기능 호출
-                                    deletePortfolio(item.title);
-                                  },
-                                ),
-                              ]
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
       bottomNavigationBar: SubBottomBar(),

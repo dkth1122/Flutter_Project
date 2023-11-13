@@ -46,6 +46,13 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
             expandedHeight: 300,
             floating: false,
             pinned: false,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () {
+                Navigator.pop(context); // 뒤로가기 버튼 눌렀을 때 처리
+              },
+              color: const Color(0xFFFF8C42), // 뒤로가기 아이콘의 색상
+            ),
             flexibleSpace: FlexibleSpaceBar(
               background: GestureDetector(
                 onTap: () {
@@ -75,7 +82,7 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('작성자 : ${widget.user}', style: TextStyle(fontSize: 18)),
+                        Text('작성자 : ${widget.user}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                         Text('조회수 : ${widget.portfolioItem['cnt']}', style: TextStyle(fontSize: 14)),
                       ],
                     ),
@@ -191,7 +198,9 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          widget.portfolioItem['title'] ?? '제목 없음',
+                          (widget.portfolioItem['title']?.length ?? 0) > 15
+                              ? widget.portfolioItem['title']!.substring(0, 15) + '\n' + widget.portfolioItem['title']!.substring(15)
+                              : widget.portfolioItem['title'] ?? '제목 없음',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -213,24 +222,24 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
                       children: [
                         Text(
                           '${widget.portfolioItem['hashtags']?.join(', ') ?? '없음'}',
-                          style: TextStyle(color: Colors.blue, fontSize: 16),
+                          style: TextStyle(color: Color(0xFFFF8C42), fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
                     SizedBox(height: 10),
                     Divider(
                       height: 20,
-                      color: Colors.grey,
+                      color: Color(0xFFFF8C42),
                       thickness: 2,
                     ),
                     SizedBox(height: 10),
                     Text(
-                      "프로젝트 설명",
+                      "설명",
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10),
                     Text(
-                      widget.portfolioItem['portfolioDescription'] ?? '설명 없음',
+                      widget.portfolioItem['description'] ?? '설명 없음',
                       style: TextStyle(fontSize: 16),
                     ),
                     SizedBox(height: 20),
@@ -243,6 +252,32 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
                       '참여기간 : ${DateFormat('yyyy-MM-dd').format(widget.portfolioItem['startDate'].toDate())}'
                           '~ ${DateFormat('yyyy-MM-dd').format(widget.portfolioItem['endDate'].toDate())}',
                     ),
+                    SizedBox(height: 20),
+                    Text(
+                      "고객사",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    Text('${widget.portfolioItem['customer']}', style: TextStyle(fontSize: 16)),
+                    SizedBox(height: 20),
+                    Text(
+                      "업종",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    Text('${widget.portfolioItem['industry']}', style: TextStyle(fontSize: 16)),
+                    SizedBox(height: 20),
+                    Text(
+                      "프로젝트 설명",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      widget.portfolioItem['portfolioDescription'] ?? '설명 없음',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(height: 20),
+
                   ],
                 ),
               )
@@ -250,7 +285,7 @@ class _SearchPortfolioDetailState extends State<SearchPortfolioDetail> {
           ),
           SliverGrid(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+              crossAxisCount: 1,
               crossAxisSpacing: 10.0,
               mainAxisSpacing: 10.0,
             ),

@@ -64,6 +64,10 @@ class _AddPortfolioState extends State<AddPortfolio> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
   TextEditingController imageUrlController = TextEditingController();
+  TextEditingController customerController = TextEditingController();
+  TextEditingController industryController = TextEditingController();
+  TextEditingController portfolioDescriptionController = TextEditingController();
+
 
   String selectedCategory = "UX기획";
   List<String> selectedHashtags = []; // 선택한 해시태그 목록
@@ -331,7 +335,8 @@ class _AddPortfolioState extends State<AddPortfolio> {
                       });
                     },
                     icon: Icon(Icons.clear), // "x" 아이콘 추가
-                    label: Text('선택 취소',style: TextStyle(fontWeight: FontWeight.bold,color: Color(0xff424242)),),
+                    label: Text('선택 취소',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),),
+                    style: ElevatedButton.styleFrom(primary: Color(0xFFFF8C42)),
                   ),
                 ],
               )
@@ -451,6 +456,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
               ),
               SizedBox(height: 12.0),
               TextField(
+                controller: customerController,
                 decoration: InputDecoration(
                   labelText: '고객사',
                   border: OutlineInputBorder(),
@@ -461,6 +467,7 @@ class _AddPortfolioState extends State<AddPortfolio> {
               ),
               SizedBox(height: 12.0),
               TextField(
+                controller: industryController,
                 decoration: InputDecoration(
                   labelText: '업종',
                   border: OutlineInputBorder(),
@@ -468,9 +475,11 @@ class _AddPortfolioState extends State<AddPortfolio> {
                 onChanged: (value) {
                   industry = value;
                 },
+
               ),
               SizedBox(height: 12.0),
               TextField(
+                controller: portfolioDescriptionController,
                 decoration: InputDecoration(
                   labelText: '포트폴리오 설명',
                   border: OutlineInputBorder(),
@@ -544,7 +553,10 @@ class _AddPortfolioState extends State<AddPortfolio> {
                           content: Text('포트폴리오가 등록되었습니다.'),
                         ),
                       );
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => Portfolio()));
+
+                      //리스트로 돌아가기
+                      Navigator.of(context).pop(true);
+
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
@@ -567,82 +579,6 @@ class _AddPortfolioState extends State<AddPortfolio> {
                 ),
               ),
               SizedBox(height: 16.0),
-              //미리보기 오류 발생
-              /*ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: portfolioItems.  length,
-                  itemBuilder: (context, index) {
-                    PortfolioItem item = portfolioItems[index];
-                    return Card(
-                      elevation: 5,
-                      margin: EdgeInsets.all(10),
-                      child: ListTile(
-                        leading: Image.network(item.thumbnailUrl, width: 100, height: 100, fit: BoxFit.cover),
-                        title: Text(
-                          item.title,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
-                        ),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              item.description,
-                              style: TextStyle(
-                                fontSize: 16,
-                              ),
-                            ),
-                            Text(
-                              "카테고리: ${item.category}",
-                              style: TextStyle(
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              "시작 날짜: ${item.startDate != null ? DateFormat('yyyy-MM-dd').format(item.startDate!) : '날짜 없음'}",
-                              style: TextStyle(
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              "끝 날짜: ${item.endDate != null ? DateFormat('yyyy-MM-dd').format(item.endDate!) : '날짜 없음'}",
-                              style: TextStyle(
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              "고객사: ${item.customer}",
-                              style: TextStyle(
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              "업종: ${item.industry}",
-                              style: TextStyle(
-                                fontSize: 14,
-                              ),
-                            ),
-                            Text(
-                              "포트폴리오 설명: ${item.portfolioDescription}",
-                              style: TextStyle(
-                                fontSize: 14,
-                              ),
-                            ),
-                            Wrap(
-                              children: item.hashtags.map((hashtag) {
-                                return Chip(
-                                  label: Text(hashtag),
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),*/
             ],
           ),
         ),

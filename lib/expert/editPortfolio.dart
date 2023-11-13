@@ -427,7 +427,8 @@ class _EditPortfolioState extends State<EditPortfolio> {
                     });
                   },
                   icon: Icon(Icons.clear), // "x" 아이콘 추가
-                  label: Text('선택 취소',style: TextStyle(fontWeight: FontWeight.bold,color: Color(0xff424242)),),
+                  label: Text('선택 취소',style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white),),
+                  style: ElevatedButton.styleFrom(primary: Color(0xFFFF8C42)),
                 ),
               ],
             )

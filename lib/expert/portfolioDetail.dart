@@ -39,34 +39,6 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
     }
   }
 
-  _showImageDialog(String imageUrl) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          content: Container(
-            height: 500,
-            width: 500,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(imageUrl),
-                fit: BoxFit.cover,
-              ),
-            ),
-          ),
-          actions: [
-            ElevatedButton(
-              onPressed: (){
-                Navigator.of(context).pop();
-              },
-              child: Text("닫기")
-            )
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     if (portfolioDoc == null) {
@@ -91,15 +63,17 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
             expandedHeight: 300,
             floating: false,
             pinned: false,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back_outlined),
+              onPressed: () {
+                Navigator.pop(context); // 뒤로가기 버튼 눌렀을 때 처리
+              },
+              color: const Color(0xFFFF8C42), // 뒤로가기 아이콘의 색상
+            ),
             flexibleSpace: FlexibleSpaceBar(
-              background: GestureDetector(
-                onTap: () {
-                  _showImageDialog(data['thumbnailUrl'] ?? '');
-                },
-                child: Image.network(
-                  data['thumbnailUrl'] ?? '',
-                  fit: BoxFit.cover,
-                ),
+              background: Image.network(
+                data['thumbnailUrl'] ?? '',
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -120,7 +94,7 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('작성자 : ${widget.user}', style: TextStyle(fontSize: 18)),
+                        Text('작성자 : ${widget.user}', style: TextStyle(fontSize: 18,fontWeight: FontWeight.bold)),
                         Text('조회수 : ${data['cnt']}', style: TextStyle(fontSize: 14)),
                       ],
                     ),
@@ -128,7 +102,9 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
                     Text('카테고리 > ${data['category']}', style: TextStyle(fontSize: 16)),
                     SizedBox(height: 10),
                     Text(
-                      data['title'] ?? '제목 없음',
+                      (data['title']?.length ?? 0) > 15
+                          ? data['title']!.substring(0, 15) + '\n' + data['title']!.substring(15)
+                          : data['title'] ?? '제목 없음',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -139,7 +115,7 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
                       children: [
                         Text(
                           '${data['hashtags']?.join(', ') ?? '없음'}',
-                          style: TextStyle(color: Colors.blue, fontSize: 16),
+                          style: TextStyle(color: Color(0xFFFF8C42), fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -147,17 +123,17 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
                     SizedBox(height: 10),
                     Divider(
                       height: 20,
-                      color: Colors.grey,
+                      color: Color(0xFFFF8C42),
                       thickness: 2,
                     ),
                     SizedBox(height: 10),
                     Text(
-                      "프로젝트 설명",
+                      "설명",
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 10),
                     Text(
-                      data['portfolioDescription'] ?? '설명 없음',
+                      data['description'] ?? '설명 없음',
                       style: TextStyle(fontSize: 16),
                     ),
                     SizedBox(height: 20),
@@ -184,6 +160,17 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
                     ),
                     SizedBox(height: 10),
                     Text('${data['industry']}', style: TextStyle(fontSize: 16)),
+                    SizedBox(height: 20),
+                    Text(
+                      "프로젝트 설명",
+                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      data['portfolioDescription'] ?? '설명 없음',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                    SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -191,7 +178,7 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
           ),
           SliverGrid(
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
+              crossAxisCount: 1, // 한 열에 하나의 이미지만 표시하도록 설정
               crossAxisSpacing: 10.0,
               mainAxisSpacing: 10.0,
             ),
@@ -199,18 +186,13 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
                   (BuildContext context, int index) {
                 if (data['subImageUrls'] != null && index < data['subImageUrls'].length) {
                   String imageUrl = data['subImageUrls'][index];
-                  return GestureDetector(
-                    onTap: () {
-                      _showImageDialog(imageUrl);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: NetworkImage(imageUrl),
-                            fit: BoxFit.cover,
-                          ),
+                  return Padding(
+                    padding: const EdgeInsets.all(5.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: NetworkImage(imageUrl),
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
@@ -225,7 +207,6 @@ class _PortfolioDetailPageState extends State<PortfolioDetailPage> {
         ],
       ),
       bottomNavigationBar: SubBottomBar(),
-
     );
   }
 }
