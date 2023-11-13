@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project_flutter/main.dart';
+import 'package:project_flutter/test.dart';
 import 'package:provider/provider.dart';
 
 import 'expert/my_expert.dart';
@@ -52,7 +53,7 @@ class _SubBottomBarState extends State<SubBottomBar> {
             Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginPage()));
           } else {
             // 사용자가 로그인한 경우에만 MyPage로 이동
-            Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyLikeList()));
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => MyLike()));
           }
         },
         icon: Icon(Icons.favorite),
