@@ -185,7 +185,7 @@ class _SearchSuccessState extends State<SearchSuccess> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             Text(
-                              '가격: ${data['price'].toString()}',
+                              '가격: ${NumberFormat('#,###').format(data['price'])}원',
                               style: TextStyle(fontSize: 12),
                             ),
                           ],

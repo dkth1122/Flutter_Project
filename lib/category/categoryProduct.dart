@@ -96,6 +96,7 @@ class _CategoryProductState extends State<CategoryProduct> {
                   padding: EdgeInsets.fromLTRB(10, 0,10, 0),
                   child: Column(
                     children: [
+                      SizedBox(height: 10,),
                       _categoryPortfolioList(sendText)
                     ],
                   ),
@@ -161,7 +162,6 @@ class _CategoryProductState extends State<CategoryProduct> {
                             width: 0.6,
                             color: Color.fromRGBO(182, 182, 182, 0.6)
                         ),
-                      color: Colors.white,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -276,7 +276,6 @@ class _CategoryProductState extends State<CategoryProduct> {
               },
               child: Column(
                 children: [
-                  SizedBox(height: 10,),
                   Container(
                     height: 100,
                     padding: EdgeInsets.all(5),
@@ -285,7 +284,6 @@ class _CategoryProductState extends State<CategoryProduct> {
                         width: 0.6,
                         color: Color.fromRGBO(182, 182, 182, 0.6),
                       ),
-                      color: Colors.white,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
