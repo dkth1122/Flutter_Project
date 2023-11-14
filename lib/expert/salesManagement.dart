@@ -301,19 +301,33 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
                             title: Text(salesItem.pName),
                             subtitle: Text(salesItem.category),
                             leading: Image.network(salesItem.imgUrl),
-                            trailing: Text('${NumberFormat('#,###').format(salesItem.price)}원'),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    _showDeleteConfirmationDialog(context, salesItem.pName);
+                                  },
+                                  child: Icon(Icons.delete, color: Colors.red),
+                                ),
+                                SizedBox(width: 16),
+                                Text('${NumberFormat('#,###').format(salesItem.price)}원'),
+                              ],
+                            ),
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => ProductView(
-                                  productName: salesItem.pName,
-                                  price: salesItem.price.toString(),
-                                  imageUrl: salesItem.imgUrl,
-                                )),
+                                MaterialPageRoute(
+                                  builder: (context) => ProductView(
+                                    productName: salesItem.pName,
+                                    price: salesItem.price.toString(),
+                                    imageUrl: salesItem.imgUrl,
+                                  ),
+                                ),
                               );
                             },
                           ),
-                          SizedBox(height: 10)
+                          SizedBox(height: 10),
                         ],
                       );
                     },
@@ -328,6 +342,51 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
       ),
       bottomNavigationBar: BottomAppBar(),
     );
+  }
+
+  void _showDeleteConfirmationDialog(BuildContext context, String productName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('삭제 확인'),
+          content: Text('정말로 $productName 상품을 삭제하시겠습니까?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // 다이얼로그 닫기
+              },
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                _deleteProduct(productName);
+                Navigator.of(context).pop(); // 다이얼로그 닫기
+              },
+              child: Text('삭제'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _deleteProduct(String productName) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('product')
+          .where('pName', isEqualTo: productName)
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          doc.reference.delete();
+        });
+        setState(() {});
+      });
+
+    } catch (e) {
+      print('상품 삭제 중 오류 발생: $e');
+    }
   }
 
 
