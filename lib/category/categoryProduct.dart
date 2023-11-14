@@ -83,7 +83,7 @@ class _CategoryProductState extends State<CategoryProduct> {
             children: [
               SingleChildScrollView(
                 child: Container(
-                  padding: EdgeInsets.fromLTRB(10, 0,10, 0),
+                  padding: EdgeInsets.fromLTRB(10, 0,10, 10),
                   child: Column(
                     children: [
                       _categoryProductList(sendText)

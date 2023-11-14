@@ -190,14 +190,11 @@ class _MyExpertState extends State<MyExpert> {
                     radius: 70,
                     backgroundImage: NetworkImage(profileImageUrl),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _userInfo(),
-                      ],
-                    ),
+                  Row(
+                    children: [
+                      SizedBox(width: 20,),
+                      _userInfo(),
+                    ],
                   ),
                 ],
               ),
