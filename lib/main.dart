@@ -152,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
   // 배너 광고 클릭시 이동하는 페이지
   List<Widget> bannerWidgets = [
     ProductView(productName: "트렌디한 상세 페이지", price: "150000", imageUrl: "https://firebasestorage.googleapis.com/v0/b/projectflutter-15fe4.appspot.com/o/images%2F2023-11-13%2008%3A50%3A38.053488.png?alt=media&token=2f869fdd-619e-4c5e-b3e9-3391c135aa34"),
-    Test(),
+    ProductView(productName: "결혼식 FULL 영상을 고퀄리티로!", price: "450000", imageUrl: "https://firebasestorage.googleapis.com/v0/b/projectflutter-15fe4.appspot.com/o/images%2F2023-11-14%2009%3A02%3A55.303877.png?alt=media&token=83ff893e-d01b-45df-b706-ce095a653150"),
     ProductView(productName: "UIUX기획", price: "1500000", imageUrl: "https://firebasestorage.googleapis.com/v0/b/projectflutter-15fe4.appspot.com/o/images%2F2023-11-08%2001%3A02%3A35.180706.png?alt=media&token=8e697bf0-df9c-442b-94c8-4dcc1b63154c"),
     ProductView(productName: "반응형 홈페이지 제작", price: "660000", imageUrl: "https://firebasestorage.googleapis.com/v0/b/projectflutter-15fe4.appspot.com/o/images%2F2023-11-13%2008%3A42%3A50.371683.png?alt=media&token=3397abe5-a6b0-4fbe-bdad-d580cb85e9d1"),
   ];

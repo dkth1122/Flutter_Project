@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:project_flutter/proposal/proposalVIew.dart';
 import 'package:project_flutter/subBottomBar.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +35,7 @@ class _ProposalListState extends State<ProposalList> {
       },
       child: Container(
         height: 120,
-        margin: EdgeInsets.all(16),
+        margin: EdgeInsets.fromLTRB(10, 5, 10, 5),
         padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white, // 배경색 설정
@@ -62,7 +63,9 @@ class _ProposalListState extends State<ProposalList> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      title,
+                      title.length > 10
+                          ? '${title.substring(0, 10)}...'
+                          : title,
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
@@ -71,10 +74,12 @@ class _ProposalListState extends State<ProposalList> {
                     ),
                     SizedBox(height: 8,),
                     Text(
-                      content,
+                      content.length > 25
+                          ? '${content.substring(0, 25)}...'
+                          : content,
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.grey, // 서브타이틀 텍스트 색상 설정
+                        color: Colors.grey,
                       ),
                     ),
                   ],
@@ -88,7 +93,7 @@ class _ProposalListState extends State<ProposalList> {
                     color: Color(0xff424242),
                   ),
                   Text(
-                    price.toString(),
+                    '${NumberFormat('#,###').format(price).toString()}원',
                     style: TextStyle(
                       fontSize: 18,
                       color: Color(0xff424242),
@@ -120,6 +125,7 @@ class _ProposalListState extends State<ProposalList> {
           return Center(child: CircularProgressIndicator());
         }
         return ListView.builder(
+          physics: NeverScrollableScrollPhysics(), // 스크롤 금지
           shrinkWrap: true,
           itemCount: snap.data!.docs.length,
           itemBuilder: (context, index) {
@@ -153,7 +159,15 @@ class _ProposalListState extends State<ProposalList> {
           },
         ),
       ),
-      body: _listProposal(),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            SizedBox(height: 5,),
+            _listProposal(),
+            SizedBox(height: 5,),
+          ],
+        ),
+      ),
       bottomNavigationBar: SubBottomBar(),
     );
 

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '../subBottomBar.dart';
 
@@ -187,7 +188,7 @@ class _ProposalViewState extends State<ProposalView> {
               ),
             ),
             Text(
-              '${widget.proposalPrice}원',
+              '${NumberFormat('#,###').format(widget.proposalPrice).toString()}원',
               style: TextStyle(
                 fontSize: 16,
                 color: Color(0xff424242),
