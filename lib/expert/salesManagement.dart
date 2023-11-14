@@ -381,13 +381,22 @@ class _SalesManagementPageState extends State<SalesManagementPage> {
         querySnapshot.docs.forEach((doc) {
           doc.reference.delete();
         });
-        setState(() {});
       });
 
+      await FirebaseFirestore.instance
+          .collection('like')
+          .where('pName', isEqualTo: productName)
+          .get()
+          .then((QuerySnapshot querySnapshot) {
+        querySnapshot.docs.forEach((doc) {
+          doc.reference.delete();
+        });
+      });
+
+      setState(() {});
     } catch (e) {
       print('상품 삭제 중 오류 발생: $e');
     }
   }
-
 
 }
