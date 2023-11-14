@@ -46,9 +46,9 @@ class _CircularDialogState extends State<CircularDialog> {
   }
 
   List<Offset> iconOffsets = [];
-  List<String> addButtonTexts = ["구매관리", "테스트", "고객센터", "수익관리", "응답관리", "등급확인", "상품보기", "프로젝트"];
+  List<String> addButtonTexts = ["구매관리", "쿠폰관리", "고객센터", "수익관리", "응답관리", "등급확인", "상품보기", "프로젝트"];
   List<IconData> iconData = [Icons.shopping_cart,Icons.card_giftcard,  Icons.headset_mic,  Icons.attach_money, Icons.chat, Icons.grade, Icons.shopping_bag,  Icons.insert_drive_file];
-  List<Widget> pageChange = [PurchaseManagement(userId:sessionId),Test(),UserCustomer(),Revenue(),MessageResponse(),ExpertRating(),Product(),MyProposalList(userId : sessionId)];
+  List<Widget> pageChange = [PurchaseManagement(userId:sessionId),MyCoupon(),UserCustomer(),Revenue(),MessageResponse(),ExpertRating(),Product(),MyProposalList(userId : sessionId)];
   List<double> iconRotations = [pi / 2, 135 * (pi / 180), pi, 225 * (pi / 180), 270 * (pi / 180), 315 * (pi / 180), 360 * (pi / 180), 45 * (pi / 180)]; // 각 아이콘의 회전 각도
   List<Color> iconColors = [
     Color(0xFF5B5BFF),//구매

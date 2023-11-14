@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
+import '../subBottomBar.dart';
 import 'faqUpdate.dart';
 
 class FaqView extends StatefulWidget {
@@ -105,6 +106,7 @@ class _FaqViewState extends State<FaqView> {
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
   Future<void> _showDeleteDialog(DocumentSnapshot doc) async {

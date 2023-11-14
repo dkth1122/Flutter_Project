@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../firebase_options.dart';
 import '../join/userModel.dart';
+import '../subBottomBar.dart';
 import 'myQuestionView.dart';
 
 void main() async {
@@ -63,6 +64,7 @@ class _MyQuestionState extends State<MyQuestion> {
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
   Widget _myQuestion() {
