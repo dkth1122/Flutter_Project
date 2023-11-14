@@ -248,6 +248,7 @@ class _ProductState extends State<Product> {
                               );
                             },
                             child: Container(
+                              margin: EdgeInsets.only(bottom: 16), // 간격 조절 (원하는 만큼 설정)
                               height: 150,
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
@@ -261,7 +262,7 @@ class _ProductState extends State<Product> {
                                 ],
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center, // Center horizontally
+                                mainAxisAlignment: MainAxisAlignment.center, // 가로 중앙 정렬
                                 children: [
                                   Expanded(
                                     flex: 6,
@@ -283,7 +284,7 @@ class _ProductState extends State<Product> {
                                       padding: EdgeInsets.all(8),
                                       color: Colors.black.withOpacity(0.8),
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+                                        mainAxisAlignment: MainAxisAlignment.center, // 세로 중앙 정렬
                                         crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           GestureDetector(
@@ -338,6 +339,7 @@ class _ProductState extends State<Product> {
                               ),
                             ),
                           );
+
                         }
                       },
                     );
