@@ -19,7 +19,7 @@ class _MyCouponState extends State<MyCoupon> {
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("coupon")
-          .where("user", isEqualTo: userId)
+          .where("userId", isEqualTo: userId)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
         if (!snap.hasData) {

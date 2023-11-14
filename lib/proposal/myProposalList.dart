@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:project_flutter/proposal/myProposal.dart';
+import 'package:project_flutter/subBottomBar.dart';
 
 import 'myProposalView.dart';
 
@@ -187,6 +188,7 @@ class _MyProposalListState extends State<MyProposalList> {
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 }
