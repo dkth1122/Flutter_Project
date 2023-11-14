@@ -212,33 +212,29 @@ class _ProductState extends State<Product> {
                   });
                 }
 
-                return GridView.builder(
+                return ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                  ),
-                  itemCount: sortedProductList.length, // 수정된 부분: 선택된 카테고리에 속하는 상품의 개수로 설정
-                  itemBuilder: (context, index) {
-                    final document = sortedProductList[index];
-                    final productName = document['pName'] as String;
-                    final price = document['price'] as int;
-                    final imageUrl = document['iUrl'] as String;
+                  itemCount: (sortedProductList.length / 3).ceil(),
+                  itemBuilder: (context, rowIndex) {
+                    int startIndex = rowIndex * 3;
+                    int endIndex = (rowIndex + 1) * 3;
 
-                    final formattedPrice = NumberFormat("#,###").format(price);
+                    if (endIndex > sortedProductList.length) {
+                      endIndex = sortedProductList.length;
+                    }
 
-                    return FutureBuilder<double>(
-                      future: getAverageRating(productName),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return CircularProgressIndicator(); // 평균을 계산하는 중이면 로딩 표시
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}'); // 오류가 있을 경우 오류 표시
-                        } else {
-                          starAvg = snapshot.data ?? 0.0; // 계산된 평균 평점
-                          return GestureDetector(
+                    return Row(
+                      children: List.generate(endIndex - startIndex, (index) {
+                        final document = sortedProductList[startIndex + index];
+                        final productName = document['pName'] as String;
+                        final price = document['price'] as int;
+                        final imageUrl = document['iUrl'] as String;
+
+                        final formattedPrice = NumberFormat("#,###").format(price);
+
+                        return Expanded(
+                          child: GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -252,81 +248,76 @@ class _ProductState extends State<Product> {
                               );
                             },
                             child: Container(
-                              width: 150,
-                              height: 100,
+                              margin: const EdgeInsets.all(3),
+                              height: 150,
                               decoration: BoxDecoration(
                                 border: Border.all(color: Colors.grey, width: 1.0),
                               ),
-                              child: Stack(
+                              child: Column(
                                 children: [
                                   Image.network(
                                     imageUrl,
                                     width: double.infinity,
-                                    height: double.infinity,
+                                    height: 100,
                                     fit: BoxFit.cover,
                                   ),
-                                  Positioned(
-                                    bottom: 0,
-                                    left: 0,
-                                    right: 0,
-                                    child: Container(
-                                      padding: EdgeInsets.all(8),
-                                      color: Colors.black.withOpacity(0.5),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => ProductView(
-                                                    productName: productName,
-                                                    price: formattedPrice,
-                                                    imageUrl: imageUrl,
-                                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    color: Colors.black.withOpacity(0.5),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => ProductView(
+                                                  productName: productName,
+                                                  price: formattedPrice,
+                                                  imageUrl: imageUrl,
                                                 ),
-                                              );
-                                            },
-                                            child: Text(
-                                              '$productName (★${starAvg.toStringAsFixed(1)})',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12,
                                               ),
+                                            );
+                                          },
+                                          child: Text(
+                                            '$productName (★${starAvg.toStringAsFixed(1)})',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
                                             ),
                                           ),
-                                          GestureDetector(
-                                            onTap: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) => ProductView(
-                                                    productName: productName,
-                                                    price: formattedPrice,
-                                                    imageUrl: imageUrl,
-                                                  ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => ProductView(
+                                                  productName: productName,
+                                                  price: formattedPrice,
+                                                  imageUrl: imageUrl,
                                                 ),
-                                              );
-                                            },
-                                            child: Text(
-                                              '$formattedPrice 원',
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 10,
                                               ),
+                                            );
+                                          },
+                                          child: Text(
+                                            '$formattedPrice 원',
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          );
-                        }
-                      },
+                          ),
+                        );
+                      }),
                     );
                   },
                 );
