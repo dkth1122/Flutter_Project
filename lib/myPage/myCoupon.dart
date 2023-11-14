@@ -12,14 +12,14 @@ class MyCoupon extends StatefulWidget {
 }
 
 class _MyCouponState extends State<MyCoupon> {
-  Widget _listProposal() {
+  Widget _listCoupon() {
     UserModel userModel = Provider.of<UserModel>(context, listen: false);
     final userId = userModel.userId;
 
     return StreamBuilder(
       stream: FirebaseFirestore.instance
           .collection("coupon")
-          .where("user", isNotEqualTo: userId)
+          .where("user", isEqualTo: userId)
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snap) {
         if (!snap.hasData) {
@@ -87,7 +87,7 @@ class _MyCouponState extends State<MyCoupon> {
           },
         ),
       ),
-      body: _listProposal(),
+      body: _listCoupon(),
       bottomNavigationBar: SubBottomBar(),
     );
   }

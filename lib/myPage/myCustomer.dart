@@ -62,10 +62,10 @@ class _MyCustomerState extends State<MyCustomer> {
       QuerySnapshot querySnapshot = await FirebaseFirestore.instance
           .collection('coupon').where("userId",isEqualTo: userId )
           .get();
-      return querySnapshot.size;
+      return querySnapshot.size + 1;
     } catch (e) {
       print('Error getting document count: $e');
-      return -1; // 에러가 발생하면 -1을 반환하거나 다른 방식으로 처리할 수 있습니다.
+      return 0; // 에러가 발생하면 -1을 반환하거나 다른 방식으로 처리할 수 있습니다.
     }
   }
   Widget _MyProposalFirst() {

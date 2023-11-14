@@ -457,7 +457,8 @@ class _JoinState extends State<Join> {
                       },
                       decoration: InputDecoration(
                         labelText: '닉네임',
-                        hintText: '5자 이내, 특수기호 불가',
+                        hintText: '5'
+                            '자 이내, 특수기호 불가',
 
 
                       ),
