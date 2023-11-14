@@ -324,7 +324,7 @@ class _MyHomePageState extends State<MyHomePage> {
             width: 2.0, // 테두리 너비
           ),
         ),
-        child: FloatingActionButton( 
+        child: FloatingActionButton(
           onPressed: () {
             Navigator.push(
               context,
@@ -369,7 +369,7 @@ class _MyHomePageState extends State<MyHomePage> {
         height: 150,
         viewportFraction: 1.0,
         autoPlay: true,
-        autoPlayInterval: const Duration(seconds: 2),
+        autoPlayInterval: const Duration(seconds: 3),
         onPageChanged: (index, reason) {
           setState(() {
             _current = index;

@@ -9,6 +9,7 @@ import 'package:project_flutter/product/productView.dart';
 import 'package:intl/intl.dart';
 
 import '../firebase_options.dart';
+import '../subBottomBar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -326,7 +327,7 @@ class _ProductState extends State<Product> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomBar(),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 

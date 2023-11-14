@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
+import '../subBottomBar.dart';
 import 'noticeUpdate.dart';
 
 class NoticeView extends StatefulWidget {
@@ -104,6 +105,7 @@ class _NoticeViewState extends State<NoticeView> {
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
   Future<void> _showDeleteDialog(DocumentSnapshot doc) async {

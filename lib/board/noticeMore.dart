@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../join/userModel.dart';
+import '../subBottomBar.dart';
 import 'notice.dart';
 import 'noticeView.dart';
 
@@ -78,6 +79,7 @@ class _NoticeMoreState extends State<NoticeMore> {
           ),
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
   Widget _notice() {

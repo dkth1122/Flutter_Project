@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../subBottomBar.dart';
+
 class MyQuestionView extends StatefulWidget {
   final DocumentSnapshot document;
   MyQuestionView({required this.document});
@@ -73,6 +75,7 @@ class _MyQuestionViewState extends State<MyQuestionView> {
           ],
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
   Widget _listComments() {
