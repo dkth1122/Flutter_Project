@@ -313,21 +313,35 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       // extendBody: true, // body를 침범하도록 함
-      floatingActionButton: um.isLogin ? FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => ChatList()),
-          );
-        },
-        child: Image.asset(
-          'assets/talk.png',
-          width: 80.0, // 이미지의 폭 조절
-          height: 80.0, // 이미지의 높이 조절
-        ), // 이미지 경로를 설정
-        backgroundColor: Colors.transparent, // 배경색을 투명으로 설정
-        elevation: 0.0, // 그림자를 없애는 설정
-      ) : Container(),
+      floatingActionButton: um.isLogin
+          ? Container(
+        width: 70.0,
+        height: 70.0,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: Color.fromRGBO(255, 140, 42, 0.7), // 테두리 색상
+            width: 2.0, // 테두리 너비
+          ),
+        ),
+        child: FloatingActionButton( 
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => ChatList()),
+            );
+          },
+          child: Image.asset(
+            'assets/chat.png',
+            width: 65.0, // 이미지의 폭 조절
+            height: 65.0, // 이미지의 높이 조절
+          ),
+          backgroundColor: Colors.white,
+          elevation: 0.0,
+        ),
+      )
+          : Container(),
+
 
       bottomNavigationBar: um.isLogin ? BottomBar() : SubBottomBar(),
     );
