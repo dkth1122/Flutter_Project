@@ -216,26 +216,25 @@ class _ProductState extends State<Product> {
                 return ListView.builder(
                   shrinkWrap: true,
                   physics: NeverScrollableScrollPhysics(),
-                  itemCount: (sortedProductList.length / 3).ceil(),
-                  itemBuilder: (context, rowIndex) {
-                    int startIndex = rowIndex * 3;
-                    int endIndex = (rowIndex + 1) * 3;
+                  itemCount: sortedProductList.length,
+                  itemBuilder: (context, index) {
+                    final document = sortedProductList[index];
+                    final productName = document['pName'] as String;
+                    final price = document['price'] as int;
+                    final imageUrl = document['iUrl'] as String;
 
-                    if (endIndex > sortedProductList.length) {
-                      endIndex = sortedProductList.length;
-                    }
+                    final formattedPrice = NumberFormat("#,###").format(price);
 
-                    return Row(
-                      children: List.generate(endIndex - startIndex, (index) {
-                        final document = sortedProductList[startIndex + index];
-                        final productName = document['pName'] as String;
-                        final price = document['price'] as int;
-                        final imageUrl = document['iUrl'] as String;
-
-                        final formattedPrice = NumberFormat("#,###").format(price);
-
-                        return Expanded(
-                          child: GestureDetector(
+                    return FutureBuilder<double>(
+                      future: getAverageRating(productName),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          starAvg = snapshot.data ?? 0.0;
+                          return GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
@@ -249,79 +248,102 @@ class _ProductState extends State<Product> {
                               );
                             },
                             child: Container(
-                              margin: const EdgeInsets.all(3),
                               height: 150,
                               decoration: BoxDecoration(
-                                border: Border.all(color: Colors.grey, width: 1.0),
-                              ),
-                              child: Column(
-                                children: [
-                                  Image.network(
-                                    imageUrl,
-                                    width: double.infinity,
-                                    height: 100,
-                                    fit: BoxFit.cover,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 3,
+                                    blurRadius: 5,
+                                    offset: Offset(0, 3),
                                   ),
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    color: Colors.black.withOpacity(0.5),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => ProductView(
-                                                  productName: productName,
-                                                  price: formattedPrice,
-                                                  imageUrl: imageUrl,
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center, // Center horizontally
+                                children: [
+                                  Expanded(
+                                    flex: 6,
+                                    child: Container(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.horizontal(
+                                          left: Radius.circular(10),
+                                        ),
+                                        child: Image.network(
+                                          imageUrl,
+                                          fit: BoxFit.fill,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 4,
+                                    child: Container(
+                                      padding: EdgeInsets.all(8),
+                                      color: Colors.black.withOpacity(0.8),
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center, // Center vertically
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => ProductView(
+                                                    productName: productName,
+                                                    price: formattedPrice,
+                                                    imageUrl: imageUrl,
+                                                  ),
                                                 ),
+                                              );
+                                            },
+                                            child: Text(
+                                              '$productName (★${starAvg.toStringAsFixed(1)})',
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
                                               ),
-                                            );
-                                          },
-                                          child: Text(
-                                            '$productName (★${starAvg.toStringAsFixed(1)})',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
                                             ),
                                           ),
-                                        ),
-                                        GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => ProductView(
-                                                  productName: productName,
-                                                  price: formattedPrice,
-                                                  imageUrl: imageUrl,
+                                          GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => ProductView(
+                                                    productName: productName,
+                                                    price: formattedPrice,
+                                                    imageUrl: imageUrl,
+                                                  ),
                                                 ),
+                                              );
+                                            },
+                                            child: Text(
+                                              '$formattedPrice 원',
+                                              style: const TextStyle(
+                                                color: Colors.amber,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.bold,
                                               ),
-                                            );
-                                          },
-                                          child: Text(
-                                            '$formattedPrice 원',
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ),
-                        );
-                      }),
+                          );
+                        }
+                      },
                     );
                   },
                 );
+
               },
             ),
           ],
