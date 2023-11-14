@@ -9,6 +9,7 @@ import 'package:project_flutter/search/search.dart';
 import 'package:project_flutter/bottomBar.dart';
 import 'package:project_flutter/search/searchPortfolioDetail.dart';
 import 'package:project_flutter/subBottomBar.dart';
+import 'package:project_flutter/test.dart';
 import 'package:project_flutter/tutorial.dart';
 import 'package:provider/provider.dart';
 import 'admin/adminDomain.dart';
@@ -140,11 +141,21 @@ class _MyHomePageState extends State<MyHomePage> {
       .snapshots();
   FocusNode myFocusNode = FocusNode();
 
-  List<String> imageBanner = ['assets/banner1.webp','assets/banner2.webp','assets/banner3.webp','assets/banner4.webp','assets/banner5.webp'];
+  List<String> imageBanner = ['assets/banner1.webp','assets/banner3.webp','assets/banner4.webp','assets/banner5.webp'];
+
+
   List<String> imagePaths1 = ['assets/category_ux.png','assets/category_web.png','assets/category_shop.png','assets/category_mobile.png',];
   List<String> imagePaths2 = ['assets/category_program.png','assets/category_trend.png','assets/category_data.png','assets/category_rest.png',];
   List<String> categories = ["UX기획", "웹", "커머스", "모바일"];
   List<String> categories2 = ["프로그램", "트렌드", "데이터", "기타"];
+
+  // 배너 광고 클릭시 이동하는 페이지
+  List<Widget> bannerWidgets = [
+    ProductView(productName: "트렌디한 상세 페이지", price: "150000", imageUrl: "https://firebasestorage.googleapis.com/v0/b/projectflutter-15fe4.appspot.com/o/images%2F2023-11-13%2008%3A50%3A38.053488.png?alt=media&token=2f869fdd-619e-4c5e-b3e9-3391c135aa34"),
+    Test(),
+    ProductView(productName: "UIUX기획", price: "1500000", imageUrl: "https://firebasestorage.googleapis.com/v0/b/projectflutter-15fe4.appspot.com/o/images%2F2023-11-08%2001%3A02%3A35.180706.png?alt=media&token=8e697bf0-df9c-442b-94c8-4dcc1b63154c"),
+    ProductView(productName: "반응형 홈페이지 제작", price: "660000", imageUrl: "https://firebasestorage.googleapis.com/v0/b/projectflutter-15fe4.appspot.com/o/images%2F2023-11-13%2008%3A42%3A50.371683.png?alt=media&token=3397abe5-a6b0-4fbe-bdad-d580cb85e9d1"),
+  ];
 
   String sessionId = "";
   @override
@@ -350,15 +361,24 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget sliderWidget() {
     return CarouselSlider(
       carouselController: _controller,
-      items: imageBanner.map(
-            (imagePath) {
+      items: imageBanner.asMap().entries.map(
+            (entry) {
+          int index = entry.key;
+          String imagePath = entry.value;
+
           return Builder(
             builder: (context) {
-              return SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
+              return GestureDetector(
+                onTap: () {
+                  // 이미지를 클릭할 때의 동작을 정의
+                  _navigateToNewScreen(bannerWidgets[index]); // 해당 이미지의 클래스로 이동
+                },
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: Image.asset(
+                    imagePath,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               );
             },
@@ -401,6 +421,13 @@ class _MyHomePageState extends State<MyHomePage> {
           );
         }).toList(),
       ),
+    );
+  }
+
+  void _navigateToNewScreen(Widget bannerWidget) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => bannerWidget),
     );
   }
 
@@ -871,7 +898,5 @@ class _MyHomePageState extends State<MyHomePage> {
       },
     );
   }
-
-
 
 }
