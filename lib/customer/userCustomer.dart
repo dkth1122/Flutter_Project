@@ -11,6 +11,7 @@ import '../board/faqView.dart';
 import '../board/noticeMore.dart';
 import '../firebase_options.dart';
 import '../join/userModel.dart';
+import '../subBottomBar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -63,7 +64,7 @@ class _UserCustomerState extends State<UserCustomer> {
       ),
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.all(10),
+          padding: EdgeInsets.fromLTRB(10, 0, 10, 10),
           child: Column(
             children: [
               Row(
@@ -85,9 +86,7 @@ class _UserCustomerState extends State<UserCustomer> {
                   )
                 ],
               ),
-              SizedBox(height: 20,),
               _notice(),
-              SizedBox(height: 20,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
@@ -107,7 +106,6 @@ class _UserCustomerState extends State<UserCustomer> {
                   )
                 ],
               ),
-              SizedBox(height: 20,),
               _faq(),
               Visibility(
                 visible: sessionId != "",
@@ -150,6 +148,7 @@ class _UserCustomerState extends State<UserCustomer> {
           ),
         ),
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
   Widget _notice() {
@@ -159,7 +158,7 @@ class _UserCustomerState extends State<UserCustomer> {
         if (!snap.hasData) {
           return Transform.scale(
             scale: 0.1,
-            child: CircularProgressIndicator(strokeWidth: 20,),
+            child: CircularProgressIndicator(strokeWidth: 10,),
           );
         }
         return ListView.builder(
@@ -193,7 +192,7 @@ class _UserCustomerState extends State<UserCustomer> {
         if (!snap.hasData) {
           return Transform.scale(
             scale: 0.1,
-            child: CircularProgressIndicator(strokeWidth: 20,),
+            child: CircularProgressIndicator(strokeWidth: 10,),
           );
         }
         return ListView.builder(
