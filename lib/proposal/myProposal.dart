@@ -111,10 +111,10 @@ class _MyProjectProposalState extends State<MyProjectProposal> {
               TextField(
                 controller: _title,
                 decoration: InputDecoration(labelText: "프로젝트 제목",
-                  hintText: '10자 이하로 입력하세요.',
+                  hintText: '15자 이하로 입력하세요.',
                 ),
                 inputFormatters: [
-                  LengthLimitingTextInputFormatter(10), // 최대 10글자까지 입력 가능하도록 설정
+                  LengthLimitingTextInputFormatter(15), // 최대 10글자까지 입력 가능하도록 설정
                 ],
               ),
               SizedBox(height: 20),

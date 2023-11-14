@@ -109,7 +109,7 @@ class _MyCustomerState extends State<MyCustomer> {
               ListTile(
                 title: Text.rich(
                   TextSpan(
-                    text: "${data["title"]}",
+                    text: data["title"].length > 8 ? '${data["title"].substring(0, 8)}...' : data["title"],
                     style: TextStyle(
                       fontSize: 20, // 큰 글자 크기
                       fontWeight: FontWeight.bold,
