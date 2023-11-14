@@ -117,7 +117,6 @@ class _SearchSuccessState extends State<SearchSuccess> {
             final productName = document['pName'] as String;
             final price = document['price'] as int;
             final imageUrl = document['iUrl'] as String;
-            final formattedPrice = NumberFormat("#,###").format(price);
 
             return InkWell(
               onTap: () {
@@ -126,7 +125,7 @@ class _SearchSuccessState extends State<SearchSuccess> {
                   MaterialPageRoute(
                     builder: (context) => ProductView(
                       productName: productName,
-                      price: formattedPrice,
+                      price: price.toString(),
                       imageUrl: imageUrl,
                     ),
                   ),

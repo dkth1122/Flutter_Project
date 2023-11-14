@@ -136,7 +136,6 @@ class _CategoryProductState extends State<CategoryProduct> {
             final productName = document['pName'] as String;
             final price = document['price'] as int;
             final imageUrl = document['iUrl'] as String;
-            final formattedPrice = NumberFormat("#,###").format(price);
 
             return InkWell(
               onTap: () {
@@ -145,7 +144,7 @@ class _CategoryProductState extends State<CategoryProduct> {
                   MaterialPageRoute(
                     builder: (context) => ProductView(
                       productName: productName,
-                      price: formattedPrice,
+                      price: price.toString(),
                       imageUrl: imageUrl,
                     ),
                   ),

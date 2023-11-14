@@ -476,32 +476,32 @@ class _ProductViewState extends State<ProductView>
                             final userNick = userData['nick'] as String;
 
                             return Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children:[GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context)
-                                      .push(MaterialPageRoute(builder: (context) => UserPortfolio(
-                                      seller : seller
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children:[
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context)
+                                        .push(MaterialPageRoute(builder: (context) => UserPortfolio(
+                                        seller : seller
 
-                                  )));
-                                },
+                                    )));
+                                  },
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  mainAxisAlignment: MainAxisAlignment.start,
                                   children:[
                                     CircleAvatar(
                                       radius: 40,
                                       backgroundImage: NetworkImage(userProfileImage),
                                     ),
                                     SizedBox(width: 20),
-                                    Text(userNick), // 닉네임 출력
-                                    SizedBox(width: 80),
-                                    TextButton(
-                                      onPressed: _toggleChat,
-                                      child: Text("1:1문의하기"),
-                                    ),
+                                    Text(userNick),
                                   ],
                                 ),
-                              )
+                              ),
+                                TextButton(
+                                  onPressed: _toggleChat,
+                                  child: Text("1:1문의하기"),
+                                ),
                               ],
                             );
                           }
