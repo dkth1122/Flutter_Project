@@ -274,16 +274,6 @@ void applyCouponFilter(String option) {
         ),
         body: Column(
           children: <Widget>[
-            Padding(
-              padding: EdgeInsets.all(16.0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: '검색',
-                  prefixIcon: Icon(Icons.search),
-                ),
-                // Implement your search functionality here
-              ),
-            ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

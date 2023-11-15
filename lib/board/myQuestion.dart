@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import '../firebase_options.dart';
@@ -88,7 +89,7 @@ class _MyQuestionState extends State<MyQuestion> {
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
             return ListTile(
-              title: Text('작성일 : ${data['timestamp'].toDate().toString()}'),
+              title: Text('작성일  : ${DateFormat('yyyy-MM-dd HH:mm:ss').format(data['timestamp'].toDate())}'),
               subtitle: Text('${data['title']}'),
               onTap: (){
                 Navigator.push(

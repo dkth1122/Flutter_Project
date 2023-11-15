@@ -60,18 +60,21 @@ class _QuestionAnswerViewState extends State<QuestionAnswerView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    '제목 : ${data['title']}',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
+                  Container(
+                    width: 250,
+                    child: Text(
+                      '제목 : ${data['title']}',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text('작성일 : ${DateFormat('yyyy-MM-dd').format(data['timestamp'].toDate())}'),
-                      Text('시간 : ${DateFormat('HH:mm:ss').format(data['timestamp'].toDate())}'),
+                      Text('${DateFormat('yyyy-MM-dd').format(data['timestamp'].toDate())}'),
+                      Text('${DateFormat('HH:mm:ss').format(data['timestamp'].toDate())}'),
                     ],
                   ),
                 ],
@@ -79,9 +82,13 @@ class _QuestionAnswerViewState extends State<QuestionAnswerView> {
               SizedBox(height: 10,),
               Row(
                 children: [
-                  Text( '내용 : ${data['content']}',
-                    style: TextStyle(
-                      fontSize: 18,
+                  Expanded(
+                    child: Text(
+                      '내용 : ${data['content']}',
+                      style: TextStyle(
+                        fontSize: 18,
+                      ),
+                      maxLines: null, // 텍스트가 여러 줄로 나뉘지 않도록 설정합니다.
                     ),
                   ),
                 ],
@@ -143,10 +150,35 @@ class _QuestionAnswerViewState extends State<QuestionAnswerView> {
             if (commentData['comments'] == null || commentData['timestamp'] == null) {
               return Container();
             }
-            return ListTile(
-              title: Text(commentData['comments']),
-              subtitle: Text('작성일: ${commentData['timestamp'].toDate().toString()}'),
+            return Stack(
+              children: [
+                ListTile(
+                  title: Text(commentData['comments']),
+                  subtitle: Text('작성일 : ${DateFormat('yyyy-MM-dd HH:mm:ss').format(commentData['timestamp'].toDate())}'),
+                ),
+                Positioned(
+                  right: 0,
+                  bottom: 0,
+                  child: IconButton(
+                    icon: Icon(Icons.clear), // X 아이콘
+                    onPressed: () {
+                      FirebaseFirestore.instance
+                          .collection("question")
+                          .doc(widget.document.id)
+                          .collection("comments")
+                          .get()
+                          .then((querySnapshot) {
+                        querySnapshot.docs.forEach((doc) {
+                          doc.reference.delete();
+                        });
+                        print("댓글 컬렉션 삭제 성공");
+                      });
+                    },
+                  ),
+                ),
+              ],
             );
+
           },
         );
       },
