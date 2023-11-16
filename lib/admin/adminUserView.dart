@@ -249,7 +249,6 @@ class AdminUserViewPage extends StatelessWidget {
 
                   return ListTile(
                     title: Text('${data['title']}'),
-                    subtitle: Text("작성자 : ${data['user']}"),
                     // 답변 상태에 따라 다른 UI 표시
                     trailing: isAnswered
                         ? Icon(Icons.check_circle, color: Colors.green)
