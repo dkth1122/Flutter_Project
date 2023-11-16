@@ -79,7 +79,7 @@
     Widget build(BuildContext context) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Chat App', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          title: Text('채팅 하기', textAlign: TextAlign.center, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           backgroundColor: Color(0xFFFCAF58),
           actions: <Widget>[
             IconButton(
@@ -392,14 +392,16 @@
                     children: <Widget>[
                       if (text != null)
                         Text(
-                          text!,
-                          style: TextStyle(color: Colors.white),
+                          text!.length > 25 ? text!.substring(0, 25) + '\n' + text!.substring(25) : text!,
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
                         ),
                       if (imageUrl != null)
                         Image.network(
                           imageUrl!,
-                          width: 100, // 이미지의 너비 설정
-                          height: 100, // 이미지의 높이 설정
+                          width: 100, // Image width
+                          height: 100, // Image height
                         ),
                     ],
                   ),
