@@ -48,9 +48,23 @@ class _QuestionState extends State<Question> {
 
       _title.clear();
       _content.clear();
+
+      // 등록이 완료되면 스낵바로 메시지 표시
+      _showSnackBar('등록이 완료되었습니다.');
+
+      // 이전 페이지로 이동
+      Navigator.pop(context);
     } else {
-      print("제목 또는 내용을 입력해주세요.");
+      _showSnackBar("제목 또는 내용을 입력해주세요.");
     }
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 
 
