@@ -115,7 +115,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       if (isResponseEnabled) {
         return "네, 현재는 바로 응답이 가능한 상태입니다. 30분 내에 응답을 드릴 수 있습니다.";
       } else {
-        return "죄송합니다. \n 현재는 30분 내에 응답할 수 없는 상태입니다.";
+        return "죄송합니다. 30분 내에 응답할 수 없는 상태입니다.";
       }
     }
     return "안녕하세요! 무엇을 도와드릴까요?";
