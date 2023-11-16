@@ -144,7 +144,7 @@ class _MyProposalListState extends State<MyProposalList> {
             return _customListTile(
               title: data["title"],
               category: data["category"],
-              content: content.length > 12 ? content.substring(0, 12) + "..." : content,
+              content: content.length > 10 ? content.substring(0, 10) + "..." : content,
               price: data["price"],
               delYn: data["delYn"],
             );
