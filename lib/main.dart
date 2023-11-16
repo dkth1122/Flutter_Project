@@ -136,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final Stream<QuerySnapshot> portfolioStream = FirebaseFirestore.instance.collectionGroup("portfolio").snapshots();
   final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").orderBy("cnt", descending: true).limit(4).snapshots();
   final Stream<QuerySnapshot> productStream2 = FirebaseFirestore.instance.collection("product")
-      .where("likeCnt", isGreaterThanOrEqualTo: 3)
+      .where("likeCnt", isGreaterThanOrEqualTo: 100)
       .snapshots();
   FocusNode myFocusNode = FocusNode();
 
