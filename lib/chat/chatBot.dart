@@ -103,7 +103,7 @@ class _ChatResponsePageState extends State<ChatResponsePage> {
       if (isNightResponseEnabled) {
         return "예, 현재는 야간 응답이 가능합니다. \n 23:00~08:00(KST) 동안 야간 응답을 지원합니다.";
       } else {
-        return "죄송합니다. 현재는 야간 응답이 불가능한 시간입니다.";
+        return "죄송합니다. 야간 응답이 불가능한 시간입니다.";
       }
     } else if (question.contains("휴가 중")) {
       if (isOnVacation) {
