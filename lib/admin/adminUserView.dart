@@ -236,16 +236,34 @@ class AdminUserViewPage extends StatelessWidget {
             DocumentSnapshot doc = snap.data!.docs[index];
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-            return ListTile(
-              title: Text('${data['title']}'),
-              subtitle: Text("작성자 : ${data['user']}"),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => QuestionAnswerView(document: doc),
-                  ),
-                );
+            // 내부 서브컬렉션 'comments'에서 데이터 가져오기
+            return FutureBuilder<QuerySnapshot>(
+              future: doc.reference.collection('comments').get(),
+              builder: (context, commentsSnapshot) {
+                if (commentsSnapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else {
+                  // 서브컬렉션에 데이터가 있는지 확인
+                  bool isAnswered = commentsSnapshot.hasData &&
+                      commentsSnapshot.data!.docs.isNotEmpty;
+
+                  return ListTile(
+                    title: Text('${data['title']}'),
+                    subtitle: Text("작성자 : ${data['user']}"),
+                    // 답변 상태에 따라 다른 UI 표시
+                    trailing: isAnswered
+                        ? Icon(Icons.check_circle, color: Colors.green)
+                        : Icon(Icons.access_time, color: Colors.orange),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QuestionAnswerView(document: doc),
+                        ),
+                      );
+                    },
+                  );
+                }
               },
             );
           },
