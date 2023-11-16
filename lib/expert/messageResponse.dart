@@ -185,6 +185,17 @@ class _MessageResponsenState extends State<MessageResponse> {
               subtitle: Text('23:00~08:00(KST)까지 의뢰인의 문의 메시지에 응답 가능'),
               trailing: buildSwitch('야간 응답', isNightResponseEnabled),
             ),
+            SizedBox(height: 30,),
+            ElevatedButton(
+                onPressed: (){
+                  saveSettingsToFirestore();
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Color(0xFFFF8C42), // 버튼의 배경색 설정
+                  padding: EdgeInsets.fromLTRB(30, 15, 30, 15)
+                ),
+                child: Text('등록하기', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),)
+            )
           ],
         ),
       ),
