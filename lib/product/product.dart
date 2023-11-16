@@ -7,8 +7,10 @@ import 'package:project_flutter/bottomBar.dart';
 import 'package:project_flutter/product/productAdd.dart';
 import 'package:project_flutter/product/productView.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 import '../firebase_options.dart';
+import '../join/userModel.dart';
 import '../subBottomBar.dart';
 
 void main() async {
@@ -34,6 +36,8 @@ class _ProductState extends State<Product> {
       return Stream<QuerySnapshot>.empty();
     }
   }
+
+  String user = "";
 
   List<String> categories = [
     'UX기획',
@@ -61,10 +65,66 @@ class _ProductState extends State<Product> {
   @override
   void initState() {
     super.initState();
+    UserModel um = Provider.of<UserModel>(context, listen: false);
     Firebase.initializeApp().then((value) {
       setState(() {
         productStream = FirebaseFirestore.instance.collection("product").snapshots();
       });
+    });
+
+    if (um.isLogin) {
+      // 사용자가 로그인한 경우
+      user = um.userId!;
+    } else {
+      // 사용자가 로그인하지 않은 경우
+      user = "없음";
+      print("로그인 안됨");
+    }
+  }
+
+  void checkUserStatusForProductRegistration() {
+
+    // 사용자의 상태 확인
+    var userQuery = FirebaseFirestore.instance
+        .collection('userList')
+        .where('userId', isEqualTo: user)
+        .get();
+
+// 쿼리의 결과를 비동기로 받아옴
+    userQuery.then((QuerySnapshot querySnapshot) {
+      if (querySnapshot.docs.isNotEmpty) {
+        // 상태가 'E'이면 상품 등록 가능
+        var userData = querySnapshot.docs.first.data() as Map<String, dynamic>?;
+        if (userData != null && userData['status'] == 'E') {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(),
+            ),
+          );
+        } else {
+          // 상태가 'E'가 아니면 스낵바로 메시지 표시
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('상품 등록은 전문가로 진행 가능합니다.'),
+            ),
+          );
+        }
+      } else {
+        // 쿼리 결과가 비어있으면 스낵바로 메시지 표시
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('사용자를 찾을 수 없습니다.'),
+          ),
+        );
+      }
+    }).catchError((error) {
+      // 에러가 발생하면 스낵바로 메시지 표시
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('에러: $error'),
+        ),
+      );
     });
   }
 
@@ -92,12 +152,7 @@ class _ProductState extends State<Product> {
             icon: const Icon(Icons.add),
             color: Color(0xff424242),
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => HomeScreen(),
-                ),
-              );
+              checkUserStatusForProductRegistration();
             },
           ),
         ],
