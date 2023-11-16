@@ -139,10 +139,12 @@ class _MyProposalListState extends State<MyProposalList> {
             DocumentSnapshot doc = snap.data!.docs[index];
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
+            String content = data["content"];
+
             return _customListTile(
               title: data["title"],
               category: data["category"],
-              content: data["content"],
+              content: content.length > 12 ? content.substring(0, 12) + "..." : content,
               price: data["price"],
               delYn: data["delYn"],
             );
