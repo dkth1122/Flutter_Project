@@ -9,7 +9,6 @@ import 'package:project_flutter/search/search.dart';
 import 'package:project_flutter/bottomBar.dart';
 import 'package:project_flutter/search/searchPortfolioDetail.dart';
 import 'package:project_flutter/subBottomBar.dart';
-import 'package:project_flutter/test.dart';
 import 'package:project_flutter/tutorial.dart';
 import 'package:provider/provider.dart';
 import 'admin/adminDomain.dart';
@@ -137,7 +136,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final Stream<QuerySnapshot> portfolioStream = FirebaseFirestore.instance.collectionGroup("portfolio").snapshots();
   final Stream<QuerySnapshot> productStream = FirebaseFirestore.instance.collection("product").orderBy("cnt", descending: true).limit(4).snapshots();
   final Stream<QuerySnapshot> productStream2 = FirebaseFirestore.instance.collection("product")
-      .where("likeCnt", isGreaterThanOrEqualTo: 1)
+      .where("likeCnt", isGreaterThanOrEqualTo: 3)
       .snapshots();
   FocusNode myFocusNode = FocusNode();
 

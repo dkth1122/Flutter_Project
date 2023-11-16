@@ -80,6 +80,7 @@ class _MyQuestionState extends State<MyQuestion> {
             child: CircularProgressIndicator(strokeWidth: 20,),
           );
         }
+
         return ListView.builder(
           shrinkWrap: true,
           physics: NeverScrollableScrollPhysics(),
@@ -88,16 +89,46 @@ class _MyQuestionState extends State<MyQuestion> {
             DocumentSnapshot doc = snap.data!.docs[index];
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-            return ListTile(
-              title: Text('작성일  : ${DateFormat('yyyy-MM-dd HH:mm:ss').format(data['timestamp'].toDate())}'),
-              subtitle: Text('${data['title']}'),
-              onTap: (){
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => MyQuestionView(document: doc),
-                    )
-                );
+            // 추가: 해당 문서의 comments 컬렉션에 대한 쿼리
+            CollectionReference commentsCollection =
+            FirebaseFirestore.instance.collection("question").doc(doc.id).collection("comments");
+
+            return FutureBuilder(
+              future: commentsCollection.get(),
+              builder: (context, AsyncSnapshot<QuerySnapshot> commentsSnapshot) {
+                if (commentsSnapshot.connectionState == ConnectionState.waiting) {
+                  return ListTile(
+                    title: Text('작성일  : ${DateFormat('yyyy-MM-dd HH:mm:ss').format(data['timestamp'].toDate())}'),
+                    subtitle: Text('${data['title']}'),
+                    trailing: Text("답변 대기 중..."),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MyQuestionView(document: doc),
+                        ),
+                      );
+                    },
+                  );
+                } else {
+                  // 추가: comments 컬렉션에 데이터가 있으면 답변완료로 표시
+                  bool hasComments = commentsSnapshot.hasData &&
+                      commentsSnapshot.data!.docs.isNotEmpty;
+
+                  return ListTile(
+                    title: Text('작성일  : ${DateFormat('yyyy-MM-dd HH:mm:ss').format(data['timestamp'].toDate())}'),
+                    subtitle: Text('${data['title']}'),
+                    trailing: hasComments ? Text("답변 완료") : Text("답변 대기 중..."),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => MyQuestionView(document: doc),
+                        ),
+                      );
+                    },
+                  );
+                }
               },
             );
           },
