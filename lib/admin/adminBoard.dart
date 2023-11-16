@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project_flutter/board/faq.dart';
 import 'package:project_flutter/board/notice.dart';
+import 'package:project_flutter/subBottomBar.dart';
 
 import '../board/questionAnswer.dart';
 
@@ -31,47 +32,52 @@ class _AdminBoardState extends State<AdminBoard> {
             },
           ),
         ),
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Notice()),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Color(0xFFFF8C42),
+      body: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Notice()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                primary: Color(0xFFFF8C42),
+              ),
+              child: Text('공지사항 등록하기'),
             ),
-            child: Text('공지사항 등록하기'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Faq()),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Color(0xFFFF8C42),
+            SizedBox(width: 10,),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Faq()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                primary: Color(0xFFFF8C42),
+              ),
+              child: Text('FAQ 등록하기'),
             ),
-            child: Text('FAQ 등록하기'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => QuestionAnswer()),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Color(0xFFFF8C42),
+            SizedBox(width: 10,),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => QuestionAnswer()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                primary: Color(0xFFFF8C42),
+              ),
+              child: Text('1:1문의 답변하기'),
             ),
-            child: Text('1:1문의 답변하기'),
-          ),
-        ],
-      )
+          ],
+        ),
+      ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:project_flutter/subBottomBar.dart';
 
 import '../firebase_options.dart';
 import '../main.dart';
@@ -99,6 +100,7 @@ class _AdminDomainPageState extends State<AdminDomainPage> {
           ),
         ],
       ),
+      bottomNavigationBar: SubBottomBar(),
     );
   }
 }
