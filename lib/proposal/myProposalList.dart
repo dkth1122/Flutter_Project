@@ -133,6 +133,7 @@ class _MyProposalListState extends State<MyProposalList> {
           return Center(child: CircularProgressIndicator());
         }
         return ListView.builder(
+          physics: NeverScrollableScrollPhysics(), // 스크롤 금지
           shrinkWrap: true,
           itemCount: snap.data!.docs.length,
           itemBuilder: (context, index) {
