@@ -93,7 +93,7 @@ class _PortfolioState extends State<Portfolio> {
       List<PortfolioItem> loadedItems = [];
 
       for (QueryDocumentSnapshot expertDoc in expertSnapshot.docs) {
-        QuerySnapshot portfolioSnapshot = await expertDoc.reference.collection('portfolio').get();
+        QuerySnapshot portfolioSnapshot = await expertDoc.reference.collection('portfolio').orderBy('registrationDate', descending: true).get();
 
         for (QueryDocumentSnapshot portfolioDoc in portfolioSnapshot.docs) {
           Map<String, dynamic> data = portfolioDoc.data() as Map<String, dynamic>;

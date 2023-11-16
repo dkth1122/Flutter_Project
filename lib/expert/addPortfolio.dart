@@ -243,8 +243,8 @@ class _AddPortfolioState extends State<AddPortfolio> {
         'portfolioDescription': item.portfolioDescription,//포트폴리오 설명
         'hashtags': item.hashtags,
         'likeCnt' : 0,
-        'cnt' : 0
-
+        'cnt' : 0,
+        'registrationDate' : FieldValue.serverTimestamp(),
       });
 
       // 데이터 추가 성공
