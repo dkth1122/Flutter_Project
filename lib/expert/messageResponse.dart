@@ -102,6 +102,7 @@ class _MessageResponsenState extends State<MessageResponse> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('설정이 저장되었습니다.')),
     );
+    Navigator.of(context).pop();
   }
 
   @override
