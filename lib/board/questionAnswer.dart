@@ -10,7 +10,7 @@ class QuestionAnswer extends StatefulWidget {
 }
 
 class _QuestionAnswerState extends State<QuestionAnswer> {
-  final Stream<QuerySnapshot> questionStream = FirebaseFirestore.instance.collection("question").snapshots();
+  final Stream<QuerySnapshot> questionStream = FirebaseFirestore.instance.collection("question").orderBy("timestamp", descending: true).snapshots();
   @override
   Widget build(BuildContext context) {
     return Scaffold(

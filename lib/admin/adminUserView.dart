@@ -63,136 +63,90 @@ class AdminUserViewPage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                _buildUserInfo(),
+                SizedBox(height: 20),
+                _buildBanButton(),
+                SizedBox(height: 20),
+                _buildCouponInfo(),
+                SizedBox(height: 20),
+                _buildCouponButton(context),
+                SizedBox(height: 20),
+                _buildQuestionInfo(context),
+                SizedBox(height: 20),
+                Text('탈퇴 여부: ${user.delYn}'),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserInfo() {
+    return Card(
+      elevation: 4,
+      child: Container(
+        width: 500,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
                 '고객 정보',
                 style: TextStyle(
-                  fontSize: 30,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              Text('아이디 : ${user.uId}'),
-              Text('이름 : ${user.name} (${user.nick})'),
-              Text('이메일 : ${user.email}'),
-              Text('생일 : ${user.birth}'),
-              Text('가입일 : ${user.cdatetime}'),
-              ElevatedButton(
-                child: Text(user.banYn == 'N' ? '정지' : '해제'),
-                onPressed: () {
-                  if (user.banYn == 'N') {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        String bReason = '';
-                        return AlertDialog(
-                          title: Text('정지 사유 입력'),
-                          content: TextField(
-                            onChanged: (value) {
-                              bReason = value.trim();
-                            },
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              child: Text('확인'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                if (bReason.isEmpty) {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text('정지 사유 입력'),
-                                        content: Text('정지 사유를 입력하세요.'),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            child: Text('확인'),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                } else {
-                                  String updatedBanYn = 'Y';
-                                  Timestamp currentTime = Timestamp.now();
+              SizedBox(height: 10),
+              Text('아이디: ${user.uId}'),
+              Text('이름: ${user.name} (${user.nick})'),
+              Text('이메일: ${user.email}'),
+              Text('생일: ${user.birth}'),
+              Text('가입일: ${user.cdatetime}'),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
-                                  FirebaseFirestore.instance
-                                      .collection('userList')
-                                      .doc(user.userId)
-                                      .update({'banYn': updatedBanYn});
+  Widget _buildBanButton() {
+    return ElevatedButton(
+      onPressed: () {
+        // TODO: Implement ban/unban logic
+      },
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFFCAF58)),
+      ),
+      child: Text(user.banYn == 'N' ? '정지' : '해제'),
+    );
+  }
 
-                                  FirebaseFirestore.instance.collection('ban')
-                                      .add({
-                                    'uId': user.uId,
-                                    'bdate': currentTime,
-                                    'bReason': bReason,
-                                  });
-
-                                  Navigator.of(context).pop();
-                                }
-                              },
-                            ),
-                            TextButton(
-                              child: Text('취소'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  } else {
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: Text('밴이 해제되었습니다.'),
-                          actions: <Widget>[
-                            TextButton(
-                              child: Text('확인'),
-                              onPressed: () {
-                                Navigator.of(context).pop();
-                                String updatedBanYn = 'N';
-
-                                FirebaseFirestore.instance
-                                    .collection('userList')
-                                    .doc(user.userId)
-                                    .update({'banYn': updatedBanYn});
-
-                                FirebaseFirestore.instance
-                                    .collection('ban')
-                                    .where('uId', isEqualTo: user.uId)
-                                    .get()
-                                    .then((snapshot) {
-                                  for (DocumentSnapshot doc in snapshot.docs) {
-                                    doc.reference.delete();
-                                  }
-                                });
-
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          ],
-                        );
-                      },
-                    );
-                  }
-                },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      Color(0xFFFCAF58)),
-                ),
-              ),
+  Widget _buildCouponInfo() {
+    return Card(
+      elevation: 4,
+      child: Container(
+        width: 500,
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
               Text(
                 '쿠폰 정보',
                 style: TextStyle(
-                  fontSize: 30,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
+              SizedBox(height: 10),
               FutureBuilder<QuerySnapshot?>(
                 future: FirebaseFirestore.instance
                     .collection('coupon')
@@ -206,24 +160,13 @@ class AdminUserViewPage extends StatelessWidget {
                       return Text('Error: ${snapshot.error}');
                     } else {
                       if (snapshot.data != null) {
-                        List<String> coupons = [];
-                        snapshot.data!.docs.forEach((couponDoc) {
-                          final couponData = couponDoc.data() as Map<
-                              String,
-                              dynamic>?;
-                          if (couponData != null) {
-                            coupons.add(couponData['couponInfo'].toString());
-                          }
-                        });
-
                         return Column(
                           children: snapshot.data!.docs.map((couponDoc) {
-                            final couponData = couponDoc.data() as Map<
-                                String,
-                                dynamic>;
+                            final couponData =
+                            couponDoc.data() as Map<String, dynamic>;
                             final cName = couponData['cName'];
                             final discount = couponData['discount'];
-                            return Text('쿠폰: $cName($discount%)');
+                            return Text('$cName($discount%)');
                           }).toList(),
                         );
                       } else {
@@ -233,114 +176,43 @@ class AdminUserViewPage extends StatelessWidget {
                   }
                 },
               ),
-
-              ElevatedButton(
-                onPressed: () {
-                  String addCName = ''; // 초기화
-                  int addDiscount = 10; // 기본 할인율을 10으로 설정
-
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return StatefulBuilder(
-                        builder: (BuildContext context, StateSetter setState) {
-                          return AlertDialog(
-                            title: Text('쿠폰 추가'),
-                            content: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextField(
-                                  onChanged: (value) {
-                                    setState(() {
-                                      addCName = value.trim(); // 트림 적용
-                                    });
-                                  },
-                                  decoration: InputDecoration(
-                                      labelText: '쿠폰 이름'),
-                                ),
-                                DropdownButton<int>(
-                                  value: addDiscount,
-                                  items: [10, 20, 30, 40, 50].map((discount) {
-                                    return DropdownMenuItem<int>(
-                                      value: discount,
-                                      child: Text('$discount%'),
-                                    );
-                                  }).toList(),
-                                  onChanged: (int? value) {
-                                    if (value != null) {
-                                      setState(() {
-                                        addDiscount = value;
-                                      });
-                                    }
-                                  },
-                                ),
-                              ],
-                            ),
-                            actions: <Widget>[
-                              TextButton(
-                                child: Text('추가'),
-                                onPressed: () {
-                                  if (addCName == null || addCName.isEmpty) {
-                                    showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return AlertDialog(
-                                          title: Text('쿠폰 이름 입력'),
-                                          content: Text('쿠폰 이름을 입력하세요.'),
-                                          actions: <Widget>[
-                                            TextButton(
-                                              child: Text('확인'),
-                                              onPressed: () {
-                                                Navigator.of(context).pop();
-                                              },
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  } else {
-                                    // Firestore에 새로운 쿠폰 추가 로직
-                                    FirebaseFirestore.instance.collection(
-                                        'coupon').add({
-                                      'cName': addCName,
-                                      'discount': addDiscount,
-                                      'userId': user.uId,
-                                    });
-                                    Navigator.of(context).pop();
-                                    Navigator.of(context).pop();
-                                  }
-                                },
-                              ),
-                              TextButton(
-                                child: Text('취소'),
-                                onPressed: () {
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                  );
-                },
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.all<Color>(
-                      Color(0xFFFCAF58)),
-                ),
-                child: Text('쿠폰 추가'),
-              ),
-              Text(
-                '문의 정보',
-                style: TextStyle(
-                  fontSize: 30,
-                ),
-              ),
-              _questionAnswer(),
-
-              Text('탈퇴 여부: ${user.delYn}'),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCouponButton(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        // TODO: Implement coupon add logic
+      },
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(Color(0xFFFCAF58)),
+      ),
+      child: Text('쿠폰 추가'),
+    );
+  }
+
+  Widget _buildQuestionInfo(BuildContext context) {
+    return Card(
+      elevation: 4,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '문의 정보',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 10),
+            _questionAnswer(),
+          ],
         ),
       ),
     );
@@ -364,16 +236,33 @@ class AdminUserViewPage extends StatelessWidget {
             DocumentSnapshot doc = snap.data!.docs[index];
             Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-            return ListTile(
-              title: Text('${data['title']}'),
-              subtitle: Text("작성자 : ${data['user']}"),
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => QuestionAnswerView(document: doc),
-                    )
-                );
+            // 내부 서브컬렉션 'comments'에서 데이터 가져오기
+            return FutureBuilder<QuerySnapshot>(
+              future: doc.reference.collection('comments').get(),
+              builder: (context, commentsSnapshot) {
+                if (commentsSnapshot.connectionState == ConnectionState.waiting) {
+                  return CircularProgressIndicator();
+                } else {
+                  // 서브컬렉션에 데이터가 있는지 확인
+                  bool isAnswered = commentsSnapshot.hasData &&
+                      commentsSnapshot.data!.docs.isNotEmpty;
+
+                  return ListTile(
+                    title: Text('${data['title']}'),
+                    // 답변 상태에 따라 다른 UI 표시
+                    trailing: isAnswered
+                        ? Icon(Icons.check_circle, color: Colors.green)
+                        : Icon(Icons.access_time, color: Colors.orange),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QuestionAnswerView(document: doc),
+                        ),
+                      );
+                    },
+                  );
+                }
               },
             );
           },
@@ -381,5 +270,4 @@ class AdminUserViewPage extends StatelessWidget {
       },
     );
   }
-
 }
