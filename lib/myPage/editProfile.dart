@@ -42,21 +42,29 @@ class _EditProfileState extends State<EditProfile> {
           TextField(
             onChanged: (email) {
               String emailText = _email.text;
-              if (!isEmailValid(emailText)) {
-                setState(() {
-                  emailValidationMessage = '유효하지 않은 이메일 형식입니다.';
-                });
+              if (emailText != labelText) {
+                // 검증 로직 실행
+                if (!isEmailValid(emailText)) {
+                  setState(() {
+                    emailValidationMessage = '유효하지 않은 이메일 형식입니다.';
+                  });
+                } else {
+                  isEmailAlreadyRegistered(emailText).then((isDuplicate) {
+                    if (isDuplicate) {
+                      setState(() {
+                        emailValidationMessage = '중복된 이메일 주소입니다.';
+                      });
+                    } else {
+                      setState(() {
+                        emailValidationMessage = '사용 가능한 이메일 주소입니다.';
+                      });
+                    }
+                  });
+                }
               } else {
-                isEmailAlreadyRegistered(emailText).then((isDuplicate) {
-                  if (isDuplicate) {
-                    setState(() {
-                      emailValidationMessage = '중복된 이메일 주소입니다.';
-                    });
-                  } else {
-                    setState(() {
-                      emailValidationMessage = '사용 가능한 이메일 주소입니다.';
-                    });
-                  }
+                // labelText와 같은 경우 메시지 초기화
+                setState(() {
+                  emailValidationMessage = '';
                 });
               }
             },
@@ -81,103 +89,110 @@ class _EditProfileState extends State<EditProfile> {
   Future<void> updateUserData() async {
     String emailText = _email.text;
 
-    if (emailText.isEmpty) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('이메일 누락'),
-            content: Text('이메일을 입력해주세요.'),
-            actions: [
-              TextButton(
-                child: Text('확인'),
-                onPressed: () {
-                  Navigator.of(context).pop(); // 다이얼로그 닫기
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } else if (!isEmailValid(emailText)) {
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('유효하지 않은 이메일 형식'),
-            content: Text('올바른 이메일 형식으로 입력해주세요.'),
-            actions: [
-              TextButton(
-                child: Text('확인'),
-                onPressed: () {
-                  Navigator.of(context).pop(); // 다이얼로그 닫기
-                },
-              ),
-            ],
-          );
-        },
-      );
-    } else {
-      try {
-        CollectionReference users = FirebaseFirestore.instance.collection("userList");
-        QuerySnapshot snap = await users.where('userId', isEqualTo: widget.data['userId']).get();
+    if (_image != null) {
+      // 새 이미지가 선택된 경우 프로필 이미지 업데이트
+      _updateProfileImage(_image!);
+    }
 
-        for (QueryDocumentSnapshot doc in snap.docs) {
-          await users.doc(doc.id).update({'email': _email.text});
+    if (emailText.isNotEmpty) {
+      if (emailText.isEmpty) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('이메일 누락'),
+              content: Text('이메일을 입력해주세요.'),
+              actions: [
+                TextButton(
+                  child: Text('확인'),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // 다이얼로그 닫기
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else if (!isEmailValid(emailText)) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('유효하지 않은 이메일 형식'),
+              content: Text('올바른 이메일 형식으로 입력해주세요.'),
+              actions: [
+                TextButton(
+                  child: Text('확인'),
+                  onPressed: () {
+                    Navigator.of(context).pop(); // 다이얼로그 닫기
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        try {
+          CollectionReference users = FirebaseFirestore.instance.collection("userList");
+          QuerySnapshot snap = await users.where('userId', isEqualTo: widget.data['userId']).get();
 
-          setState(() {
-            Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?; // 데이터를 Map으로 변환
-            if (data != null) {
-              setState(() {
-                labelText = data['email'] ?? '';
-                labelText = _email.text; // labelText를 업데이트
-              });
-            }
-          });
-          _email.clear();
+          for (QueryDocumentSnapshot doc in snap.docs) {
+            await users.doc(doc.id).update({'email': _email.text});
+
+            setState(() {
+              Map<String, dynamic>? data = doc.data() as Map<String, dynamic>?; // 데이터를 Map으로 변환
+              if (data != null) {
+                setState(() {
+                  labelText = data['email'] ?? '';
+                  labelText = _email.text; // labelText를 업데이트
+                });
+              }
+            });
+            _email.clear();
+          }
+
+          // 업데이트 성공 시 사용자에게 성공 메시지 표시
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('업데이트 완료'),
+                content: Text('이메일이 성공적으로 업데이트되었습니다.'),
+                actions: [
+                  TextButton(
+                    child: Text('확인'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      FocusScope.of(context).unfocus();
+                      setState(() {
+                        labelText = _email.text;
+                      });
+                    },
+                  ),
+                ],
+              );
+            },
+          );
+        } catch (e) {
+          // 업데이트 실패 시 사용자에게 실패 메시지 표시
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('업데이트 실패'),
+                content: Text('이메일 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.'),
+                actions: [
+                  TextButton(
+                    child: Text('확인'),
+                    onPressed: () {
+                      Navigator.of(context).pop(); // 알림 다이얼로그 닫기
+                    },
+                  ),
+                ],
+              );
+            },
+          );
         }
-
-        // 업데이트 성공 시 사용자에게 성공 메시지 표시
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('업데이트 완료'),
-              content: Text('이메일이 성공적으로 업데이트되었습니다.'),
-              actions: [
-                TextButton(
-                  child: Text('확인'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    FocusScope.of(context).unfocus();
-                    setState(() {
-                      labelText = _email.text;
-                    });
-                  },
-                ),
-              ],
-            );
-          },
-        );
-      } catch (e) {
-        // 업데이트 실패 시 사용자에게 실패 메시지 표시
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text('업데이트 실패'),
-              content: Text('이메일 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.'),
-              actions: [
-                TextButton(
-                  child: Text('확인'),
-                  onPressed: () {
-                    Navigator.of(context).pop(); // 알림 다이얼로그 닫기
-                  },
-                ),
-              ],
-            );
-          },
-        );
       }
     }
   }
