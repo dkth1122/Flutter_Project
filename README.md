@@ -1,4 +1,4 @@
-![image](https://github.com/gguekgguek/project_flutter/assets/134660588/c70924ab-62b6-4de1-bdd5-6700780cb7d1)<img src="https://capsule-render.vercel.app/api?type=waving&color=FF8C42&height=200&section=header&text=&fontSize=50&fontColor=fff" />
+<img src="https://capsule-render.vercel.app/api?type=waving&color=FF8C42&height=200&section=header&text=&fontSize=50&fontColor=fff" />
 <div align="center">
 <img src="https://github.com/Jeongseonil/anesi/assets/77383087/0c0b7abe-b643-4d47-acda-8242134a29de" width="300" height="300"/>
 </div>
@@ -16,14 +16,17 @@
 <div> 
  "픽서포유"라는 이름은 'Fixer 4U'의 현대 영어 표현으로, "당신을 위한 중개인"이라는 의미를 지니고 있습니다. 이는 앱이 전문가와 의뢰인 간의 중개자 역할을 수행하며 상호 협력을 도모하는 측면을 강조합니다.
  </div>
+ <div>
+   픽서포유는 사용자들이 자유롭게 서로의 요구사항을 충족시키는 플랫폼으로, 수익 창출과 함께 자유로운 재능의 거래를 촉진합니다.
+ </div>
 <br>
 <br>
 <h2>💁‍♂️ 팀원 소개</h2>
 <table>
   <tr>
-    <th>✨팀장✨ 이승현 😎</th>
-    <th> 김아지 😐</th>
-    <th>　윤나연 🤔　</th>
+    <th>팀장 이승현 😎</th>
+    <th>김아지 😐</th>
+    <th>윤나연 🤔</th>
     <th>최인경 🤗</th>
   </tr>
   <tr>
@@ -41,37 +44,47 @@
 <br>
 <h2>🛠 Stacks</h2>
 <div>
-  <img src="https://img.shields.io/badge/Html5-E34F26?style=flat&logo=html5&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Css3-1572B6?style=flat&logo=css3&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Javascript-F7DF1E?style=flat&logo=javascript&logoColor=white"/> 
-  <img src="https://img.shields.io/badge/Mysql-4479A1?style=flat&logo=mysql&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Jquery-0769AD?style=flat&logo=jquery&logoColor=white"/> 
-  <img src="https://img.shields.io/badge/Vue.js-4FC08D?style=flat&logo=vuedotjs&logoColor=white"/>
-  <img src="https://img.shields.io/badge/SpringBoot-6DB33F?style=flat&logo=springboot&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Flutter-E34F26?style=flat&logo=html5&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Dart-1572B6?style=flat&logo=css3&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Cloud Firestore-F7DF1E?style=flat&logo=javascript&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/GitHub-4479A1?style=flat&logo=mysql&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Figma-0769AD?style=flat&logo=jquery&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/AndroidStudio-0769AD?style=flat&logo=jquery&logoColor=white"/> 
+</div>
 </div>
 <br>
 <br>
 
-<h2>⚙ 주요 기능</h2>
-<h3>📌 스토어</h3>
+<h2>⚙ 기능 구현</h2>
+<h3>📌 메인</h3>
 <ul>
-  <li>각각의 상품 상세페이지 제공</li>
-  <li>리뷰와 문의 지원</li>
+  <li>서비스 검색기능</li>
+  <li>채팅 챗봇</li>
+  <li>바텀바</li>
+  <li>찜 기능</li>
 </ul>
-<h3>📌 커뮤니티</h3>
+<h3>📌 상품/포트폴리오</h3>
 <ul>
-  <li>게시글 등록과 썸네일</li>
-  <li>댓글과 좋아요</li>
+  <li>상품 상세페이지</li>
+  <li>토스 API 결제</li>
+  <li>리뷰 및 문의기능</li>
+  <li>전문가 포트폴리오</li>
 </ul>
-<h3>📌 중고 물품</h3>
+<h3>📌 관리자</h3>
 <ul>
-  <li>중고 물품 매입 및 판매</li>
+  <li>회원 정보관리</li>
+  <li>고객센터 관리</li>
+  <li>공지관리</li>
+  <li>쿠폰관리</li>
+
 </ul>
 <h3>📌 마이페이지</h3>
 <ul>
-  <li>회원 정보수정</li>
-  <li>나의 문의, 리뷰, 게시글, 쇼핑</li>
-  <li>스크랩북</li>
+  <li>계정관리</li>
+  <li>프로젝트 의뢰 및 제안</li>
+  <li>수익관리, 판매관리, 구매관리</li>
+  <li>메세지 응답관리, 채팅관리</li>
+
 </ul>
 <h3>📌 관리자</h3>
 <ul>
