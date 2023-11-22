@@ -1,6 +1,6 @@
 <img src="https://capsule-render.vercel.app/api?type=waving&color=FF8C42&height=200&section=header&text=&fontSize=50&fontColor=fff" />
 <div align="center">
-<img src="https://github.com/Jeongseonil/anesi/assets/77383087/0c0b7abe-b643-4d47-acda-8242134a29de" width="300" height="300"/>
+<img src="https://github.com/gguekgguek/project_flutter/assets/logo.png" width="300" height="300"/>
 </div>
 <h2>🔎 프로젝트 정보</h2>
 <div><b>📆 2023.10.23 ~ 2023.11.10 (19일)</b></div>
