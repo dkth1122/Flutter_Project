@@ -1,6 +1,6 @@
 <img src="https://capsule-render.vercel.app/api?type=waving&color=FF8C42&height=200&section=header&text=&fontSize=50&fontColor=fff" />
 <div align="center">
-<img src="assets/logo.png" width="660" height="300"/>
+<img src="assets/logo.png" width="400" height="300"/>
 </div>
 <h2>🔎 프로젝트 정보</h2>
 <div><b>📆 2023.10.23 ~ 2023.11.10 (19일)</b></div>
