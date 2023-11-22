@@ -94,16 +94,4 @@
   <li>통계를 통한 매출확인</li>
 </ul>
 <br>
-<div> ⭐ 기능구성도 : https://drive.google.com/file/d/1y-01uktdRTbNTj9PdYa_tDSTxb3xG23s/view?usp=sharing  </div>
-
-<br>
-<br>
-<h2>📺 시연 영상 </h2>
-<div> 🎁 고객 관점 시연 영상 : https://youtu.be/_UXwgNDWhh4 </div>
-<div> 📢 관리자 관점 시연 영상 : https://youtu.be/Lr98-rdsHdE </div>
-<br>
-<br>
-<h2>💾 Mysql sql문</h2>
-<div>https://drive.google.com/file/d/1rmM8AHz5vv3P9UWlfg1ExZRXg8wCWYjy/view?usp=sharing</div>
-
 ![Footer](https://capsule-render.vercel.app/api?type=waving&color=FF8C42&height=200&section=footer)
