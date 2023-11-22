@@ -44,12 +44,12 @@
 <br>
 <h2>🛠 Stacks</h2>
 <div>
-  <img src="https://img.shields.io/badge/Flutter-E34F26?style=flat&logo=html5&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Dart-1572B6?style=flat&logo=css3&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Cloud Firestore-F7DF1E?style=flat&logo=javascript&logoColor=white"/> 
-  <img src="https://img.shields.io/badge/GitHub-4479A1?style=flat&logo=mysql&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Figma-0769AD?style=flat&logo=jquery&logoColor=white"/> 
-  <img src="https://img.shields.io/badge/AndroidStudio-0769AD?style=flat&logo=jquery&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white">
+  <img src="https://img.shields.io/badge/Dart-0175C2?style=flat&logo=dart&logoColor=white"/>
+  <img src="https://img.shields.io/badge/CloudFirestore-FFCA28?style=for-the-badge&logo=firebase&logoColor=white">
+  <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> 
+  <img src="https://img.shields.io/badge/Figma-F24E1E?style=flat&logo=figma&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/AndroidStudio-3DDC84?style=flat&logo=androidstudio&logoColor=white"/> 
 </div>
 </div>
 <br>
