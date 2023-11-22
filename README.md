@@ -106,4 +106,4 @@
 <h2>💾 Mysql sql문</h2>
 <div>https://drive.google.com/file/d/1rmM8AHz5vv3P9UWlfg1ExZRXg8wCWYjy/view?usp=sharing</div>
 
-![Footer](https://capsule-render.vercel.app/api?type=waving&color=A782C3&height=200&section=footer)
+![Footer](https://capsule-render.vercel.app/api?type=waving&color=FF8C42&height=200&section=footer)
