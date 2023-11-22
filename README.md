@@ -45,11 +45,11 @@
 <h2>🛠 Stacks</h2>
 <div>
   <img src="https://img.shields.io/badge/flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white">
-  <img src="https://img.shields.io/badge/Dart-0175C2?style=flat&logo=dart&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Dart-0175C2?style=for-the-badge&logo=dart&logoColor=white"/>
   <img src="https://img.shields.io/badge/CloudFirestore-FFCA28?style=for-the-badge&logo=firebase&logoColor=white">
   <img src="https://img.shields.io/badge/github-181717?style=for-the-badge&logo=github&logoColor=white"> 
-  <img src="https://img.shields.io/badge/Figma-F24E1E?style=flat&logo=figma&logoColor=white"/> 
-  <img src="https://img.shields.io/badge/AndroidStudio-3DDC84?style=flat&logo=androidstudio&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white"/> 
+  <img src="https://img.shields.io/badge/AndroidStudio-3DDC84?style=for-the-badge&logo=androidstudio&logoColor=white"/> 
 </div>
 </div>
 <br>
