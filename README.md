@@ -93,5 +93,5 @@
   <li>고객, 문의, 리뷰 관리</li>
   <li>통계를 통한 매출확인</li>
 </ul>
-<br>
+
 ![Footer](https://capsule-render.vercel.app/api?type=waving&color=FF8C42&height=200&section=footer)
