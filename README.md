@@ -26,11 +26,23 @@
 <br>
 <h2>💁‍♂️ 담당 역할</h2>
 - 채팅기능<br>
-- 결제 api 연결<br>
+
+[![채팅 시연](https://github.com/dkth1122/Flutter_Project/assets/134511884/f5f3c6c2-1611-43b9-a99b-00c43bb1d78d)](https://youtube.com/shorts/sQjqtCfQvPs?feature=share)
+
+
+
+- 결제 기능<br>
+
+[![결제 시연](https://github.com/dkth1122/Flutter_Project/assets/134511884/7af312f0-0b2d-4973-b47c-95b729e5eccd)](https://youtube.com/shorts/JUidUr4GLpY?feature=share
+)
+
 - 전문가 포트폴리오<br>
 - 전문가 수익관리<br>
 - 메시지 응담설정 기능<br>
 - 전문가 등급기능<br>
+
+[![전문가 기능 시연](https://github.com/dkth1122/Flutter_Project/assets/134511884/5a63b0b5-e96d-407a-967a-403c04e2bc09)](https://youtu.be/QetMCPUFfls?feature=share)
+
 
 <br>
 <br>
