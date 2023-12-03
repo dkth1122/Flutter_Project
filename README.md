@@ -6,7 +6,7 @@
 <div><b>📆 2023.10.23 ~ 2023.11.10 (19일)</b></div>
 <div>더조은컴퓨터아카데미 두 번째 단체 프로젝트.</div>
 
-[다운로드 PPT](Flutter_Project.pptx)
+[다운로드 PDF](Flutter_Project_윤나연.pdf)
 
 <br>
 <br>
