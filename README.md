@@ -38,7 +38,7 @@
 
 - 전문가 포트폴리오<br>
 - 전문가 수익관리<br>
-- 메시지 응담설정 기능<br>
+- 메시지 응답설정 기능<br>
 - 전문가 등급기능<br>
 
 [![전문가 기능 시연](https://github.com/dkth1122/Flutter_Project/assets/134511884/5a63b0b5-e96d-407a-967a-403c04e2bc09)](https://youtu.be/QetMCPUFfls?feature=share)
