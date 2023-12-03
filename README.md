@@ -24,7 +24,7 @@
  </div>
 <br>
 <br>
-<h2>💁‍♂️ 담당 역할</h2>
+<h2>💁‍♂️ 담당 역할 및 시연 영상</h2>
 - 채팅기능<br>
 
 [![채팅 시연](https://github.com/dkth1122/Flutter_Project/assets/134511884/f5f3c6c2-1611-43b9-a99b-00c43bb1d78d)](https://youtube.com/shorts/sQjqtCfQvPs?feature=share)
